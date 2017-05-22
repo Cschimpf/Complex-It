@@ -1,0 +1,21 @@
+Data Biography for Dataset GDP-LIFE
+
+This dataset comes from the Gapminder website.  It contains GDP and Life data for 156 Countries
+
+GDP.xls has a country in each row, and a year in each of the 63 columns
+
+LIFE.xls has the same countries in each row, and the same years in each of the 63 columns
+
+For both spreadsheets, there is a header row containing a label V2 V3, etc
+
+
+RAW.mat is a Matlab mat file containing the arrays NUMGDP and NUMLIFE have the imported spreadsheet original data from gapminder
+
+
+ZSCORED.mat contains the arrays GDPZ and LIFEZ - the zscored data
+
+DERIVATIVES.mat contains the arrays DGDPZ and DLIFEZ the time derivatives of the zscored data
+
+CLUSTERDATA.mat contains the array GDPLIFE which has each country as a row with the derivative of GDP and derivative of life appended to make 126 columns (2 X 63) making it ready for clustering
+
+
