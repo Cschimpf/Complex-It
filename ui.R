@@ -95,7 +95,8 @@ ui <- fluidPage(
                  numericInput("maxit", "Max. iterations:", 500),
                  uiOutput("disttype"),
                  selectInput("radiustype", "Radius type:", 
-                             c("letremy","gaussian"))
+                             c("letremy","gaussian")),
+                 plotOutput(outputId = "som_3Dplot", width = "50%", height = "500px")
         ),
         tabPanel("Help",
                  h2("Under Construction")

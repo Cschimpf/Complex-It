@@ -153,8 +153,9 @@ server <- function(input, output) {
     # and is used to determine the distances between array points in the coordinats
     distg <- as.matrix(dist(coords))
     #redirect the console to write everything to a PDF until the dev off command is listed below
-    dev.set()  
-    pdf('./data/somresults.pdf') 
+    #dev.set()  
+    #pdf('./data/somresults.pdf') 
+    output$som_3Dplot <- renderPlot({
     # the segmentPCA needs to setup 6 columns (3 for start and 3 for end) for the segments3D command
     segmentpca <- matrix(ncol = 6)
     text.data <- matrix(ncol = max(clustered_data[,ncol(clustered_data)]))
@@ -204,8 +205,9 @@ server <- function(input, output) {
       } 
     } 
     # now, show the SOM results, after redirecting the console with dev off
-    dev.off()
-    system2('open', args = './data/somresults.pdf', wait = FALSE)  
+    #dev.off()
+    #system2('open', args = './data/somresults.pdf', wait = FALSE)  
+    })
     ########  
   })  
 }
