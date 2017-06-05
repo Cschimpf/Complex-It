@@ -99,7 +99,11 @@ server <- function(input, output) {
       fpath <- paste(c("C:\\ComplexIt\\temp\\"), file_a$name, sep = "")
       write.csv(k_data, file = fpath)
       #the double arrow declares k_data global to pass the clusters from Kmean to SOM
+     
       clustered_data <<- k_data
+      current_kmeans_solution <<- create_user_saved_kmeans_res("default_name", k$centers, k$cluster, input$clusters)
+      
+   
       #this block creates the 'Cluster 1, 2...n' labels for the table display in Shiny
       clus_label =c()
       for(i in 1: nrow(k$centers)){
@@ -129,7 +133,9 @@ server <- function(input, output) {
     cluster_tags<-as.character(clustered_data[,ncol(clustered_data)])
     set.seed(255)
     # Train the SOM and created the "somiris" data object 
+   
     som.trained<- trainSOM(cluster_data)  #trainSOM is the SOMbrero training algorithm
+    print(current_kmeans_solution)
     #somiris
     # pcairis
     #textiris
