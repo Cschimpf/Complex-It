@@ -1,4 +1,5 @@
 ####Global Variables#####
+current_data_file = NULL
 current_kmeans_solution = c()
 
 ####Global Classes and related Functions####

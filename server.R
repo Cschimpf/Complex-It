@@ -29,28 +29,50 @@ server <- function(input, output) {
     
     the.sep <- switch(input$sep, "Comma"=",", "Semicolon"=";", "Tab"="\t",
                       "Space"="")
-    #print(the.sep)
+   
     the.quote <- switch(input$quote, "None"="","Double Quote"='"',
                         "Single Quote"="'")
-    the.dec <- switch(input$dec, "Period"=".", "Comma"=",")
+    
     if (input$rownames) {
       the.table <- read.csv(in.file$datapath, header=input$header, 
                             sep=the.sep, quote=the.quote, row.names=1,
                             dec=the.dec)
     } else {
       the.table <- na.omit(read.csv(in.file$datapath, header=input$header, 
-                                    sep=the.sep, quote=the.quote, dec=the.dec))
+                                    sep=the.sep, quote=the.quote))
     }
     
-  })
+ 
+  output$varchoice <- renderUI(div(
+    checkboxGroupInput(inputId="varchoice", label="Input variables:",
+                       choices=as.list(colnames(the.table)),
+                       selected=as.list(colnames(the.table)[
+                         sapply(the.table, class) %in%
+                           c("integer", "numeric")])), 
+    actionButton(inputId = "subset_data", label = "Subset Data")))
+  current_data_file <<- the.table
+  print(current_data_file[1:5,])
+  the.table #this is set such that the last thing in this method/function is the table and is therefore set to dInput
   
+  })
+  observeEvent(input$subset_data,{
+    d.input <- dInput()
+    if(length(ncol(d.input) >= length(input$varchoice))){
+      subset_list <- c()
+      for(i in 1:length(input$varchoice)){
+        subset_list <-c(subset_list, input$varchoice[i])
+      }
+      current_data_file <<- d.input[subset_list]
+    }
+  
+  })
   # data preview table
   output$view <- renderTable({
+    #print(current_data_file)
     d.input <- dInput()
-    #print(d.input)
     if (is.null(d.input)) 
       return(NULL)
-    if (ncol(d.input)>input$ncol.preview) 
+    if (ncol(current_data_file)>input$ncol.preview) 
       d.input <- d.input[,1:input$ncol.preview]
     head(d.input, n=input$nrow.preview)
   })
@@ -59,8 +81,8 @@ server <- function(input, output) {
   #############################################################################
   #this observe event looks for users to press 'get clusters'
   observeEvent(input$init_kmeans, { 
-    if(is.null(dInput())){return()}  #this function will return nothing if there is no data
-    k <- kmeans(dInput(), isolate(input$clusters))
+    if(is.null(current_data_file)){return()}  #this function will return nothing if there is no data
+    k <- kmeans(current_data_file, isolate(input$clusters))
     
     
     #for now I left your code here so there is a trace of what changes were made
@@ -87,14 +109,14 @@ server <- function(input, output) {
       {height = 400}
       return(height)
     }
-    
-    FSTAT <- pseudoF(dInput(), k,input$clusters) 
+   
+    FSTAT <- pseudoF(current_data_file, k,input$clusters) 
     
     output$kmeans_tab <- renderTable({
       
       #this block of code appends the cluster labels to the data and then writes out to the C:\ directory
       clus <- k$cluster
-      k_data <- cbind(dInput(),clus)
+      k_data <- cbind(current_data_file,clus)
       file_a = input$file1
       fpath <- paste(c("C:\\ComplexIt\\temp\\"), file_a$name, sep = "")
       write.csv(k_data, file = fpath)
@@ -120,9 +142,9 @@ server <- function(input, output) {
       })}
     if (input$silhouette == TRUE){
       output$kmeans_silh <- renderPlot({
-        dissM <- daisy(dInput())
+        dissM <- daisy(current_data_file)
         plot(silhouette(k$cluster, dissM)) 
-      }, width = 400, height = silhouette_height(dInput()))
+      }, width = 400, height = silhouette_height(current_data_file))
     }
   })
   #### Panel 'Train the SOM'
