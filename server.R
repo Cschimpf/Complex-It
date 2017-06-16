@@ -42,39 +42,47 @@ server <- function(input, output) {
                                     sep=the.sep, quote=the.quote))
     }
     
- 
+ #right now this just deselects not numeric data columns, later should it auto subset these?
   output$varchoice <- renderUI(div(
     checkboxGroupInput(inputId="varchoice", label="Input variables:",
-                       choices=as.list(colnames(the.table)),
+                       choices=as.list(colnames(the.table)[
+                         sapply(the.table, class) %in%
+                           c("integer", "numeric")]),
                        selected=as.list(colnames(the.table)[
                          sapply(the.table, class) %in%
                            c("integer", "numeric")])), 
     actionButton(inputId = "subset_data", label = "Subset Data")))
-  current_data_file <<- the.table
-  print(current_data_file[1:5,])
-  the.table #this is set such that the last thing in this method/function is the table and is therefore set to dInput
+  column_type_identifier(the.table) 
+  full_data <<- the.table
+  current_data_file <<- the.table[numeric_only_columns]
+  
+  the.table#this is set such that the last thing in this method/function is the table and is therefore set to dInput
   
   })
   observeEvent(input$subset_data,{
     d.input <- dInput()
-    if(length(ncol(d.input) >= length(input$varchoice))){
-      subset_list <- c()
-      for(i in 1:length(input$varchoice)){
-        subset_list <-c(subset_list, input$varchoice[i])
-      }
+    
+    subset_list <- input$varchoice
+    if(length(ncol(d.input) >= length(subset_list))){
+      #subset_list <- c()
+      #for(i in 1:length(input$varchoice)){
+        #subset_list <-c(subset_list, input$varchoice[i])
+      #}
       current_data_file <<- d.input[subset_list]
     }
+    
   
   })
   # data preview table
+  # once data is populated, with the dInput call here, it will automatically be populated
   output$view <- renderTable({
     #print(current_data_file)
     d.input <- dInput()
     if (is.null(d.input)) 
       return(NULL)
-    if (ncol(current_data_file)>input$ncol.preview) 
-      d.input <- d.input[,1:input$ncol.preview]
-    head(d.input, n=input$nrow.preview)
+    if (ncol(full_data)>input$ncol.preview) 
+      full_data <- full_data[,1:input$ncol.preview]
+    head(full_data, n=input$nrow.preview)
   })
   
   #### Panel 'Cluster Data'
@@ -82,6 +90,7 @@ server <- function(input, output) {
   #this observe event looks for users to press 'get clusters'
   observeEvent(input$init_kmeans, { 
     if(is.null(current_data_file)){return()}  #this function will return nothing if there is no data
+    #print(current_data_file)
     k <- kmeans(current_data_file, isolate(input$clusters))
     
     
@@ -121,7 +130,7 @@ server <- function(input, output) {
       fpath <- paste(c("C:\\ComplexIt\\temp\\"), file_a$name, sep = "")
       write.csv(k_data, file = fpath)
       #the double arrow declares k_data global to pass the clusters from Kmean to SOM
-     
+      #clustered data soon to be phased out in favor of user kmeans class
       clustered_data <<- k_data
       current_kmeans_solution <<- create_user_saved_kmeans_res("default_name", k$centers, k$cluster, input$clusters)
       
@@ -150,17 +159,19 @@ server <- function(input, output) {
   #### Panel 'Train the SOM'
   #############################################################################
   observeEvent(input$trainbutton, {
-    #Select the global kmeans clustered data object, except for the last column 
+    
     cluster_data=clustered_data[,-1]
     cluster_tags<-as.character(clustered_data[,ncol(clustered_data)])
     set.seed(255)
-    # Train the SOM and created the "somiris" data object 
    
     som.trained<- trainSOM(cluster_data)  #trainSOM is the SOMbrero training algorithm
-    print(current_kmeans_solution)
-    #somiris
-    # pcairis
-    #textiris
+    mapped_labels <- create_kmeans_SOM_mapping()
+    #print(mapped_labels)
+
+    print(mapped_labels)
+    
+    #Select the global kmeans clustered data object, except for the last column 
+    
     # Now, project the multdimensional clusted_data onto a 3D surface with theh Som map
     pca.project <- PCA(rbind(som.trained$prototypes, cluster_data), ncp = 3, graph = FALSE,
                        ind.sup = 1:nrow(som.trained$prototypes)) #PCA is the FactoMineR principal component analysis

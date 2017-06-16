@@ -1,6 +1,10 @@
 ####Global Variables#####
 current_data_file = NULL
+full_data = NULL
 current_kmeans_solution = c()
+
+numeric_only_columns = NULL
+other_columns = NULL
 
 ####Global Classes and related Functions####
 setClass("user_saved_kmeans_res", representation(save_name = "character", ucentroids = "list", uclusters = "list"))
@@ -13,12 +17,56 @@ create_user_saved_kmeans_res <- function(objectname, ucenters, cluster_labels, k
 }
 
 list_cluster_labels <-function(unlist){
-  new_list =c()
+  new_list = list()
   for(i in 1:length(unlist)){
-    new_list = c(new_list, as.numeric(unlist[i]))
+    new_list[[i]] = as.numeric(unlist[i])
   }
-  return(list(new_list))
+  return(new_list)
 }
+
+
+
+#####General Purpose Functions####
+
+
+####Panel 'Import Data'
+##################################
+
+column_type_identifier <-function(data){
+  numeric_only_columns <<-sapply(data, class) %in% c("integer", "numeric")
+  other_columns <<- logic_vector_inverter(numeric_only_columns)
+}
+
+logic_vector_inverter <- function(logic_vec){
+  new_logic_vec = logic_vec
+  for(i in 1:length(logic_vec)){
+    if(logic_vec[i] == TRUE){
+      new_logic_vec[i] = FALSE
+    }
+    else{
+      new_logic_vec[i] = TRUE
+    }
+  }
+  return(new_logic_vec)
+}
+
+
+####Panel 'Self Organize'
+##################################
+
+#this creates a list of rownames that have the pattern: "clus#_Xcase#"
+create_kmeans_SOM_mapping <- function(){
+  if(is.null(current_kmeans_solution)){return()}
+  label_merge = c()
+  for(i in 1:length(current_kmeans_solution@uclusters)){
+    new_label <- paste(current_kmeans_solution@uclusters[i], "_X", i, sep="")
+    label_merge =c(label_merge, new_label)
+  }
+  return(label_merge)
+  
+}
+
+###############Still Under Development for Future Versions###############
 
 list_cluster_centers <-function(unlist, k_number) {
   

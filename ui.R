@@ -1,4 +1,5 @@
 library(shiny)
+library(shinythemes)
 library(SOMbrero)
 library(cluster)
 library(FactoMineR)
@@ -6,7 +7,7 @@ library(plot3D)
 
 ui <- fluidPage(
   
-  titlePanel("Complex-It Version 0.1"),
+  titlePanel("Complex-It V 0.1.0"),
   
   sidebarLayout(
     
@@ -47,9 +48,9 @@ ui <- fluidPage(
                              c("None","Double Quote","Single Quote"), 
                              'Double Quote'),
                  uiOutput("varchoice"),
-                 numericInput('nrow.preview','Number of rows in the preview:',20),
+                 numericInput('nrow.preview','Number of rows in the preview:',20, min = 1, max = 100),
                  numericInput('ncol.preview', 'Number of columns in the preview:',
-                              10),
+                              10,min = 1, max = 100),
                  helpText("Note: Even if the preview only shows a restricted
                           number of observations, the map will be based on the full dataset."),
                  tableOutput("view")
