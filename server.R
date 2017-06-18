@@ -179,7 +179,6 @@ server <- function(input, output) {
       mapped_labels <- create_kmeans_SOM_mapping()
     }
     som.trained<- trainSOM(cluster_data)  #trainSOM is the SOMbrero training algorithm
-    #print(mapped_labels)
 
     print(mapped_labels)
     
