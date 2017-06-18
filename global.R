@@ -1,10 +1,22 @@
 ####Global Variables#####
+
+#Data Variables
+####
 current_data_file = NULL
 full_data = NULL
 current_kmeans_solution = c()
 
+#Reference Variables
+####
 numeric_only_columns = NULL
 other_columns = NULL
+all.somplot.types <- list("numeric"=
+                            list("prototypes"=
+                                   list("3d", "barplot",
+                                        "smooth distances"="smooth.dist",
+                                        "U matrix distances"="umatrix"),
+                                 "obs"=c("color", "barplot", 
+                                         "names", "boxplot")))
 
 ####Global Classes and related Functions####
 setClass("user_saved_kmeans_res", representation(save_name = "character", ucentroids = "list", uclusters = "list"))

@@ -1,9 +1,6 @@
 library(shiny)
 library(shinythemes)
-library(SOMbrero)
-library(cluster)
-library(FactoMineR)
-library(plot3D)
+
 
 ui <- fluidPage(
   
@@ -86,17 +83,19 @@ ui <- fluidPage(
                  
                  br(), br(),
                  h4("Options"),
-                 #uiOutput("varchoice"),
+                
                  numericInput("dimx", "Map dimension X:", 5, min= 1),
                  numericInput("dimy", "Map dimension Y:", 5, min= 1),
                  h4("Advanced options"),
-                 selectInput("affectation", "Affectation type:", 
-                             c("standard","heskes")),
                  uiOutput("initproto"),
                  numericInput("maxit", "Max. iterations:", 500),
-                 uiOutput("disttype"),
-                 selectInput("radiustype", "Radius type:", 
-                             c("letremy","gaussian")),
+                 uiOutput("scaling"),
+                 numericInput("randseed",
+                              HTML("Set a random seed for reproducible results"), sample(1:1e4, size= 1)),
+                 numericInput("eps0", "Scaling value for gradient descent", 1,
+                              min= 0.01, step= .01),
+                 
+  
                  plotOutput(outputId = "som_3Dplot", width = "50%", height = "500px")
         ),
         tabPanel("Help",

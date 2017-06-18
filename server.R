@@ -55,7 +55,7 @@ server <- function(input, output) {
   column_type_identifier(the.table) 
   full_data <<- the.table
   current_data_file <<- the.table[numeric_only_columns]
-  
+  print(all.somplot.types)
   the.table#this is set such that the last thing in this method/function is the table and is therefore set to dInput
   
   })
@@ -158,14 +158,27 @@ server <- function(input, output) {
   })
   #### Panel 'Train the SOM'
   #############################################################################
+  output$initproto <- renderUI({
+    selectInput("initproto", label="Prototypes initialization method:", 
+                choices=c("random","obs","pca"), 
+                selected="random")
+  })
+  
+  output$scaling <- renderUI({
+    selectInput(inputId="scaling", label="Data scaling:", 
+                choices =c("unitvar", "none", "center"),
+                selected ="unitvar")
+  })
+
   observeEvent(input$trainbutton, {
     
     cluster_data=clustered_data[,-1]
     cluster_tags<-as.character(clustered_data[,ncol(clustered_data)])
     set.seed(255)
-   
+    if(!is.null(current_kmeans_solution)){
+      mapped_labels <- create_kmeans_SOM_mapping()
+    }
     som.trained<- trainSOM(cluster_data)  #trainSOM is the SOMbrero training algorithm
-    mapped_labels <- create_kmeans_SOM_mapping()
     #print(mapped_labels)
 
     print(mapped_labels)
