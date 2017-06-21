@@ -2,7 +2,7 @@ library(shiny)
 library(shinythemes)
 
 
-ui <- fluidPage(
+ui <- fluidPage(theme=shinytheme("spacelab"),
   
   titlePanel("Complex-It V 0.1.0"),
   
@@ -95,9 +95,36 @@ ui <- fluidPage(
                  numericInput("eps0", "Scaling value for gradient descent", 1,
                               min= 0.01, step= .01),
                  
-  
+                 br(),
+                 uiOutput("trainnotice"),
                  plotOutput(outputId = "som_3Dplot", width = "50%", height = "500px")
         ),
+        tabPanel("Plot Map",
+                 h3("Plot the self-organizing map"),
+                 p("In this panel you can visualize the computed 
+                   self-organizing map. This panel contains the standard plots used to analyze the
+                   map."),
+                 
+                 h4("Options"),
+                 selectInput("somplotwhat", "Plot what?", 
+                             choices= list("Observations"= "obs",
+                                           "Prototypes"= "prototypes")),
+                 selectInput("somplottype", "Type of plot:", 
+                             choices= c("color", "barplot", 
+                                        "names", "boxplot")),
+                 conditionalPanel("input.somplottype == 'color' ||
+                                  input.somplottype == '3d'",
+                                  selectInput("somplotvar", 
+                                              "Variable: (only used for '3d',
+                                              'color' and 'boxplot' plots if available)", 
+                                              choices= "(Not Available)")),
+                 conditionalPanel("input.somplottype == 'boxplot'",
+                                  selectInput("somplotvar2", 
+                                              "Variable: (hold Ctrl to select
+                                              multiple variables)", 
+                                              choices= "(Not Available)", 
+                                              multiple= TRUE)),
+                 plotOutput("somplot")),
         tabPanel("Help",
                  h2("Under Construction")
                  

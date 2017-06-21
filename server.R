@@ -4,7 +4,7 @@ library(cluster)
 library(FactoMineR)
 library(plot3D)
 
-server <- function(input, output) {
+server <- function(input, output, session) {
   
   output$complexit_logo <- renderImage(list(src="complexit_logo.png"), 
                                        deleteFile=FALSE)
@@ -53,9 +53,8 @@ server <- function(input, output) {
                            c("integer", "numeric")])), 
     actionButton(inputId = "subset_data", label = "Subset Data")))
   column_type_identifier(the.table) 
-  full_data <<- the.table
+  full_data <<- the.table ###this may be redundant and unnecessary??
   current_data_file <<- the.table[numeric_only_columns]
-  print(all.somplot.types)
   the.table#this is set such that the last thing in this method/function is the table and is therefore set to dInput
   
   })
@@ -171,93 +170,61 @@ server <- function(input, output) {
   })
 
   observeEvent(input$trainbutton, {
-    
-    cluster_data=clustered_data[,-1]
-    cluster_tags<-as.character(clustered_data[,ncol(clustered_data)])
-    set.seed(255)
+    tmp_data <- current_data_file
+    mapped_labels = NULL
     if(!is.null(current_kmeans_solution)){
       mapped_labels <- create_kmeans_SOM_mapping()
-    }
-    som.trained<- trainSOM(cluster_data)  #trainSOM is the SOMbrero training algorithm
-
-    print(mapped_labels)
-    
-    #Select the global kmeans clustered data object, except for the last column 
-    
-    # Now, project the multdimensional clusted_data onto a 3D surface with theh Som map
-    pca.project <- PCA(rbind(som.trained$prototypes, cluster_data), ncp = 3, graph = FALSE,
-                       ind.sup = 1:nrow(som.trained$prototypes)) #PCA is the FactoMineR principal component analysis
-    
-    #At this point, all the SOM training and PCA projection is complete
-    # The remaining code in this section was created by Nathalie at SOMbrero
-    # to get the information ready to plot as a 3D mesh
-    # She uses Plot3D for the plotting library focusing on the use of two commands:
-    # Segments3D will plot the node/segment surface map
-    # text3D will superimpose the cluster numbers in the last column on top of the mesh
-    
-    kmeans_som_labels <- aggregate(cluster_tags, list(som.trained$clustering), table)
-    clust_coord <- pca.project$ind.sup$coord
-    
-    coords <- som.trained$parameters$the.grid$coord
-    # the distance matrix is a classic matrix measurement algorithm
-    # and is used to determine the distances between array points in the coordinats
-    distg <- as.matrix(dist(coords))
-    #redirect the console to write everything to a PDF until the dev off command is listed below
-    #dev.set()  
-    #pdf('./data/somresults.pdf') 
-    output$som_3Dplot <- renderPlot({
-    # the segmentPCA needs to setup 6 columns (3 for start and 3 for end) for the segments3D command
-    segmentpca <- matrix(ncol = 6)
-    text.data <- matrix(ncol = max(clustered_data[,ncol(clustered_data)]))
-    
-    for (ind in 1:nrow(coords)) {
-      whereclust <- match(ind, kmeans_som_labels[ ,1])
-      if (!is.na(whereclust)) {
-        text.data <- rbind(text.data, kmeans_som_labels[whereclust,2:ncol(kmeans_som_labels)])
-      } else text.data <- rbind(text.data, rep(0, ncol(kmeans_som_labels)))
-      
-      sel_nei <- which(distg[ind, ] == 1)
-      sel_nei <- sel_nei[sel_nei > ind]
-      for (ind2 in seq_along(sel_nei)) {
-        segmentpca <- rbind(segmentpca, 
-                            c(clust_coord[ind, ], clust_coord[sel_nei[ind2], ]))
-      }
+      rownames(tmp_data) <- mapped_labels
     }
     
-    #Now that all the manipulations are completed and the for loops complete
-    # it is time to clean up and missing or invalid data
-    segmentpca <- na.omit(segmentpca)
-    text.data <- na.omit(text.data)
-    #maxtext helps find the largest label to best scale the text later
-    #in the text3D command below
-    maxtext <- max(as.vector(text.data))
+    set.seed(input$rand.seed)
     
-    # Finally ready to plot the 3D mesh using segments3D from the Plot3D package
-    # Changing phi and theta might be a future enhancement for users to rotate the plot
-    # the "b" and the "red" can be changed for better coloring
-    segments3D(segmentpca[,1], segmentpca[,2], segmentpca[,3], segmentpca[,4],
-               segmentpca[,5], segmentpca[,6], phi=-30, theta=-10, bty = "b", 
-               col="red")
-    
-    # Now, point by point, loop through and add the cluster numbers to the right
-    #nodes in the 3D mesh
-    for (ind in 1:nrow(text.data)) {
-      nonzeros <- which(text.data[ind, ] != 0)
-      delay <- 1
-      if (length(nonzeros) > 0) {
-        for (ind2 in nonzeros) {
-          text3D(clust_coord[ind,1], clust_coord[ind,2],
-                 delay*clust_coord[ind,3],
-                 labels = paste0(ind, ": ", colnames(text.data)[ind2]), #labels are the text strings
-                 cex = sqrt(text.data[ind,ind2]) * 2 / sqrt(maxtext), add = TRUE) #cex sets the default size for text
-          delay <- delay + 0.2
-        }
-      } 
-    } 
-    # now, show the SOM results, after redirecting the console with dev off
-    #dev.off()
-    #system2('open', args = './data/somresults.pdf', wait = FALSE)  
-    })
+    current_som_solution<<- trainSOM(tmp_data, dimension=c(input$dimx,input$dimy), 
+             maxit=input$maxit, scaling=input$scaling, init.proto=input$initproto)
+    updatePlotSomVar() # update variable choice for som plots
     ########  
   })  
+  output$trainnotice <- renderUI({
+    if(input$trainbutton == 0){
+      return()
+    }
+    else{
+      h4(strong(paste(input$trainbutton[1], "th trained SOM...", sep="")))
+    }
+    
+  })
+  #### Panel 'Plot'
+  #############################################################################
+  observe({
+    updateSelectInput(session, "somplottype", 
+                      choices=all.somplot.types[["numeric"]][[
+                        input$somplotwhat]])
+  })
+  
+  # update variables available for plotting
+  updatePlotSomVar <- function() observe({
+    tmp.names <- colnames(current_som_solution$data)
+   
+    updateSelectInput(session, "somplotvar", choices=tmp.names)
+    updateSelectInput(session, "somplotvar2", choices=tmp.names, 
+                      selected=tmp.names[1:min(5,length(tmp.names))])
+  })
+  # Plot the SOM
+  output$somplot <- renderPlot({
+    if(is.null(current_data_file))
+      return(NULL)
+    if(input$trainbutton ==0)
+      return(NULL)
+    
+    tmp.view <- NULL
+    if (input$somplottype =="boxplot") {
+      tmp.var <- (1:ncol(current_som_solution$data))[colnames(current_som_solution$data) %in% 
+                                                       input$somplotvar2]
+      print(tmp.var)
+    } 
+    else {tmp.var <- input$somplotvar}
+    plot(x=current_som_solution, what=input$somplotwhat, type=input$somplottype,
+         variable=tmp.var,view=tmp.view)
+    
+  })
 }

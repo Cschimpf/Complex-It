@@ -4,7 +4,8 @@
 ####
 current_data_file = NULL
 full_data = NULL
-current_kmeans_solution = c()
+current_kmeans_solution = NULL
+current_som_solution = NULL
 
 #Reference Variables
 ####
@@ -77,6 +78,8 @@ create_kmeans_SOM_mapping <- function(){
   return(label_merge)
   
 }
+
+
 
 ###############Still Under Development for Future Versions###############
 
