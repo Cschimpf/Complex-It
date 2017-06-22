@@ -9,16 +9,7 @@ server <- function(input, output, session) {
   output$complexit_logo <- renderImage(list(src="complexit_logo.png"), 
                                        deleteFile=FALSE)
   
-  dirs = c("C:\\ComplexIt", "C:\\ComplexIt\\Data from User", "C:\\ComplexIt\\temp")
-  for(i in 1:length(dirs)){
-    if (dir.exists(dirs[i]) == TRUE) {
-      print("Folder already exists")
-    }
-    else{
-      dir.create(dirs[i])
-      print("Folder created")
-    }
-  }
+
   #### Panel 'Import data'
   ##############################################################################
   dInput <- reactive({
@@ -33,14 +24,10 @@ server <- function(input, output, session) {
     the.quote <- switch(input$quote, "None"="","Double Quote"='"',
                         "Single Quote"="'")
     
-    if (input$rownames) {
-      the.table <- read.csv(in.file$datapath, header=input$header, 
-                            sep=the.sep, quote=the.quote, row.names=1,
-                            dec=the.dec)
-    } else {
+    
       the.table <- na.omit(read.csv(in.file$datapath, header=input$header, 
                                     sep=the.sep, quote=the.quote))
-    }
+    
     
  #right now this just deselects not numeric data columns, later should it auto subset these?
   output$varchoice <- renderUI(div(
@@ -112,7 +99,7 @@ server <- function(input, output, session) {
     #uses the number of data rows to calculate the height of the silhouette 
     #will return 400 as a default height if the scaled nrows is less than 400
     silhouette_height = function(X){
-      height = (nrow(X) * 4)
+      height = (nrow(X) * 5)
       if (height < 400) 
       {height = 400}
       return(height)
@@ -125,12 +112,6 @@ server <- function(input, output, session) {
       #this block of code appends the cluster labels to the data and then writes out to the C:\ directory
       clus <- k$cluster
       k_data <- cbind(current_data_file,clus)
-      file_a = input$file1
-      fpath <- paste(c("C:\\ComplexIt\\temp\\"), file_a$name, sep = "")
-      write.csv(k_data, file = fpath)
-      #the double arrow declares k_data global to pass the clusters from Kmean to SOM
-      #clustered data soon to be phased out in favor of user kmeans class
-      clustered_data <<- k_data
       current_kmeans_solution <<- create_user_saved_kmeans_res("default_name", k$centers, k$cluster, input$clusters)
       
    
@@ -140,9 +121,19 @@ server <- function(input, output, session) {
         clus_label = c(clus_label, paste(c("Cluster"), toString(i), sep = " "))
       }
       clus_size <- k$size
-      cen_tab <- cbind(clus_label, k$centers, clus_size)
+      cen_tab <<- cbind(clus_label, k$centers, clus_size)
       
     })
+    output$download_clusters <- downloadHandler(
+      filename = function() {
+        paste(substr(input$file1$name,1, nchar(input$file1$name)-4), format(Sys.time(),format="_%Y-%m-%d_%H.%M"), ".csv", sep="")
+      },
+      content = function(file){
+        write.csv(cen_tab, file)
+      }, 
+      contentType = "text/csv"
+      
+    )
     #this function displays the pseudoF
     if (input$pseudo_f == TRUE) {
       output$pseudoF <- renderText({
@@ -189,7 +180,7 @@ server <- function(input, output, session) {
       return()
     }
     else{
-      h4(strong(paste(input$trainbutton[1], "th trained SOM...", sep="")))
+      h4(strong(paste("Trained SOM at", format(Sys.time(),format="%Y-%m-%d-%H:%M:%S"),sep=" ")))
     }
     
   })

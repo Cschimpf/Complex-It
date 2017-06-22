@@ -9,7 +9,8 @@ ui <- fluidPage(theme=shinytheme("spacelab"),
   sidebarLayout(
     
     sidebarPanel(
-      imageOutput("complexit_logo", inline=TRUE)
+      imageOutput("complexit_logo", inline=TRUE),
+      width = 4
                 ),
       
     mainPanel(
@@ -38,7 +39,6 @@ ui <- fluidPage(theme=shinytheme("spacelab"),
                    "text/comma-separated-values,text/plain",
                    ".csv")),
                  checkboxInput('header', ' Header?', TRUE),
-                 checkboxInput('rownames', ' Row names?', FALSE),
                  selectInput('sep', 'Separator:',
                              c("Comma","Semicolon","Tab","Space"), 'Comma'),
                  selectInput('quote', 'Quote:',
@@ -55,19 +55,18 @@ ui <- fluidPage(theme=shinytheme("spacelab"),
         ),
         
         tabPanel("Cluster Data",
-                 h3("Cluster Data - Under Construction"),
+                 h3("Cluster Data"),
                  p(HTML("Here is a default explanation Corey hasn't filled out yet.")),
                  br(),
                  helpText("Select display options."),
-                 #uiOutput("varchoice"),
                  checkboxInput('silhouette', 'Silhouette?'),
                  checkboxInput('pseudo_f', 'Pseudo F?'),
                  numericInput(inputId = "clusters", label = "Select the number of clusters", value = 2, min = 2),
                  actionButton(inputId = "init_kmeans", label="Get Clusters"),
+                 conditionalPanel("input.init_kmeans > 0", downloadButton("download_clusters", "Download Clusters")),
                  tableOutput("kmeans_tab"),
                  textOutput("pseudoF"),
                  plotOutput(outputId = "kmeans_silh", inline=TRUE)
-          #width = "50%", height = "800px"
         ),
         
         tabPanel("Self-Organize",
@@ -79,9 +78,9 @@ ui <- fluidPage(theme=shinytheme("spacelab"),
                  #data, check the original SOMbrero 
                  br(), br(),
                  
-               
+                 uiOutput("trainnotice"),
                  
-                 br(), br(),
+                 br(), 
                  h4("Options"),
                 
                  numericInput("dimx", "Map dimension X:", 5, min= 1),
@@ -95,8 +94,7 @@ ui <- fluidPage(theme=shinytheme("spacelab"),
                  numericInput("eps0", "Scaling value for gradient descent", 1,
                               min= 0.01, step= .01),
                  
-                 br(),
-                 uiOutput("trainnotice"),
+                
                  plotOutput(outputId = "som_3Dplot", width = "50%", height = "500px")
         ),
         tabPanel("Plot Map",
