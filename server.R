@@ -143,7 +143,7 @@ server <- function(input, output, session) {
       output$kmeans_silh <- renderPlot({
         dissM <- daisy(current_data_file)
         plot(silhouette(k$cluster, dissM)) 
-      }, width = 400, height = silhouette_height(current_data_file))
+      }, width = 500, height = silhouette_height(current_data_file))
     }
   })
   #### Panel 'Train the SOM'

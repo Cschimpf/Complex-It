@@ -72,7 +72,7 @@ create_kmeans_SOM_mapping <- function(){
   if(is.null(current_kmeans_solution)){return()}
   label_merge = c()
   for(i in 1:length(current_kmeans_solution@uclusters)){
-    new_label <- paste(current_kmeans_solution@uclusters[i], "_X", i, sep="")
+    new_label <- paste(current_kmeans_solution@uclusters[i], ";", i, sep="")
     label_merge =c(label_merge, new_label)
   }
   return(label_merge)
