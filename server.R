@@ -1,5 +1,5 @@
 library(shiny)
-library(SOMbrero)
+suppressMessages(library(SOMbrero))
 library(cluster)
 library(FactoMineR)
 library(plot3D)
