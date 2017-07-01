@@ -17,22 +17,20 @@ ui <- fluidPage(theme=shinytheme("spacelab"),
       tabsetPanel(
         
         tabPanel("Import Data",
-                 h3("First step: import data"),
+                 h3("Import and Prepare Data"),
                  
-                 p(HTML("To run the application, import your data set using the
-                        import button below. Your data must be supplied in the form of a csv file.
-                        If the importation is done properly, a preview of the data is displayed below.
-                        When this is done, choose the SOM type of the left hand side panel and proceed
-                        to the next step: self-organize a map.")),
-                 p(HTML('This could be a place to link example datasets
-                        <a href= 
-                        "http://www.google.com"
-                        target="_blank">complex attractor</a>, <a href= 
-                        "http://www.google.com"
-                        target="_blank">another example</a> and <a href= 
-                        "http://www.google.com"
-                        target="_blank">geospatial example </a>(download these files on your computer and
-                        proceed).')),
+                 p(HTML("To start an analysis session, import your data set using the
+                        'Browse...' button below. Your data must be in the form of a csv file. Note that when you 
+                        download Complex-It from GitHub, several datasets  will be downloaded with it. Explore 
+                        the '/data' folder inside the Complex-It folder for further analysis opportunities. 
+                        If the data is successfully imported, a preview of your data will be displayed. You may
+                        also subset the data by deselecting variables and pressing the 'Subset data' button.
+                        ")),
+                 p(HTML('The Complex-It team extends a big thanks to the SOMbrero team from which our
+                         package draws on SOM training and visualization functions. For more SOM analysis
+                         visit the SOMbrero <a href= 
+                        "https://cran.r-project.org/web/packages/SOMbrero/index.html"
+                        target="_blank">package site.</a>')),
                  br(), 
                  fileInput('file1', 'Choose CSV File', accept = c(
                    "text/csv",
@@ -56,7 +54,11 @@ ui <- fluidPage(theme=shinytheme("spacelab"),
         
         tabPanel("Cluster Data",
                  h3("Cluster Data"),
-                 p(HTML("Here is a default explanation Corey hasn't filled out yet.")),
+                 p(HTML("In this tab you can use the kmeans clustering algorithm to group the cases in your
+                        data into self-similar 'clusters'. The Pseudo F provides a measure of how distinct
+                        and well defined the clusters are. Silhouette plots display how well each case fits
+                        within its respective cluster, where 1 is a perfect fit with its clusterand -1 is a 
+                        perfect fit with a different, neighboring cluster")),
                  br(),
                  helpText("Select display options."),
                  checkboxInput('silhouette', 'Silhouette?'),
@@ -70,8 +72,12 @@ ui <- fluidPage(theme=shinytheme("spacelab"),
         ),
         
         tabPanel("Self-Organize",
-                 h3("Train the self-organizing map and project the cluster results"),
-                 p(HTML("Need to come up with some introduction/instruction text here.")),
+                 h3("Train the Self-Organizing Map"),
+                 p(HTML("In this tab you can train the Self-Organizing Map (SOM) to project the cases in your
+                         data onto an X * Y dimensional map, where each XiYi 'neuron' on the map represents
+                         a different vector of values for all the data variables. Set the SOM dimensions
+                         with the 'Map Dimension X & Y sliders and set a random seed between 1-9999 to
+                         to set reproducible SOM results")),
                 
                  actionButton("trainbutton","Train SOM"),
                  #verbatimTextOutput("summary") #prints the output of a reactive variable, can show status of uploaded
@@ -90,7 +96,8 @@ ui <- fluidPage(theme=shinytheme("spacelab"),
                  numericInput("maxit", "Max. iterations:", 500),
                  uiOutput("scaling"),
                  numericInput("randseed",
-                              HTML("Set a random seed for reproducible results"), sample(1:1e4, size= 1)),
+                              HTML("Set a random seed for reproducible results"), sample(1:1e4, size= 1), 
+                              min = 1, max = 9999),
                  numericInput("eps0", "Scaling value for gradient descent", 1,
                               min= 0.01, step= .01),
                  
@@ -98,10 +105,10 @@ ui <- fluidPage(theme=shinytheme("spacelab"),
                  plotOutput(outputId = "som_3Dplot", width = "50%", height = "500px")
         ),
         tabPanel("Plot Map",
-                 h3("Plot the self-organizing map"),
+                 h3("Plot the Self-Organizing Map"),
                  p("In this panel you can visualize the computed 
-                   self-organizing map. This panel contains the standard plots used to analyze the
-                   map."),
+                   self-organizing map. This panel contains several plots to analyze the map. The names plot
+                    under 'Obs' will map previous kmeans labels to cases on their respective part of the SOM"),
                  
                  h4("Options"),
                  selectInput("somplotwhat", "Plot what?", 
@@ -124,7 +131,7 @@ ui <- fluidPage(theme=shinytheme("spacelab"),
                                               multiple= TRUE)),
                  plotOutput("somplot")),
         tabPanel("Help",
-                 h2("Under Construction")
+                 h3("Under Construction")
                  
         )
         
