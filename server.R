@@ -169,7 +169,6 @@ server <- function(input, output, session) {
     }
     
     set.seed(input$rand.seed)
-    
     current_som_solution<<- trainSOM(tmp_data, dimension=c(input$dimx,input$dimy), 
              maxit=input$maxit, scaling=input$scaling, init.proto=input$initproto)
     updatePlotSomVar() # update variable choice for som plots

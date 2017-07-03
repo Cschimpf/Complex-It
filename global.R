@@ -97,3 +97,10 @@ create_centers_indexes <-function(unlist, k_number){
   }
 }
 
+convert_list_to_vector <-function(a_list){
+  new_vec =c()
+  for(i in 1:length(current_kmeans_solution@uclusters)){
+    new_vec = c(new_vec, as.integer(current_kmeans_solution@uclusters[i]))
+  }
+  return(new_vec)
+}
