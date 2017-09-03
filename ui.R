@@ -1,5 +1,6 @@
 library(shiny)
 library(shinythemes)
+library(shinyFiles)
 
 
 ui <- fluidPage(theme=shinytheme("spacelab"),
@@ -65,7 +66,8 @@ ui <- fluidPage(theme=shinytheme("spacelab"),
                  checkboxInput('pseudo_f', 'Pseudo F?'),
                  numericInput(inputId = "clusters", label = "Select the number of clusters", value = 2, min = 2),
                  actionButton(inputId = "init_kmeans", label="Get Clusters"),
-                 conditionalPanel("input.init_kmeans > 0", downloadButton("download_clusters", "Download Clusters")),
+                 conditionalPanel("input.init_kmeans > 0", shinySaveButton("save", "Save results", "Save file as", 
+                                  filetype=list(csv="csv"))),
                  tableOutput("kmeans_tab"),
                  textOutput("pseudoF"),
                  plotOutput(outputId = "kmeans_silh", inline=TRUE)

@@ -20,12 +20,12 @@ all.somplot.types <- list("numeric"=
                                          "names", "boxplot")))
 
 ####Global Classes and related Functions####
-setClass("user_saved_kmeans_res", representation(save_name = "character", ucentroids = "list", uclusters = "list"))
+setClass("user_saved_kmeans_res", representation(save_name = "character", ucentroids = "list", uclusters = "list", usize = "integer"))
 
-create_user_saved_kmeans_res <- function(objectname, ucenters, cluster_labels, k_number){
+create_user_saved_kmeans_res <- function(objectname, ucenters, cluster_labels, k_size){
   new_labels <- list_cluster_labels(cluster_labels)
   ucenters <- list(ucenters)
-  new_class = new("user_saved_kmeans_res", save_name = objectname, ucentroids = ucenters, uclusters = new_labels)
+  new_class = new("user_saved_kmeans_res", save_name = objectname, ucentroids = ucenters, uclusters = new_labels, usize = k_size)
   return(new_class)
 }
 
@@ -37,9 +37,45 @@ list_cluster_labels <-function(unlist){
   return(new_list)
 }
 
+setGeneric(name="append_cluster_labels", 
+           def = function(cluster_obj, data_obj){
+             
+             standardGeneric("append_cluster_labels")
+           })
+
+setMethod(f = "append_cluster_labels", 
+          signature = "user_saved_kmeans_res",
+          definition = function(cluster_obj, data_obj){
+            
+            clus_labels =c()
+            for(i in 1: length(cluster_obj@uclusters)){
+              newnum <- as.numeric(cluster_obj@uclusters[i])
+              clus_labels = c(clus_labels, newnum)
+            }
+            appended_labels <- cbind(data_obj, clus_labels)
+            return(appended_labels)
+          })
+#setGeneric(name=)
+
 
 
 #####General Purpose Functions####
+
+
+#### 'General'
+##################################
+
+extend_filename <- function(filename, ext){
+ 
+  splitname = strsplit(as.character(filename), "[.]")
+  
+  if(length(splitname[[1]]) == 3){
+    print('here')
+    splitname[[1]][2] = paste(splitname[[1]][2], ext, sep="")
+    finalname = paste('.', splitname[[1]][2], splitname[[1]][3], sep="")
+  }
+  return(finalname)
+}
 
 
 ####Panel 'Import Data'

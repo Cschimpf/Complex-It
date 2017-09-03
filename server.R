@@ -3,6 +3,7 @@ suppressMessages(library(SOMbrero))
 library(cluster)
 library(FactoMineR)
 library(plot3D)
+#library(shinyFiles)
 
 server <- function(input, output, session) {
   
@@ -82,7 +83,7 @@ server <- function(input, output, session) {
     
     #for now I left your code here so there is a trace of what changes were made
     #I added 'sol' to the parameters so the kmeans already calculated could be used in this function
-    pseudoF = function(X,sol, k, ns = 25){
+    pseudoF = function(X,sol, k){
       #nk = length(k)
       #n = nrow(X)
       T = sum(scale(X,scale=F)^2)
@@ -112,7 +113,9 @@ server <- function(input, output, session) {
       #this block of code appends the cluster labels to the data and then writes out to the C:\ directory
       clus <- k$cluster
       k_data <- cbind(current_data_file,clus)
-      current_kmeans_solution <<- create_user_saved_kmeans_res("default_name", k$centers, k$cluster, input$clusters)
+      current_kmeans_solution <<- create_user_saved_kmeans_res("default_name", k$centers, k$cluster, k$size)
+   
+      
       
    
       #this block creates the 'Cluster 1, 2...n' labels for the table display in Shiny
@@ -124,16 +127,24 @@ server <- function(input, output, session) {
       cen_tab <<- cbind(clus_label, k$centers, clus_size)
       
     })
-    output$download_clusters <- downloadHandler(
-      filename = function() {
-        paste(substr(input$file1$name,1, nchar(input$file1$name)-4), format(Sys.time(),format="_%Y-%m-%d_%H.%M"), ".csv", sep="")
-      },
-      content = function(file){
-        write.csv(cen_tab, file)
-      }, 
-      contentType = "text/csv"
+    #initializes the directory and save function
+    roots =c(wd='.')
+    shinyFileSave(input, 'save', roots=roots)
+    observeEvent(input$save, {
       
-    )
+      fileinfo <- parseSavePath(roots, input$save)
+           
+      k_data <- append_cluster_labels(current_kmeans_solution, current_data_file)
+      write.csv(k_data, as.character(fileinfo$datapath))
+      
+      #save the cluster summary details
+      sumfileinfo <- extend_filename(fileinfo$datapath, "_kstats.")
+      summarykstats <- cbind(as.data.frame(current_kmeans_solution@ucentroids), "clus_size" = current_kmeans_solution@usize)
+      
+      write.csv(summarykstats, sumfileinfo)
+      
+    })
+   
     #this function displays the pseudoF
     if (input$pseudo_f == TRUE) {
       output$pseudoF <- renderText({
@@ -218,3 +229,16 @@ server <- function(input, output, session) {
     
   })
 }
+
+
+########################Discarded Code
+# output$download_clusters <- downloadHandler(
+#   filename = function() {
+#     paste(substr(input$file1$name,1, nchar(input$file1$name)-4), format(Sys.time(),format="_%Y-%m-%d_%H.%M"), ".csv", sep="")
+#   },
+#   content = function(file){
+#     write.csv(cen_tab, file)
+#   }, 
+#   contentType = "text/csv"
+#   
+# )
