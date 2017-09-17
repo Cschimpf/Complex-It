@@ -3,7 +3,7 @@ suppressMessages(library(SOMbrero))
 library(cluster)
 library(FactoMineR)
 library(plot3D)
-#library(shinyFiles)
+library(shinyFiles)
 
 server <- function(input, output, session) {
   
@@ -114,8 +114,26 @@ server <- function(input, output, session) {
       clus <- k$cluster
       k_data <- cbind(current_data_file,clus)
       current_kmeans_solution <<- create_user_saved_kmeans_res("default_name", k$centers, k$cluster, k$size)
-   
+      ### Save the original kmeans solution as well to more easily call off-the-shelf prediction routines
+      current_kmeans_original_solution <<- k
       
+      ### Initialize the predict.kmeans function:
+      predict.kmeans=
+        function(km, data)
+        {k <- nrow(km$centers)
+        n <- nrow(data)
+        d <- as.matrix(dist(rbind(km$centers, data)))[-(1:k),1:k]
+        out <- apply(d, 1, which.min)
+        return(out)}
+      
+      
+      ### see if predicted is selected
+      if (input$Predicted_Kmeans_solution == TRUE) {
+      ### Then predict new results assuming it is in the current data file
+      predicted_cluster_data <<- predict.kmeans(current_kmeans_original_solution, current_data_file)
+      }
+      
+  
       
    
       #this block creates the 'Cluster 1, 2...n' labels for the table display in Shiny

@@ -64,6 +64,8 @@ ui <- fluidPage(theme=shinytheme("spacelab"),
                  helpText("Select display options."),
                  checkboxInput('silhouette', 'Silhouette?'),
                  checkboxInput('pseudo_f', 'Pseudo F?'),
+                 ### check if the user would like to save the original cluster solution, or a new data set through prediction
+                 checkboxInput('Predicted_Kmeans_solution', 'Predicted Kmeans Solution?'),
                  numericInput(inputId = "clusters", label = "Select the number of clusters", value = 2, min = 2),
                  actionButton(inputId = "init_kmeans", label="Get Clusters"),
                  conditionalPanel("input.init_kmeans > 0", shinySaveButton("save", "Save results", "Save file as", 
