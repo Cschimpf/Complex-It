@@ -219,8 +219,16 @@ server <- function(input, output, session) {
     else{
       ### post the quality control factors as well
       qc<-quality(current_som_solution)
-      h4(strong(paste("Trained SOM : Topo Error : Quant Error ", format(Sys.time(),format="%Y-%m-%d-%H:%M:%S"),format(qc$topographic,digits=4),format(qc$quantization,digits=4),sep=" : ")))
-    }
+      tagList(
+      h4(strong(paste("Trained SOM ", format(Sys.time(),format="%Y-%m-%d-%H:%M:%S"),sep=" "))),
+      br(),
+      h4(strong(paste("Topo Error  ", format(qc$topographic,digits=4),sep=" "))),
+      br(),
+      h4(strong(paste("Quant Error ", format(qc$quantization,digits=4),sep=" "))),
+      br(),
+      print(summary(current_som_solution))
+        )
+          }
   })
   #### Panel 'Plot'
   #############################################################################
