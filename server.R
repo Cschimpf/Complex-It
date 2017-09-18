@@ -208,9 +208,10 @@ server <- function(input, output, session) {
       return()
     }
     else{
-      h4(strong(paste("Trained SOM at", format(Sys.time(),format="%Y-%m-%d-%H:%M:%S"),sep=" ")))
+      ### post the quality control factors as well
+      qc<-quality(current_som_solution)
+      h4(strong(paste("Trained SOM : Topo Error : Quant Error ", format(Sys.time(),format="%Y-%m-%d-%H:%M:%S"),format(qc$topographic,digits=4),format(qc$quantization,digits=4),sep=" : ")))
     }
-    
   })
   #### Panel 'Plot'
   #############################################################################
