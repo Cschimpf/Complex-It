@@ -153,6 +153,15 @@ server <- function(input, output, session) {
       fileinfo <- parseSavePath(roots, input$save)
            
       k_data <- append_cluster_labels(current_kmeans_solution, current_data_file)
+      ### if predicted is selected, use the new solutions
+      if (input$Predicted_Kmeans_solution == TRUE) {
+        ### assign k_data to the new cluster values
+        current_kmeans_solution_predicted<-current_kmeans_solution
+        current_kmeans_solution_predicted@uclusters<-as.list(as.numeric(predicted_cluster_data))
+        k_data <- append_cluster_labels(current_kmeans_solution_predicted, current_data_file)
+          }
+    
+            
       write.csv(k_data, as.character(fileinfo$datapath))
       
       #save the cluster summary details
