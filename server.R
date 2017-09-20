@@ -126,14 +126,18 @@ server <- function(input, output, session) {
         out <- apply(d, 1, which.min)
         return(out)}
       
-      
-      ### see if predicted is selected
+
+      ### see if predicted kmeans is selected
       if (input$Predicted_Kmeans_solution == TRUE) {
       ### Then predict new results assuming it is in the current data file
       predicted_cluster_data <<- predict.kmeans(current_kmeans_original_solution, current_data_file)
       }
       
-  
+      ### see if predicted SOM is selected
+      if (input$Predicted_SOM_solution == TRUE) {
+      ### Then predict new results assuming it is in the current data file
+      predicted_cluster_data <<- predict(current_som_solution, current_data_file)
+      }
       
    
       #this block creates the 'Cluster 1, 2...n' labels for the table display in Shiny
@@ -160,7 +164,13 @@ server <- function(input, output, session) {
         current_kmeans_solution_predicted@uclusters<-as.list(as.numeric(predicted_cluster_data))
         k_data <- append_cluster_labels(current_kmeans_solution_predicted, current_data_file)
           }
-    
+      if (input$Predicted_SOM_solution == TRUE) {
+        ### assign k_data to the new cluster values
+        current_kmeans_solution_predicted<-current_kmeans_solution
+        current_kmeans_solution_predicted@uclusters<-as.list(as.numeric(predicted_cluster_data))
+        k_data <- append_cluster_labels(current_kmeans_solution_predicted, current_data_file)
+      }
+      
             
       write.csv(k_data, as.character(fileinfo$datapath))
       
