@@ -157,6 +157,16 @@ server <- function(input, output, session) {
       }, width = 500, height = silhouette_height(current_data_file))
     }
   })
+  
+  observeEvent(input$printinputoutput, {
+    print('input')
+    print(input)
+    print('output')
+    print(output)
+    
+  
+  })
+  
   #### Panel 'Train the SOM'
   #############################################################################
   output$initproto <- renderUI({

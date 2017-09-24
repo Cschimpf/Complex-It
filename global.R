@@ -70,7 +70,6 @@ extend_filename <- function(filename, ext){
   splitname = strsplit(as.character(filename), "[.]")
   
   if(length(splitname[[1]]) == 3){
-    print('here')
     splitname[[1]][2] = paste(splitname[[1]][2], ext, sep="")
     finalname = paste('.', splitname[[1]][2], splitname[[1]][3], sep="")
   }
