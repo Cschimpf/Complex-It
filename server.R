@@ -1,17 +1,16 @@
-
 library(shiny)
 suppressMessages(library(SOMbrero))
 library(cluster)
 library(FactoMineR)
 library(plot3D)
-#library(shinyFiles)
+library(shinyFiles)
 
 server <- function(input, output, session) {
   
   output$complexit_logo <- renderImage(list(src="complexit_logo.png"), 
                                        deleteFile=FALSE)
   
-
+  
   #### Panel 'Import data'
   ##############################################################################
   dInput <- reactive({
@@ -22,30 +21,30 @@ server <- function(input, output, session) {
     
     the.sep <- switch(input$sep, "Comma"=",", "Semicolon"=";", "Tab"="\t",
                       "Space"="")
-   
+    
     the.quote <- switch(input$quote, "None"="","Double Quote"='"',
                         "Single Quote"="'")
     
     
-      the.table <- na.omit(read.csv(in.file$datapath, header=input$header, 
-                                    sep=the.sep, quote=the.quote))
+    the.table <- na.omit(read.csv(in.file$datapath, header=input$header, 
+                                  sep=the.sep, quote=the.quote))
     
     
- #right now this just deselects not numeric data columns, later should it auto subset these?
-  output$varchoice <- renderUI(div(
-    checkboxGroupInput(inputId="varchoice", label="Input variables:",
-                       choices=as.list(colnames(the.table)[
-                         sapply(the.table, class) %in%
-                           c("integer", "numeric")]),
-                       selected=as.list(colnames(the.table)[
-                         sapply(the.table, class) %in%
-                           c("integer", "numeric")])), 
-    actionButton(inputId = "subset_data", label = "Subset Data")))
-  column_type_identifier(the.table) 
-  full_data <<- the.table ###this may be redundant and unnecessary??
-  current_data_file <<- the.table[numeric_only_columns]
-  the.table#this is set such that the last thing in this method/function is the table and is therefore set to dInput
-  
+    #right now this just deselects not numeric data columns, later should it auto subset these?
+    output$varchoice <- renderUI(div(
+      checkboxGroupInput(inputId="varchoice", label="Input variables:",
+                         choices=as.list(colnames(the.table)[
+                           sapply(the.table, class) %in%
+                             c("integer", "numeric")]),
+                         selected=as.list(colnames(the.table)[
+                           sapply(the.table, class) %in%
+                             c("integer", "numeric")])), 
+      actionButton(inputId = "subset_data", label = "Subset Data")))
+    column_type_identifier(the.table) 
+    full_data <<- the.table ###this may be redundant and unnecessary??
+    current_data_file <<- the.table[numeric_only_columns]
+    the.table#this is set such that the last thing in this method/function is the table and is therefore set to dInput
+    
   })
   observeEvent(input$subset_data,{
     d.input <- dInput()
@@ -54,12 +53,12 @@ server <- function(input, output, session) {
     if(length(ncol(d.input) >= length(subset_list))){
       #subset_list <- c()
       #for(i in 1:length(input$varchoice)){
-        #subset_list <-c(subset_list, input$varchoice[i])
+      #subset_list <-c(subset_list, input$varchoice[i])
       #}
       current_data_file <<- d.input[subset_list]
     }
     
-  
+    
   })
   # data preview table
   # once data is populated, with the dInput call here, it will automatically be populated
@@ -106,7 +105,7 @@ server <- function(input, output, session) {
       {height = 400}
       return(height)
     }
-   
+    
     FSTAT <- pseudoF(current_data_file, k,input$clusters) 
     
     output$kmeans_tab <- renderTable({
@@ -115,10 +114,32 @@ server <- function(input, output, session) {
       clus <- k$cluster
       k_data <- cbind(current_data_file,clus)
       current_kmeans_solution <<- create_user_saved_kmeans_res("default_name", k$centers, k$cluster, k$size)
-   
+      ### Save the original kmeans solution as well to more easily call off-the-shelf prediction routines
+      current_kmeans_original_solution <<- k
+      
+      ### Initialize the predict.kmeans function:
+      predict.kmeans=
+        function(km, data)
+        {k <- nrow(km$centers)
+        n <- nrow(data)
+        d <- as.matrix(dist(rbind(km$centers, data)))[-(1:k),1:k]
+        out <- apply(d, 1, which.min)
+        return(out)}
       
       
-   
+      ### see if predicted kmeans is selected
+      if (input$Predicted_Kmeans_solution == TRUE) {
+        ### Then predict new results assuming it is in the current data file
+        predicted_cluster_data <<- predict.kmeans(current_kmeans_original_solution, current_data_file)
+      }
+      
+      ### see if predicted SOM is selected
+      if (input$Predicted_SOM_solution == TRUE) {
+        ### Then predict new results assuming it is in the current data file
+        predicted_cluster_data <<- predict(current_som_solution, current_data_file)
+      }
+      
+      
       #this block creates the 'Cluster 1, 2...n' labels for the table display in Shiny
       clus_label =c()
       for(i in 1: nrow(k$centers)){
@@ -134,8 +155,23 @@ server <- function(input, output, session) {
     observeEvent(input$save, {
       
       fileinfo <- parseSavePath(roots, input$save)
-           
+      
       k_data <- append_cluster_labels(current_kmeans_solution, current_data_file)
+      ### if predicted is selected, use the new solutions
+      if (input$Predicted_Kmeans_solution == TRUE) {
+        ### assign k_data to the new cluster values
+        current_kmeans_solution_predicted<-current_kmeans_solution
+        current_kmeans_solution_predicted@uclusters<-as.list(as.numeric(predicted_cluster_data))
+        k_data <- append_cluster_labels(current_kmeans_solution_predicted, current_data_file)
+      }
+      if (input$Predicted_SOM_solution == TRUE) {
+        ### assign k_data to the new cluster values
+        current_kmeans_solution_predicted<-current_kmeans_solution
+        current_kmeans_solution_predicted@uclusters<-as.list(as.numeric(predicted_cluster_data))
+        k_data <- append_cluster_labels(current_kmeans_solution_predicted, current_data_file)
+      }
+      
+      
       write.csv(k_data, as.character(fileinfo$datapath))
       
       #save the cluster summary details
@@ -145,7 +181,7 @@ server <- function(input, output, session) {
       write.csv(summarykstats, sumfileinfo)
       
     })
-   
+    
     #this function displays the pseudoF
     if (input$pseudo_f == TRUE) {
       output$pseudoF <- renderText({
@@ -158,16 +194,6 @@ server <- function(input, output, session) {
       }, width = 500, height = silhouette_height(current_data_file))
     }
   })
-  
-  observeEvent(input$printinputoutput, {
-    print('input')
-    print(input)
-    print('output')
-    print(output)
-    
-  
-  })
-  
   #### Panel 'Train the SOM'
   #############################################################################
   output$initproto <- renderUI({
@@ -181,7 +207,7 @@ server <- function(input, output, session) {
                 choices =c("unitvar", "none", "center"),
                 selected ="unitvar")
   })
-
+  
   observeEvent(input$trainbutton, {
     tmp_data <- current_data_file
     mapped_labels = NULL
@@ -192,7 +218,7 @@ server <- function(input, output, session) {
     
     set.seed(input$rand.seed)
     current_som_solution<<- trainSOM(tmp_data, dimension=c(input$dimx,input$dimy), 
-             maxit=input$maxit, scaling=input$scaling, init.proto=input$initproto)
+                                     maxit=input$maxit, scaling=input$scaling, init.proto=input$initproto)
     updatePlotSomVar() # update variable choice for som plots
     ########  
   })  
@@ -201,9 +227,18 @@ server <- function(input, output, session) {
       return()
     }
     else{
-      h4(strong(paste("Trained SOM at", format(Sys.time(),format="%Y-%m-%d-%H:%M:%S"),sep=" ")))
+      ### post the quality control factors as well
+      qc<-quality(current_som_solution)
+      tagList(
+        h4(strong(paste("Trained SOM ", format(Sys.time(),format="%Y-%m-%d-%H:%M:%S"),sep=" "))),
+        br(),
+        h4(strong(paste("Topo Error  ", format(qc$topographic,digits=4),sep=" "))),
+        br(),
+        h4(strong(paste("Quant Error ", format(qc$quantization,digits=4),sep=" "))),
+        br(),
+        print(summary(current_som_solution))
+      )
     }
-    
   })
   #### Panel 'Plot'
   #############################################################################
@@ -216,7 +251,7 @@ server <- function(input, output, session) {
   # update variables available for plotting
   updatePlotSomVar <- function() observe({
     tmp.names <- colnames(current_som_solution$data)
-   
+    
     updateSelectInput(session, "somplotvar", choices=tmp.names)
     updateSelectInput(session, "somplotvar2", choices=tmp.names, 
                       selected=tmp.names[1:min(5,length(tmp.names))])
@@ -252,3 +287,4 @@ server <- function(input, output, session) {
 #   }, 
 #   contentType = "text/csv"
 #   
+# )
