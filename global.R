@@ -6,11 +6,12 @@ current_data_file = NULL
 full_data = NULL
 current_kmeans_solution = NULL
 current_som_solution = NULL
+previous_som = NULL
 
 #Reference Variables
 ####
-numeric_only_columns = NULL
-other_columns = NULL
+#numeric_only_columns = NULL
+#other_columns = NULL
 all.somplot.types <- list("numeric"=
                             list("prototypes"=
                                    list("3d", "barplot",
@@ -20,6 +21,20 @@ all.somplot.types <- list("numeric"=
                                          "names", "boxplot")))
 
 ####Global Classes and related Functions####
+setClass("user_gen_kmeans_solution", representation(save_name = "character", uclusters = "integer", ucenters = "matrix",
+                                                    utotss = "numeric", uwithinss = "numeric", utotwithinss = "numeric",
+                                                    ubetweenss = "numeric", usize = "integer"))
+
+create_user_gen_kmeans_solution <- function(objectname, km){
+  new_class = new("user_gen_kmeans_solution", save_name = objectname, uclusters = km$cluster, ucenters = km$centers, utotss = km$totss,
+                  uwithinss = km$withinss, utotwithinss = km$tot.withinss, ubetweenss = km$betweenss, usize = km$size)
+  return(new_class)
+}
+                                            
+                    
+
+
+
 setClass("user_saved_kmeans_res", representation(save_name = "character", ucentroids = "list", uclusters = "list", usize = "integer"))
 
 create_user_saved_kmeans_res <- function(objectname, ucenters, cluster_labels, k_size){
@@ -55,8 +70,6 @@ setMethod(f = "append_cluster_labels",
             appended_labels <- cbind(data_obj, clus_labels)
             return(appended_labels)
           })
-#setGeneric(name=)
-
 
 
 #####General Purpose Functions####
@@ -76,13 +89,23 @@ extend_filename <- function(filename, ext){
   return(finalname)
 }
 
+#uses the number of data rows to calculate a dimension for the graph, width/height 
+#will return 400 as a default height if the scaled nrows is less than 400
+graph_dimension = function(data, scale = 5){
+  dimension = (nrow(data) * scale)
+  if (dimension < 400) 
+  {dimension = 400}
+  return(dimension)
+}
+
 
 ####Panel 'Import Data'
 ##################################
 
 column_type_identifier <-function(data){
-  numeric_only_columns <<-sapply(data, class) %in% c("integer", "numeric")
-  other_columns <<- logic_vector_inverter(numeric_only_columns)
+  numeric_only_columns <-sapply(data, class) %in% c("integer", "numeric")
+  return(numeric_only_columns)
+  #other_columns <<- logic_vector_inverter(numeric_only_columns)
 }
 
 logic_vector_inverter <- function(logic_vec){
@@ -98,6 +121,31 @@ logic_vector_inverter <- function(logic_vec){
   return(new_logic_vec)
 }
 
+
+####Panel 'Cluster Data'
+##################################
+
+#for now I left your code here so there is a trace of what changes were made
+
+pseudoF = function(data,sol, k){
+  #nk = length(k)
+  #n = nrow(X)
+  T = sum(scale(data, scale=F)^2)
+  #W = rep(T, nk)
+  #for (i in 1:nk){
+  #cli = kmeans(X, k[i], nstart=ns,algorithm="Lloyd")
+  #W[i] = sum(cli$withinss)
+  #}
+  W <- sum(sol@uwithinss) #this is using the withinss from 'k' above
+  pF = ((T-W)/(k-1))/(W/(nrow(data)-k))
+  return(pF)
+}
+
+plot_silhouette <- function(data, km){
+  dissM <- daisy(data)
+  sil_plot <- plot(silhouette(km@uclusters, dissM)) 
+  return(sil_plot)
+}
 
 ####Panel 'Self Organize'
 ##################################

@@ -40,7 +40,7 @@ server <- function(input, output, session) {
                            sapply(the.table, class) %in%
                              c("integer", "numeric")])), 
       actionButton(inputId = "subset_data", label = "Subset Data")))
-    column_type_identifier(the.table) 
+    numeric_only_columns <- column_type_identifier(the.table) 
     full_data <<- the.table ###this may be redundant and unnecessary??
     current_data_file <<- the.table[numeric_only_columns]
     the.table#this is set such that the last thing in this method/function is the table and is therefore set to dInput
@@ -78,75 +78,23 @@ server <- function(input, output, session) {
   observeEvent(input$init_kmeans, { 
     if(is.null(current_data_file)){return()}  #this function will return nothing if there is no data
     #print(current_data_file)
-    k <- kmeans(current_data_file, isolate(input$clusters))
+    current_kmeans_solution <<- create_user_gen_kmeans_solution("default_name", kmeans(current_data_file, isolate(input$clusters)))
     
     
-    #for now I left your code here so there is a trace of what changes were made
-    #I added 'sol' to the parameters so the kmeans already calculated could be used in this function
-    pseudoF = function(X,sol, k){
-      #nk = length(k)
-      #n = nrow(X)
-      T = sum(scale(X,scale=F)^2)
-      #W = rep(T, nk)
-      #for (i in 1:nk){
-      #cli = kmeans(X, k[i], nstart=ns,algorithm="Lloyd")
-      #W[i] = sum(cli$withinss)
-      #}
-      W <- sum(sol$withinss) #this is using the withinss from 'k' above
-      pF = ((T-W)/(k-1))/(W/(nrow(X)-k))
-      return(pF)
-    }
     
-    #uses the number of data rows to calculate the height of the silhouette 
-    #will return 400 as a default height if the scaled nrows is less than 400
-    silhouette_height = function(X){
-      height = (nrow(X) * 5)
-      if (height < 400) 
-      {height = 400}
-      return(height)
-    }
-    
-    FSTAT <- pseudoF(current_data_file, k,input$clusters) 
     
     output$kmeans_tab <- renderTable({
       
-      #this block of code appends the cluster labels to the data and then writes out to the C:\ directory
-      clus <- k$cluster
-      k_data <- cbind(current_data_file,clus)
-      current_kmeans_solution <<- create_user_saved_kmeans_res("default_name", k$centers, k$cluster, k$size)
+     
+      #current_kmeans_solution <<- create_user_saved_kmeans_res("default_name", k$centers, k$cluster, k$size)
       ### Save the original kmeans solution as well to more easily call off-the-shelf prediction routines
-      current_kmeans_original_solution <<- k
-      
-      ### Initialize the predict.kmeans function:
-      predict.kmeans=
-        function(km, data)
-        {k <- nrow(km$centers)
-        n <- nrow(data)
-        d <- as.matrix(dist(rbind(km$centers, data)))[-(1:k),1:k]
-        out <- apply(d, 1, which.min)
-        return(out)}
-      
-      
-      ### see if predicted kmeans is selected
-      if (input$Predicted_Kmeans_solution == TRUE) {
-        ### Then predict new results assuming it is in the current data file
-        predicted_cluster_data <<- predict.kmeans(current_kmeans_original_solution, current_data_file)
-      }
-      
-      ### see if predicted SOM is selected
-      if (input$Predicted_SOM_solution == TRUE) {
-        ### Then predict new results assuming it is in the current data file
-        predicted_cluster_data <<- predict(current_som_solution, current_data_file)
-      }
-      
-      
+      #current_kmeans_original_solution <<- k
       #this block creates the 'Cluster 1, 2...n' labels for the table display in Shiny
       clus_label =c()
-      for(i in 1: nrow(k$centers)){
+      for(i in 1: nrow(current_kmeans_solution@ucenters)){
         clus_label = c(clus_label, paste(c("Cluster"), toString(i), sep = " "))
       }
-      clus_size <- k$size
-      cen_tab <<- cbind(clus_label, k$centers, clus_size)
+      cen_tab <<- cbind(clus_label, current_kmeans_solution@ucenters, size = current_kmeans_solution@usize)
       
     })
     #initializes the directory and save function
@@ -156,42 +104,36 @@ server <- function(input, output, session) {
       
       fileinfo <- parseSavePath(roots, input$save)
       
-      k_data <- append_cluster_labels(current_kmeans_solution, current_data_file)
-      ### if predicted is selected, use the new solutions
-      if (input$Predicted_Kmeans_solution == TRUE) {
-        ### assign k_data to the new cluster values
-        current_kmeans_solution_predicted<-current_kmeans_solution
-        current_kmeans_solution_predicted@uclusters<-as.list(as.numeric(predicted_cluster_data))
-        k_data <- append_cluster_labels(current_kmeans_solution_predicted, current_data_file)
-      }
-      if (input$Predicted_SOM_solution == TRUE) {
-        ### assign k_data to the new cluster values
-        current_kmeans_solution_predicted<-current_kmeans_solution
-        current_kmeans_solution_predicted@uclusters<-as.list(as.numeric(predicted_cluster_data))
-        k_data <- append_cluster_labels(current_kmeans_solution_predicted, current_data_file)
-      }
-      
+      k_data <- cbind(current_data_file, "clus_labels" = current_kmeans_solution@uclusters)
       
       write.csv(k_data, as.character(fileinfo$datapath))
       
       #save the cluster summary details
       sumfileinfo <- extend_filename(fileinfo$datapath, "_kstats.")
-      summarykstats <- cbind(as.data.frame(current_kmeans_solution@ucentroids), "clus_size" = current_kmeans_solution@usize)
-      
+      summarykstats <- cbind(as.data.frame(current_kmeans_solution@ucenters), "clus_size" = current_kmeans_solution@usize)
       write.csv(summarykstats, sumfileinfo)
+      
+      #save silhouette if checked
+      if (input$silhouette == TRUE){
+        
+        setwd(".")
+        pdf("temp_silh.pdf")
+        plot_silhouette(current_data_file, current_kmeans_solution) 
+        dev.off()
+      }
       
     })
     
     #this function displays the pseudoF
     if (input$pseudo_f == TRUE) {
+      FSTAT <- pseudoF(current_data_file, current_kmeans_solution,input$clusters) 
       output$pseudoF <- renderText({
         paste("Pseudo F: ", FSTAT)
       })}
     if (input$silhouette == TRUE){
       output$kmeans_silh <- renderPlot({
-        dissM <- daisy(current_data_file)
-        plot(silhouette(k$cluster, dissM)) 
-      }, width = 500, height = silhouette_height(current_data_file))
+        plot_silhouette(current_data_file, current_kmeans_solution)
+      }, width = 500, height = graph_dimension(current_data_file))
     }
   })
   #### Panel 'Train the SOM'
@@ -219,6 +161,7 @@ server <- function(input, output, session) {
     set.seed(input$rand.seed)
     current_som_solution<<- trainSOM(tmp_data, dimension=c(input$dimx,input$dimy), 
                                      maxit=input$maxit, scaling=input$scaling, init.proto=input$initproto)
+   
     updatePlotSomVar() # update variable choice for som plots
     ########  
   })  
@@ -230,17 +173,13 @@ server <- function(input, output, session) {
       ### post the quality control factors as well
       qc<-quality(current_som_solution)
       tagList(
-        h4(strong(paste("Trained SOM ", format(Sys.time(),format="%Y-%m-%d-%H:%M:%S"),sep=" "))),
-        br(),
-        h4(strong(paste("Topo Error  ", format(qc$topographic,digits=4),sep=" "))),
-        br(),
-        h4(strong(paste("Quant Error ", format(qc$quantization,digits=4),sep=" "))),
-        br(),
-        print(summary(current_som_solution))
-      )
+        p(paste("Trained SOM ", format(Sys.time(),format="%Y-%m-%d-%H:%M:%S"),sep=" ")),
+        p(paste("Topo Error  ", format(qc$topographic,digits=4),sep=" ")),
+        p(paste("Quant Error ", format(qc$quantization,digits=4),sep=" "))
+        )
     }
   })
-  #### Panel 'Plot'
+  #### Panel 'Plot Map'
   #############################################################################
   observe({
     updateSelectInput(session, "somplottype", 
@@ -267,12 +206,68 @@ server <- function(input, output, session) {
     if (input$somplottype =="boxplot") {
       tmp.var <- (1:ncol(current_som_solution$data))[colnames(current_som_solution$data) %in% 
                                                        input$somplotvar2]
-      print(tmp.var)
-    } 
+    }
     else {tmp.var <- input$somplotvar}
+    #This if/else set is here to add cluster labels to neurons for observation plots only
+    if(input$somplotwhat =='obs'){plot(x=current_som_solution, what=input$somplotwhat, type=input$somplottype,
+                                       variable=tmp.var,view=tmp.view, print.title = TRUE)}
+    else {
     plot(x=current_som_solution, what=input$somplotwhat, type=input$somplottype,
          variable=tmp.var,view=tmp.view)
+        }
     
+  })
+  observeEvent(input$save_som, {
+               previous_som <- current_som_solution #need to rename the object or it may overwrite later current_som objects
+               save(previous_som, file = "./tmp/SavedSOMObject")})
+  output$save_som_notice <- renderUI({
+    if(input$save_som == 0){
+      return()
+    }
+    paste("Saved SOM ", format(Sys.time(),format="%Y-%m-%d-%H:%M:%S"),sep=" ")
+    
+  })
+  
+  #### Panel 'Profile Recognition'
+  #############################################################################
+  pInput <- reactive({
+    in.file_pred <- input$file_pred
+    if (is.null(in.file_pred))
+      return(NULL)
+    
+    the.sep_p <- switch(input$sep_pred, "Comma"=",", "Semicolon"=";", "Tab"="\t",
+                      "Space"="")
+    
+    the.quote_p <- switch(input$quote_pred, "None"="","Double Quote"='"',
+                        "Single Quote"="'")
+    
+    the.table_p <- na.omit(read.csv(in.file_pred$datapath, header=input$header_pred, 
+                                  sep=the.sep_p, quote=the.quote_p))
+    
+    numeric_only_columns <- column_type_identifier(the.table_p) 
+    the.table_p[numeric_only_columns]
+  })
+
+  
+  observeEvent(input$classify_prof, {
+    temp_som <- current_som_solution
+    p.input <- pInput()
+    if (input$load_prev_som == TRUE) {
+      tryCatch(load("./tmp/SavedSOMObject"), error = function(e) NULL)
+      temp_som <- previous_som #if there is no file to load, previous_som will be NULL from global
+    }
+    if (is.null(p.input) | is.null(temp_som)) {
+      print("Nothing here!")
+      return(NULL)}
+    else {
+      predicted <- predict(temp_som, p.input)
+      p.input <- cbind(p.input, 'Matched Neuron' = predicted)
+    #some prediction function goes here
+      output$view_predict <- renderTable({
+     
+        head(p.input, n=input$nrow.result_pred)
+    })
+    }
   })
 }
 
@@ -288,3 +283,42 @@ server <- function(input, output, session) {
 #   contentType = "text/csv"
 #   
 # )
+#this block of code appends the cluster labels to the data and then writes out to the C:\ directory
+#clus <- k$cluster
+#k_data <- cbind(current_data_file,clus)
+
+### Initialize the predict.kmeans function:
+# predict.kmeans=
+#   function(km, data)
+#   {k <- nrow(km@ucenters)
+#   n <- nrow(data)
+#   d <- as.matrix(dist(rbind(km@ucenters, data)))[-(1:k),1:k]
+#   out <- apply(d, 1, which.min)
+#   return(out)}
+# 
+# 
+# ### see if predicted kmeans is selected
+# if (input$Predicted_Kmeans_solution == TRUE) {
+#   ### Then predict new results assuming it is in the current data file
+#   predicted_cluster_data <<- predict.kmeans(current_kmeans_solution, current_data_file)
+# }
+# 
+# ### see if predicted SOM is selected
+# if (input$Predicted_SOM_solution == TRUE) {
+#   ### Then predict new results assuming it is in the current data file
+#   predicted_cluster_data <<- predict(current_som_solution, current_data_file)
+# }
+
+### if predicted is selected, use the new solutions
+# if (input$Predicted_Kmeans_solution == TRUE) {
+#   ### assign k_data to the new cluster values
+#   current_kmeans_solution_predicted<-current_kmeans_solution
+#   current_kmeans_solution_predicted@uclusters<-as.list(as.numeric(predicted_cluster_data))
+#   k_data <- append_cluster_labels(current_kmeans_solution_predicted, current_data_file)
+# }
+# if (input$Predicted_SOM_solution == TRUE) {
+#   ### assign k_data to the new cluster values
+#   current_kmeans_solution_predicted<-current_kmeans_solution
+#   current_kmeans_solution_predicted@uclusters<-as.list(as.numeric(predicted_cluster_data))
+#   k_data <- append_cluster_labels(current_kmeans_solution_predicted, current_data_file)
+#}

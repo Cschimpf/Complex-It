@@ -5,7 +5,7 @@ library(shinyFiles)
 
 ui <- fluidPage(theme=shinytheme("spacelab"),
                 
-                titlePanel("Complex-It V 0.1.0"),
+                titlePanel("Complex-It V 0.1.5"),
                 
                 sidebarLayout(
                   
@@ -64,10 +64,6 @@ ui <- fluidPage(theme=shinytheme("spacelab"),
                                helpText("Select display options."),
                                checkboxInput('silhouette', 'Silhouette?'),
                                checkboxInput('pseudo_f', 'Pseudo F?'),
-                               ### check if the user would like to save the original cluster solution, or a new data set through prediction
-                               ###  for now add the SOM prediction here until new tabs are available
-                               checkboxInput('Predicted_Kmeans_solution', 'Predicted Kmeans Solution?'),
-                               checkboxInput('Predicted_SOM_solution', 'Predicted SOM Solution?'),
                                numericInput(inputId = "clusters", label = "Select the number of clusters", value = 2, min = 2),
                                actionButton(inputId = "init_kmeans", label="Get Clusters"),
                                conditionalPanel("input.init_kmeans > 0", shinySaveButton("save", "Save results", "Save file as", 
@@ -135,7 +131,34 @@ ui <- fluidPage(theme=shinytheme("spacelab"),
                                                             multiple variables)", 
                                                             choices= "(Not Available)", 
                                                             multiple= TRUE)),
+                               conditionalPanel("input.trainbutton > 0", 
+                                                actionButton("save_som", "Save SOM Results")),
+                               uiOutput("save_som_notice"),
                                plotOutput("somplot")),
+                      
+                      tabPanel("Profile Recognition", 
+                               h3("Relate a new case to an existing SOM"),
+                               p("Some explanatory text"),
+                               br(),
+                               fileInput('file_pred', 'Choose CSV File', accept = c(
+                                 "text/csv",
+                                 "text/comma-separated-values,text/plain",
+                                 ".csv")),
+                               checkboxInput('header_pred', ' Header?', TRUE),
+                               checkboxInput('load_prev_som', 'Use Previous SOM Results?'),
+                               selectInput('sep_pred', 'Separator:',
+                                           c("Comma","Semicolon","Tab","Space"), 'Comma'),
+                               selectInput('quote_pred', 'Quote:',
+                                           c("None","Double Quote","Single Quote"), 
+                                           'Double Quote'),
+                               actionButton('classify_prof', 'Classify Profiles'),
+                               conditionalPanel("input.classify_prof > 0",
+                                               numericInput("nrow.result_pred","Number of rows in the results:" ,20, min = 1, max = 100),
+                                               tableOutput("view_predict"))
+                               
+                               ),
+                              
+                      
                       tabPanel("Help",
                                h3("Under Construction")
                                
@@ -147,5 +170,7 @@ ui <- fluidPage(theme=shinytheme("spacelab"),
                 
                 
                                )
+
+
 
 
