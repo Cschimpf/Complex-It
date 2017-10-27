@@ -17,6 +17,7 @@
     + SOMbrero
     + FactoMineR
     + plot3D
+    + shinyFiles
 
 
 ### Detailed Installation Steps
