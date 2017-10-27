@@ -138,7 +138,13 @@ ui <- fluidPage(theme=shinytheme("spacelab"),
                       
                       tabPanel("Profile Recognition", 
                                h3("Relate a new case to an existing SOM"),
-                               p("Some explanatory text"),
+                               p("In this panel, you can upload new data or cases and classify where they would be placed on a previous
+                                 SOM solution. If you save a SOM from the Plot Map panel, you can check 'Use Previous SOM Results?' to
+                                 classify new data or cases with that SOM. Once you save a SOM it will remain for use until you save 
+                                 another SOM (even if you close Complex-It). Otherwise, you will need to run the SOM in this Complex-It 
+                                 session.", strong("Please note, uploaded data must have the exact same order and types of columns as the data as 
+                                  previously run in the SOM. Currently there is no mechanism for checking this, we are working on that.")),
+                               
                                br(),
                                fileInput('file_pred', 'Choose CSV File', accept = c(
                                  "text/csv",
@@ -152,7 +158,9 @@ ui <- fluidPage(theme=shinytheme("spacelab"),
                                            c("None","Double Quote","Single Quote"), 
                                            'Double Quote'),
                                actionButton('classify_prof', 'Classify Profiles'),
+                               #uiOutput("prof_rec_error"),
                                conditionalPanel("input.classify_prof > 0",
+                                               br(),
                                                numericInput("nrow.result_pred","Number of rows in the results:" ,20, min = 1, max = 100),
                                                tableOutput("view_predict"))
                                

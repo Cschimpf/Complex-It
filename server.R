@@ -251,13 +251,24 @@ server <- function(input, output, session) {
   
   observeEvent(input$classify_prof, {
     temp_som <- current_som_solution
+    warning <- "No new cases uploaded for profile recognition"
     p.input <- pInput()
     if (input$load_prev_som == TRUE) {
       tryCatch(load("./tmp/SavedSOMObject"), error = function(e) NULL)
       temp_som <- previous_som #if there is no file to load, previous_som will be NULL from global
+      warning <- "No previous saved SOM"
     }
     if (is.null(p.input) | is.null(temp_som)) {
-      print("Nothing here!")
+      #this is very clunky but should handle the two major kinds of errors for now
+      if(is.null(p.input)){
+        warning <- "No new cases uploaded for profile recognition"
+      }
+      output$prof_rec_error <- renderUI({
+        tagList(
+        strong(paste("Warning!", warning, sep = " ")),
+        br()
+        )
+      })
       return(NULL)}
     else {
       predicted <- predict(temp_som, p.input)
