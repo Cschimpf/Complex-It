@@ -5,7 +5,7 @@ library(shinyFiles)
 
 ui <- fluidPage(theme=shinytheme("spacelab"),
                 
-                titlePanel("Complex-It V 0.1.5"),
+                titlePanel("Complex-It 0.1.5"),
                 
                 sidebarLayout(
                   
