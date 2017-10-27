@@ -272,6 +272,11 @@ server <- function(input, output, session) {
       return(NULL)}
     else {
       predicted <- predict(temp_som, p.input)
+      warning <- ""
+      #so very clunky just repeating the code to get rid of the warning when it goes to print the predict results
+      output$prof_rec_error <- renderUI({
+        warning
+      })
       p.input <- cbind(p.input, 'Matched Neuron' = predicted)
     #some prediction function goes here
       output$view_predict <- renderTable({
