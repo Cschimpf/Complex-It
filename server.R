@@ -228,63 +228,80 @@ server <- function(input, output, session) {
     
   })
   
-  #### Panel 'Profile Recognition'
+  #### Panel 'Agent-Model'
   #############################################################################
-  pInput <- reactive({
-    in.file_pred <- input$file_pred
-    if (is.null(in.file_pred))
-      return(NULL)
-    
-    the.sep_p <- switch(input$sep_pred, "Comma"=",", "Semicolon"=";", "Tab"="\t",
-                      "Space"="")
-    
-    the.quote_p <- switch(input$quote_pred, "None"="","Double Quote"='"',
-                        "Single Quote"="'")
-    
-    the.table_p <- na.omit(read.csv(in.file_pred$datapath, header=input$header_pred, 
-                                  sep=the.sep_p, quote=the.quote_p))
-    
-    numeric_only_columns <- column_type_identifier(the.table_p) 
-    the.table_p[numeric_only_columns]
-  })
-
+  # Plot the SOM
+  output$dummy_som_graphic <- renderImage(list(src="dummy_som_graphic.png"), 
+                                       deleteFile=FALSE)
+  output$dummy_case_graphic <- renderImage(list(src="dummy_case_graphic.png"), 
+                                          deleteFile=FALSE)
+  output$dummy_cluster_graphic <- renderImage(list(src="dummy_cluster_graphic.png"), 
+                                          deleteFile=FALSE)
+  #  output$somplot <- renderPlot({
+#    if(is.null(current_data_file))
+#      return(NULL)
+#    tmp.view <- NULL
+#    tmp.var <- input$somplotvar
+    #This if/else set is here to add cluster labels to neurons for observation plots only
+#    plot(x=current_som_solution, what=input$somplotwhat, type=input$somplottype,
+#                                      variable=tmp.var,view=tmp.view, print.title = TRUE)
+# })
   
-  observeEvent(input$classify_prof, {
-    temp_som <- current_som_solution
-    warning <- "No new cases uploaded for profile recognition"
-    p.input <- pInput()
-    if (input$load_prev_som == TRUE) {
-      tryCatch(load("./tmp/SavedSOMObject"), error = function(e) NULL)
-      temp_som <- previous_som #if there is no file to load, previous_som will be NULL from global
-      warning <- "No previous saved SOM"
-    }
-    if (is.null(p.input) | is.null(temp_som)) {
-      #this is very clunky but should handle the two major kinds of errors for now
-      if(is.null(p.input)){
-        warning <- "No new cases uploaded for profile recognition"
-      }
-      output$prof_rec_error <- renderUI({
-        tagList(
-        strong(paste("Warning!", warning, sep = " ")),
-        br()
-        )
-      })
-      return(NULL)}
-    else {
-      predicted <- predict(temp_som, p.input)
-      warning <- ""
-      #so very clunky just repeating the code to get rid of the warning when it goes to print the predict results
-      output$prof_rec_error <- renderUI({
-        warning
-      })
-      p.input <- cbind(p.input, 'Matched Neuron' = predicted)
-    #some prediction function goes here
-      output$view_predict <- renderTable({
-     
-        head(p.input, n=input$nrow.result_pred)
-    })
-    }
-  })
+#  pInput <- reactive({
+#    in.file_pred <- input$file_pred
+#    if (is.null(in.file_pred))
+#      return(NULL)
+#    
+#    the.sep_p <- switch(input$sep_pred, "Comma"=",", "Semicolon"=";", "Tab"="\t",
+#                      "Space"="")
+#    
+#    the.quote_p <- switch(input$quote_pred, "None"="","Double Quote"='"',
+#                        "Single Quote"="'")
+#    
+#    the.table_p <- na.omit(read.csv(in.file_pred$datapath, header=input$header_pred, 
+#                                  sep=the.sep_p, quote=the.quote_p))
+#    
+#    numeric_only_columns <- column_type_identifier(the.table_p) 
+#    the.table_p[numeric_only_columns]
+#  })
+#
+#  
+#  observeEvent(input$classify_prof, {
+#    temp_som <- current_som_solution
+#    warning <- "No new cases uploaded for profile recognition"
+#    p.input <- pInput()
+#    if (input$load_prev_som == TRUE) {
+#      tryCatch(load("./tmp/SavedSOMObject"), error = function(e) NULL)
+#      temp_som <- previous_som #if there is no file to load, previous_som will be NULL from global
+#      warning <- "No previous saved SOM"
+#    }
+#    if (is.null(p.input) | is.null(temp_som)) {
+#      #this is very clunky but should handle the two major kinds of errors for now
+#      if(is.null(p.input)){
+#        warning <- "No new cases uploaded for profile recognition"
+#      }
+#      output$prof_rec_error <- renderUI({
+#        tagList(
+#        strong(paste("Warning!", warning, sep = " ")),
+#        br()
+#        )
+#      })
+#      return(NULL)}
+#    else {
+#      predicted <- predict(temp_som, p.input)
+#      warning <- ""
+#      #so very clunky just repeating the code to get rid of the warning when it goes to print the predict results
+#      output$prof_rec_error <- renderUI({
+#        warning
+#      })
+#      p.input <- cbind(p.input, 'Matched Neuron' = predicted)
+#    #some prediction function goes here
+#      output$view_predict <- renderTable({
+#     
+#        head(p.input, n=input$nrow.result_pred)
+#    })
+#    }
+#  })
 }
 
 

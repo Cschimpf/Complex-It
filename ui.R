@@ -5,13 +5,13 @@ library(shinyFiles)
 
 ui <- fluidPage(theme=shinytheme("spacelab"),
                 
-                titlePanel("Complex-It 0.1.5"),
+                titlePanel("Complex-It 0.1.6"),
                 
                 sidebarLayout(
                   
                   sidebarPanel(
                     imageOutput("complexit_logo", inline=TRUE),
-                    width = 4
+                    width = 2
                   ),
                   
                   mainPanel(
@@ -136,35 +136,137 @@ ui <- fluidPage(theme=shinytheme("spacelab"),
                                uiOutput("save_som_notice"),
                                plotOutput("somplot")),
                       
-                      tabPanel("Profile Recognition", 
-                               h3("Relate a new case to an existing SOM"),
-                               p("In this panel, you can upload new data or cases and classify where they would be placed on a previous
-                                 SOM solution. If you save a SOM from the Plot Map panel, you can check 'Use Previous SOM Results?' to
-                                 classify new data or cases with that SOM. Once you save a SOM it will remain for use until you save 
-                                 another SOM (even if you close Complex-It). Otherwise, you will need to run the SOM in this Complex-It 
-                                 session.", strong("Please note, uploaded data must have the exact same order and types of columns as the data as 
-                                  previously run in the SOM. Currently there is no mechanism for checking this, we are working on that.")),
-                               
+                      tabPanel("Agent-Model", 
+                               h3("  "),
+                               p("   "),
                                br(),
-                               fileInput('file_pred', 'Choose CSV File', accept = c(
-                                 "text/csv",
-                                 "text/comma-separated-values,text/plain",
-                                 ".csv")),
-                               checkboxInput('header_pred', ' Header?', TRUE),
-                               checkboxInput('load_prev_som', 'Use Previous SOM Results?'),
-                               selectInput('sep_pred', 'Separator:',
-                                           c("Comma","Semicolon","Tab","Space"), 'Comma'),
-                               selectInput('quote_pred', 'Quote:',
-                                           c("None","Double Quote","Single Quote"), 
-                                           'Double Quote'),
-                               actionButton('classify_prof', 'Classify Profiles'),
-                               uiOutput("prof_rec_error"),
-                               conditionalPanel("input.classify_prof > 0",
-                                               br(),
-                                               numericInput("nrow.result_pred","Number of rows in the results:" ,20, min = 1, max = 100),
-                                               tableOutput("view_predict"))
+                               hr(),
+                               fluidRow(
+                                 column(3,
+                                        actionButton(inputId = "Agent_Setup", label="Setup",
+                                                     style = "foreground-color:white; 
+                                                     background-color:blue;
+                                                     float:center;
+                                                     height: 50px;
+                                                     width: 250px;
+                                                     text-align:center;
+                                                     border-radius: 5px;
+                                                     border-width: 5px"),
+                                        br(),
+                                        hr(),
+                                        actionButton(inputId = "Agent_Run_Cases", label="Run Cases",
+                                        style = "foreground-color:white; 
+                                                     background-color:blue; 
+                                                     height: 50px;
+                                                     width: 250px;
+                                                     text-align:center;
+                                                     border-radius: 5px;
+                                                     border-width: 5px"),
+                                        br(),
+                                        hr(),
+                                        actionButton(inputId = "Agent_Run_Clusters", label="Run Clusters",
+                                                     style = "foreground-color:white; 
+                                                     background-color:blue; 
+                                                     height: 50px;
+                                                     width: 250px;
+                                                     text-align:center;
+                                                     border-radius: 5px;
+                                                     border-width: 5px"),
+                                        br(),
+                                        hr(),
+                                        actionButton(inputId = "Agent_Use_Prev_SOM", label="Use Previous SOM Results",
+                                                     style = "foreground-color:white; 
+                                                     background-color:blue; 
+                                                     height: 50px;
+                                                     width: 250px;
+                                                     text-align:center;
+                                                     border-radius: 5px;
+                                                     border-width: 5px"),
+                                        br(),
+                                        hr(),
+                                        selectInput("Agent_somplottype", "Type of Grid Plot:", 
+                                                    choices= c("color", "barplot", 
+                                                               "names", "boxplot")),
+                                        br(),
+                                        hr(),
+                                        fileInput('file-acl', 'Upload Clusters', accept = c(
+                                          "text/csv",
+                                          "text/comma-separated-values,text/plain",
+                                          ".csv")),
+                                        checkboxInput('header-acl', ' Header?', TRUE),
+                                        selectInput('sep-acl', 'Separator:',
+                                                    c("Comma","Semicolon","Tab","Space"), 'Comma'),
+                                        selectInput('quote-acl', 'Quote:',
+                                                    c("None","Double Quote","Single Quote"), 
+                                                    'Double Quote'),
+                                        #uiOutput("varchoiceacl"),
+                                        numericInput('nrow.preview-acl','Number of rows in the preview:',20, min = 1, max = 100),
+                                        numericInput('ncol.preview-acl', 'Number of columns in the preview:',
+                                                     10,min = 1, max = 100),
+                                        helpText("Note: Even if the preview only shows a restricted
+                                        number of observations, the map will be based on the full dataset."),
+                                        hr(),
+                                        br(),
+                                        fileInput('file-acs', 'Upload Cases', accept = c(
+                                          "text/csv",
+                                          "text/comma-separated-values,text/plain",
+                                          ".csv")),
+                                        checkboxInput('header-acs', ' Header?', TRUE),
+                                        selectInput('sep-acs', 'Separator:',
+                                                    c("Comma","Semicolon","Tab","Space"), 'Comma'),
+                                        selectInput('quote-acs', 'Quote:',
+                                                    c("None","Double Quote","Single Quote"), 
+                                                    'Double Quote'),
+                                        #uiOutput("varchoiceacs"),
+                                        numericInput('nrow.preview-acs','Number of rows in the preview:',20, min = 1, max = 100),
+                                        numericInput('ncol.preview-acs', 'Number of columns in the preview:',
+                                                     10,min = 1, max = 100),
+                                        helpText("Note: Even if the preview only shows a restricted
+                                                 number of observations, the map will be based on the full dataset.")
+                                        ),
+                                 column(4,
+                                       h4("Case-Based Multi-Agent Grid"),
+                                       imageOutput("dummy_som_graphic", inline=TRUE),
+                                       br(),
+                                       br(),
+                                       br(),
+                                       hr(),
+                                       imageOutput("dummy_cluster_graphic", inline=TRUE),
+                                       #tableOutput("kmeans_tab"),
+                                       br(),
+                                       br(),
+                                       br(),
+                                       br(),
+                                       br(),
+                                       br(),
+                                       br(),
+                                       hr(),
+                                       imageOutput("dummy_case_graphic", inline=TRUE)
+                                       #tableOutput("view")
+                                       ))
                                
-                               ),
+                               #uiOutput("save_som_notice"),
+                               #plotOutput(outputId = "som_3Dplot", width = "50%", height = "500px"),
+                               #plotOutput("somplot"),
+                              # fileInput('file_pred', 'Choose CSV File', accept = c(
+                              #   "text/csv",
+                              #   "text/comma-separated-values,text/plain",
+                              #   ".csv")),
+                              # checkboxInput('header_pred', ' Header?', TRUE),
+                              # checkboxInput('load_prev_som', 'Use Previous SOM Results?'),
+                              # selectInput('sep_pred', 'Separator:',
+                              #             c("Comma","Semicolon","Tab","Space"), 'Comma'),
+                              # selectInput('quote_pred', 'Quote:',
+                              #             c("None","Double Quote","Single Quote"), 
+                              #             'Double Quote'),
+                              # actionButton('classify_prof', 'Classify Profiles'),
+                              # uiOutput("prof_rec_error"),
+                              # conditionalPanel("input.classify_prof > 0",
+                              #                 br(),
+                              #                 numericInput("nrow.result_pred","Number of rows in the results:" ,20, min = 1, max = 100),
+                              #                 tableOutput("view_predict"))
+                              # 
+                              ),
                               
                       
                       tabPanel("Help",
