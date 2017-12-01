@@ -7,8 +7,24 @@ full_data = NULL
 current_kmeans_solution = NULL
 current_som_solution = NULL
 previous_som = NULL
-
 #Reference Variables
+
+#Load the previous SOM and rename the workspace variable then remove the old one
+load("./Agent_SOM_Object")
+Agent_SOM_loaded=previous_som
+rm("previous_som")
+#Input for a 5 X 5 SOM 
+SOMgriddata <- structure(c(1:25), .Dim = c(5L,5L))
+
+
+#this gets the cluster
+the.table_agent_clusters <- read.csv("Agent_Cluster_Data.csv")
+
+#this gets the cases
+the.table_agent_cases <- read.csv("Agent_Case_Data.csv")
+
+
+the.table_agent_clusters <- read.csv("Agent_Cluster_Data.csv")
 ####
 #numeric_only_columns = NULL
 #other_columns = NULL
@@ -32,8 +48,6 @@ create_user_gen_kmeans_solution <- function(objectname, km){
 }
                                             
                     
-
-
 
 setClass("user_saved_kmeans_res", representation(save_name = "character", ucentroids = "list", uclusters = "list", usize = "integer"))
 

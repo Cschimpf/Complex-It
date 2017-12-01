@@ -4,13 +4,14 @@ library(cluster)
 library(FactoMineR)
 library(plot3D)
 library(shinyFiles)
+library(plotrix) 
 
 server <- function(input, output, session) {
   
-  output$complexit_logo <- renderImage(list(src="complexit_logo.png"), 
+  output$complexit_logo <- renderImage(list(src="complexit_logo.jpg"), 
                                        deleteFile=FALSE)
   
-  
+
   #### Panel 'Import data'
   ##############################################################################
   dInput <- reactive({
@@ -195,7 +196,7 @@ server <- function(input, output, session) {
     updateSelectInput(session, "somplotvar2", choices=tmp.names, 
                       selected=tmp.names[1:min(5,length(tmp.names))])
   })
-  # Plot the SOM
+  # Plot the SOM 
   output$somplot <- renderPlot({
     if(is.null(current_data_file))
       return(NULL)
@@ -231,12 +232,87 @@ server <- function(input, output, session) {
   #### Panel 'Agent-Model'
   #############################################################################
   # Plot the SOM
-  output$dummy_som_graphic <- renderImage(list(src="dummy_som_graphic.png"), 
-                                       deleteFile=FALSE)
-  output$dummy_case_graphic <- renderImage(list(src="dummy_case_graphic.png"), 
-                                          deleteFile=FALSE)
-  output$dummy_cluster_graphic <- renderImage(list(src="dummy_cluster_graphic.png"), 
-                                          deleteFile=FALSE)
+    #
+  
+    # Setup Button Pressed
+    observeEvent(input$Agent_Setup,{
+      output$somplotagent <- renderPlot({
+        color2D.matplot(SOMgriddata, show.values = TRUE, axes = FALSE, xlab = "", ylab = "", vcex = 2, vcol = "black",extremes = c("red", "yellow"),na.color="black")
+      })
+    })
+  
+    # Run Clusters Button Pressed
+    observeEvent(input$Agent_Run_Clusters,{
+    Agent_SOM <- Agent_SOM_loaded
+    SOMgriddatanew<-SOMgriddata
+    #Predict the Cluster Neurons from the centroids
+    Agents_Clusters_predicted <- predict(Agent_SOM, the.table_agent_clusters[,2:(as.numeric(length(the.table_agent_clusters))-1)])
+    #First, initialize the Agent_SOM to blanks creating an empty array
+    for (i in 1:length(SOMgriddatanew)){ 
+    SOMgriddatanew[i]<-NA
+    }
+    #Next replace the labels with the cluster neurons
+    for (i in 1:length(the.table_agent_clusters$clus_size)){
+      SOMgriddatanew[Agents_Clusters_predicted[i]]<-i
+    } 
+    output$somplotagent <- renderPlot({
+      color2D.matplot(SOMgriddatanew, show.values = TRUE, axes = FALSE, xlab = "", ylab = "", vcex = 2, vcol = "black",extremes = c("red", "yellow"),na.color="black")
+    })
+    output$view_predict_clusters <- renderTable(the.table_agent_clusters)
+    })
+    
+  # Run Cases Button Pressed
+  observeEvent(input$Agent_Run_Cases,{
+    output$view_predict_cases <- renderTable(the.table_agent_cases)
+    tmp.var <- input$somplotvaragent
+    output$somplotagent <- renderPlot({
+    plot(x=Agent_SOM_loaded, what="obs", type="names",variable=NULL,view=NULL, print.title = TRUE)
+    }) 
+  })
+  # Use Previous Button Pressed
+  observeEvent(input$Agent_Use_Prev_SOM,{
+    output$view_predict_cases <- renderTable(the.table_agent_cases)
+  })
+  
+  
+  #Not sure what these two do
+  observe({
+    updateSelectInput(session, "somplottypeagent", 
+                      choices=all.somplot.types[["numeric"]][[
+                        input$somplotwhatagent]])
+  })
+    # update variables available for plotting
+  updatePlotSomVaragent <- function() observe({
+    tmp.names <- colnames(Agent_SOM$data)
+    
+    updateSelectInput(session, "somplotvaragent", choices=tmp.names)
+    updateSelectInput(session, "somplotvar2agent", choices=tmp.names, 
+                      selected=tmp.names[1:min(5,length(tmp.names))])
+  })
+  
+
+  
+  
+  
+#   output$somplotagent <- renderPlot({
+#    plot(x=Agent_SOM_loaded, what="obs", type="names",variable=NULL,view=NULL, print.title = TRUE)
+#    tmp.view <- NULL
+#    if (input$somplottypeagent =="boxplot") {
+#      tmp.var <- (1:ncol(Agent_SOM$data))[colnames(Agent_SOM$data) %in% 
+#                                                       input$somplotvar2agent]
+#    }
+#    else {tmp.var <- input$somplotvaragent}
+#    #This if/else set is here to add cluster labels to neurons for observation plots only
+#    if(input$somplotwhatagent =='obs'){plot(x=Agent_SOM, what=input$somplotwhatagent, type=input$somplottypeagent,
+#                                       variable=tmp.var,view=tmp.view, print.title = TRUE)}
+#    else {
+#      plot(x=Agent_SOM, what=input$somplotwhatagent, type=input$somplottypeagent,
+#           variable=tmp.var,view=tmp.view)
+#    }
+#  })
+  
+  
+    #  
   #  output$somplot <- renderPlot({
 #    if(is.null(current_data_file))
 #      return(NULL)
@@ -354,4 +430,3 @@ server <- function(input, output, session) {
 #   current_kmeans_solution_predicted<-current_kmeans_solution
 #   current_kmeans_solution_predicted@uclusters<-as.list(as.numeric(predicted_cluster_data))
 #   k_data <- append_cluster_labels(current_kmeans_solution_predicted, current_data_file)
-#}

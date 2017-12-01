@@ -2,7 +2,6 @@ library(shiny)
 library(shinythemes)
 library(shinyFiles)
 
-
 ui <- fluidPage(theme=shinytheme("spacelab"),
                 
                 titlePanel("Complex-It 0.1.6"),
@@ -184,11 +183,28 @@ ui <- fluidPage(theme=shinytheme("spacelab"),
                                                      border-width: 5px"),
                                         br(),
                                         hr(),
-                                        selectInput("Agent_somplottype", "Type of Grid Plot:", 
+                                        #select the various types of SOM Plots
+                                        selectInput("somplotwhatagent", "Plot what?", 
+                                                    choices= list("Observations"= "obs",
+                                                                  "Prototypes"= "prototypes")),
+                                        selectInput("somplottypeagent", "Type of plot:", 
                                                     choices= c("color", "barplot", 
                                                                "names", "boxplot")),
+                                        conditionalPanel("input.somplottypeagent == 'color' ||
+                                                         input.somplottypeagent == '3d'",
+                                                         selectInput("somplotvaragent", 
+                                                                     "Variable: (only used for '3d',
+                                                                     'color' and 'boxplot' plots if available)", 
+                                                                     choices= "(Not Available)")),
+                                        conditionalPanel("input.somplottypeagent == 'boxplot'",
+                                                         selectInput("somplotvar2agent", 
+                                                                     "Variable: (hold Ctrl to select
+                                                                     multiple variables)", 
+                                                                     choices= "(Not Available)", 
+                                                                     multiple= TRUE)),
                                         br(),
                                         hr(),
+                                        #select the clusters
                                         fileInput('file-acl', 'Upload Clusters', accept = c(
                                           "text/csv",
                                           "text/comma-separated-values,text/plain",
@@ -226,13 +242,13 @@ ui <- fluidPage(theme=shinytheme("spacelab"),
                                         ),
                                  column(4,
                                        h4("Case-Based Multi-Agent Grid"),
-                                       imageOutput("dummy_som_graphic", inline=TRUE),
+                                       plotOutput("somplotagent",width = "800px", height = "600px"),  
                                        br(),
                                        br(),
                                        br(),
                                        hr(),
-                                       imageOutput("dummy_cluster_graphic", inline=TRUE),
-                                       #tableOutput("kmeans_tab"),
+                                       #imageOutput("dummy_cluster_graphic", inline=TRUE),
+                                       tableOutput("view_predict_clusters"),
                                        br(),
                                        br(),
                                        br(),
@@ -241,8 +257,8 @@ ui <- fluidPage(theme=shinytheme("spacelab"),
                                        br(),
                                        br(),
                                        hr(),
-                                       imageOutput("dummy_case_graphic", inline=TRUE)
-                                       #tableOutput("view")
+                                       #imageOutput("dummy_case_graphic", inline=TRUE)
+                                       tableOutput("view_predict_cases")
                                        ))
                                
                                #uiOutput("save_som_notice"),
