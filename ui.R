@@ -19,7 +19,7 @@ ui <- fluidPage(theme=shinytheme("spacelab"),
                       tabPanel("Import Data",
                                h3("Import and Prepare Data"),
                                
-                               p(HTML("To start, I'm adding text an analysis session, import your data set using the
+                               p(HTML("To start an analysis session, import your data set using the
                                       'Browse...' button below. Your data must be in the form of a csv file. Note that when you 
                                       download Complex-It from GitHub, several datasets  will be downloaded with it. Explore 
                                       the '/data' folder inside the Complex-It folder for further analysis opportunities. 
