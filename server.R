@@ -5,7 +5,7 @@ library(FactoMineR)
 library(plot3D)
 library(shinyFiles)
 library(plotrix) 
-library(plotrix) 
+
 
 
 server <- function(input, output, session) {

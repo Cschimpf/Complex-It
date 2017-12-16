@@ -7,7 +7,7 @@ full_data = NULL
 current_kmeans_solution = NULL
 current_som_solution = NULL
 previous_som = NULL
-previous_som = NULL
+
 
 #Reference Variables
 
