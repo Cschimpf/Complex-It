@@ -1,7 +1,7 @@
 library(shiny)
 library(shinythemes)
 library(shinyFiles)
-# Simple test of Github
+
 
 ui <- fluidPage(theme=shinytheme("spacelab"),
                 
