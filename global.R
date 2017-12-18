@@ -1,5 +1,11 @@
 ####Global Variables#####
 
+
+# Any code in this global.r file will run one time prior to launching
+# the Shiny App.  The code will not continually scan in the background
+# while the App runs, so a good place for intialization of variables using
+# code
+
 #Data Variables
 ####
 current_data_file = NULL

@@ -3,15 +3,37 @@ library(shinythemes)
 library(shinyFiles)
 
 
-ui <- fluidPage(theme=shinytheme("spacelab"),
-                
-                titlePanel("Complex-It 0.1.6"),
+#ui <- fluidPage(
+# here is the first option using shiny themes:  
+#----------------
+ui <- fluidPage(theme=shinytheme("cosmo"),
+#----------------
+
+# here is the next option embedding the tag in native html,
+# ----------
+# tags$head(
+# tags$link(rel = "stylesheet", type = "text/css", href = "sketchy.css")
+ #tags$style("#nrow.preview {font-size:10px;height:10px;}"),
+# ),
+# ----------
+
+
+                titlePanel("Complex-It 0.1.6 Beta"),
                 
                 sidebarLayout(
                   
-                  sidebarPanel(
-                    imageOutput("complexit_logo", inline=TRUE),
-                    width = 2
+
+#  Although we have been using sidebarPanel, I thought I would try 
+#  a wellPanel to see if it scales better - so far better on my browser
+#                  
+                 sidebarPanel(
+#                  wellPanel(
+                  h3(" "), 
+                  br(),
+                  imageOutput("complexit_logo", inline=TRUE),
+                  width = 3,
+                  p(" "),
+                  br()
                   ),
                   
                   mainPanel(
@@ -33,10 +55,11 @@ ui <- fluidPage(theme=shinytheme("spacelab"),
                                       "https://cran.r-project.org/web/packages/SOMbrero/index.html"
                                       target="_blank">package site.</a>')),
                                br(), 
-                               fileInput('file1', 'Choose CSV File', accept = c(
+                               fileInput('file1', 'Choose CSV File', buttonLabel='push',accept = c(
                                  "text/csv",
                                  "text/comma-separated-values,text/plain",
-                                 ".csv")),
+                                 ".csv")
+                                  ),
                                checkboxInput('header', ' Header?', TRUE),
                                selectInput('sep', 'Separator:',
                                            c("Comma","Semicolon","Tab","Space"), 'Comma'),
@@ -136,50 +159,82 @@ ui <- fluidPage(theme=shinytheme("spacelab"),
                                uiOutput("save_som_notice"),
                                plotOutput("somplot")),
                       
-                      tabPanel("Agent-Model", 
-                               h3("  "),
-                               p("   "),
+                      tabPanel("Case Prediction", 
+                               h3("Use your SOM solution to predict the neuron (cluster) membership of new or different cases"),
+                               p(HTML('Predict the classification of a new or different case
+                                  <br><i>Goodness of fit for classification is based on a numeric tolerance defined as
+                                  10^(-10)</i>'
+                                 )),
                                br(),
+                               fileInput('file_pred', 'Choose CSV File', accept = c(
+                                 "text/csv",
+                                 "text/comma-separated-values,text/plain",
+                                 ".csv")),
+                               checkboxInput('header_pred', ' Header?', TRUE),
+                               checkboxInput('load_prev_som', 'Use Previous SOM Results?'),
+                               selectInput('sep_pred', 'Separator:',
+                                           c("Comma","Semicolon","Tab","Space"), 'Comma'),
+                               selectInput('quote_pred', 'Quote:',
+                                           c("None","Double Quote","Single Quote"), 
+                                           'Double Quote'),
+                               actionButton('classify_prof', 'Classify Profiles'),
+                               conditionalPanel("input.classify_prof > 0",
+                                                numericInput("nrow.result_pred","Number of rows in the results:" ,20, min = 1, max = 100),
+                                                tableOutput("view_predict"))
+                               
+                      ),
+                      tabPanel("Agent-Model", 
+                               h3("Case-Based Multi-Agent Modeling: Use your SOM solution to create a simulated multi-agent environment for evaluating how policies impact the cases in your study."),
+                               #p("   "),
+                               #br(),
                                hr(),
                                fluidRow(
                                  column(3,
-                                        actionButton(inputId = "Agent_Setup", label="Setup",
+                                        actionButton(inputId = "Agent_Setup", label="Model Setup",
                                                      style = "foreground-color:white; 
-                                                     background-color:blue;
+                                                     background-color:khaki;
+                                                     color:black;
                                                      float:center;
                                                      height: 50px;
-                                                     width: 250px;
+                                                     width: 150px;
                                                      text-align:center;
-                                                     border-radius: 5px;
-                                                     border-width: 5px"),
-                                        br(),
-                                        hr(),
-                                        actionButton(inputId = "Agent_Run_Cases", label="Run Cases",
-                                        style = "foreground-color:white; 
-                                                     background-color:blue; 
-                                                     height: 50px;
-                                                     width: 250px;
-                                                     text-align:center;
+                                                     border-color:olive;
                                                      border-radius: 5px;
                                                      border-width: 5px"),
                                         br(),
                                         hr(),
                                         actionButton(inputId = "Agent_Run_Clusters", label="Run Clusters",
                                                      style = "foreground-color:white; 
-                                                     background-color:blue; 
+                                                     background-color:lavender; 
+                                                     color:black;
                                                      height: 50px;
-                                                     width: 250px;
+                                                     width: 150px;
                                                      text-align:center;
+                                                     border-color:lightslategray;
                                                      border-radius: 5px;
                                                      border-width: 5px"),
                                         br(),
                                         hr(),
-                                        actionButton(inputId = "Agent_Use_Prev_SOM", label="Use Previous SOM Results",
+                                        actionButton(inputId = "Agent_Run_Cases", label="Run Cases",
                                                      style = "foreground-color:white; 
-                                                     background-color:blue; 
+                                                     background-color:lavender; 
+                                                     color:black;
                                                      height: 50px;
-                                                     width: 250px;
+                                                     width: 150px;
                                                      text-align:center;
+                                                     border-color:lightslategray;
+                                                     border-radius: 5px;
+                                                     border-width: 5px"),
+                                        br(),
+                                        hr(),
+                                        actionButton(inputId = "Agent_Use_Prev_SOM", label="Use Previous SOM",
+                                                     style = "foreground-color:white; 
+                                                     background-color:turquoise; 
+                                                     color:black;
+                                                     height: 50px;
+                                                     width: 150px;
+                                                     text-align:center;
+                                                     border-color:seagreen;
                                                      border-radius: 5px;
                                                      border-width: 5px"),
                                         br(),
@@ -241,9 +296,9 @@ ui <- fluidPage(theme=shinytheme("spacelab"),
                                         helpText("Note: Even if the preview only shows a restricted
                                                  number of observations, the map will be based on the full dataset.")
                                         ),
-                                 column(4,
-                                       h4("Case-Based Multi-Agent Grid"),
-                                       plotOutput("somplotagent",width = "800px", height = "600px"),  
+                                 column(6,
+                                       #h4("Case-Based Multi-Agent Grid"),
+                                       plotOutput("somplotagent",width = "600px", height = "400px"),  
                                        br(),
                                        br(),
                                        br(),

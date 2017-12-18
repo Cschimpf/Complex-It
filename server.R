@@ -10,7 +10,7 @@ library(plotrix)
 
 server <- function(input, output, session) {
   
-  output$complexit_logo <- renderImage(list(src="complexit_logo_small2.jpg"), 
+  output$complexit_logo <- renderImage(list(src="complexit_logo_small3.png"), 
                                        deleteFile=FALSE)
   
 
@@ -230,6 +230,51 @@ server <- function(input, output, session) {
     paste("Saved SOM ", format(Sys.time(),format="%Y-%m-%d-%H:%M:%S"),sep=" ")
     
   })
+  
+  #### Panel 'Profile Recognition'
+  #############################################################################
+  pInput <- reactive({
+    in.file_pred <- input$file_pred
+    if (is.null(in.file_pred))
+      return(NULL)
+    
+    the.sep_p <- switch(input$sep_pred, "Comma"=",", "Semicolon"=";", "Tab"="\t",
+                        "Space"="")
+    
+    the.quote_p <- switch(input$quote_pred, "None"="","Double Quote"='"',
+                          "Single Quote"="'")
+    
+    the.table_p <- na.omit(read.csv(in.file_pred$datapath, header=input$header_pred, 
+                                    sep=the.sep_p, quote=the.quote_p))
+    
+    numeric_only_columns <- column_type_identifier(the.table_p) 
+    the.table_p[numeric_only_columns]
+  })
+  
+  
+  observeEvent(input$classify_prof, {
+    temp_som <- current_som_solution
+    p.input <- pInput()
+    if (input$load_prev_som == TRUE) {
+      tryCatch(load("./tmp/SavedSOMObject"), error = function(e) NULL)
+      temp_som <- previous_som #if there is no file to load, previous_som will be NULL from global
+    }
+    if (is.null(p.input) | is.null(temp_som)) {
+      print("Nothing here!")
+      return(NULL)}
+    else {
+      predicted <- predict(temp_som, p.input)
+      temprowvector<-row(current_data_file)
+      p.input <- cbind('Case ID' = temprowvector[,1], p.input, 'Matched Neuron' = predicted)
+      #some prediction function goes here
+      output$view_predict <- renderTable({
+        
+        head(p.input, n=input$nrow.result_pred)
+      })
+    }
+  })
+  
+  
   
   #### Panel 'Agent-Model'
   #############################################################################
