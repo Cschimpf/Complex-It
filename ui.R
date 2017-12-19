@@ -55,7 +55,7 @@ ui <- fluidPage(theme=shinytheme("cosmo"),
                                       "https://cran.r-project.org/web/packages/SOMbrero/index.html"
                                       target="_blank">package site.</a>')),
                                br(), 
-                               fileInput('file1', 'Choose CSV File', buttonLabel='push',accept = c(
+                               fileInput('file1', 'Choose CSV File', buttonLabel='Browse',accept = c(
                                  "text/csv",
                                  "text/comma-separated-values,text/plain",
                                  ".csv")
