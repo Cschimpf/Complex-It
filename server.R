@@ -215,7 +215,7 @@ server <- function(input, output, session) {
     #This if/else set is here to add cluster labels to neurons for observation plots only
     temp.dim<-current_som_solution[["parameters"]][["the.grid"]][["dim"]] #gets the dimension of the grid
     if(input$somplotwhat =='obs'){plot(x=current_som_solution, what=input$somplotwhat, type=input$somplottype,
-                                       variable=tmp.var,view=tmp.view, print.title = TRUE,the.titles = paste("Neuron ", 1:prod(temp.dim)))}
+                                       variable=tmp.var,view=tmp.view, print.title = TRUE,the.titles = paste("Quadrant ", 1:prod(temp.dim)))}
     #if(input$somplotwhat =='obs'){plot(x=current_som_solution, what=input$somplotwhat, type=input$somplottype,
     #                                   variable=tmp.var,view=tmp.view, print.title = TRUE)}
     else {
