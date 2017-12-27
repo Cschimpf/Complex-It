@@ -175,12 +175,26 @@ server <- function(input, output, session) {
     else{
       ### post the quality control factors as well
       qc<-quality(current_som_solution)
+      Neurons<-current_som_solution[["clustering"]]
+      Cases<- current_som_solution[["data"]]
+      Cases_Neurons<-cbind(Cases,Neurons)
+      Neuron_Profiles<-current_som_solution[["prototypes"]]
+      write.csv(Neuron_Profiles, file = "./tmp/AgentQuadrantData.csv")
       tagList(
         p(paste("Trained SOM ", format(Sys.time(),format="%Y-%m-%d-%H:%M:%S"),sep=" ")),
         p(paste("Topo Error  ", format(qc$topographic,digits=4),sep=" ")),
         p(paste("Quant Error ", format(qc$quantization,digits=4),sep=" "))
-        )
-    }
+        )}
+    })
+  output$somsummary <- renderUI({
+      if(input$trainbutton == 0){
+        return()
+      }
+      else{
+        ### post the summary data
+        somsummarydata<-capture.output(summary(current_som_solution))
+        paste(somsummarydata,collapse="\n\n")
+      }
   })
   #### Panel 'Plot Map'
   #############################################################################
@@ -235,7 +249,7 @@ server <- function(input, output, session) {
     
   })
   
-  #### Panel 'Profile Recognition'
+  #### Panel 'Case Prediction'
   #############################################################################
   pInput <- reactive({
     in.file_pred <- input$file_pred
@@ -270,9 +284,10 @@ server <- function(input, output, session) {
       predicted <- predict(temp_som, p.input)
       temprowvector<-row(current_data_file)
       p.input <- cbind('Case ID' = temprowvector[,1], p.input, 'Matched Neuron' = predicted)
+      write.csv(p.input, file = "./tmp/PredictQuadrantData.csv")
+      #still need to add the next best match neuron and quant errors
       #some prediction function goes here
       output$view_predict <- renderTable({
-        
         head(p.input, n=input$nrow.result_pred)
       })
     }

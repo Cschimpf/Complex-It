@@ -110,7 +110,8 @@ ui <- fluidPage(theme=shinytheme("cosmo"),
                                br(), br(),
                                
                                uiOutput("trainnotice"),
-                               
+                               br(),
+                               uiOutput("somsummary"),
                                br(), 
                                h4("Options"),
                                
@@ -160,7 +161,7 @@ ui <- fluidPage(theme=shinytheme("cosmo"),
                                plotOutput("somplot")),
                       
                       tabPanel("Case Prediction", 
-                               h3("Use your SOM solution to predict the neuron (cluster) membership of new or different cases"),
+                               h3("Use your SOM solution to predict the quadrant membership of new or different cases"),
                                p(HTML('Predict the classification of a new or different case
                                   <br><i>Goodness of fit for classification is based on a numeric tolerance defined as
                                   10^(-10)</i>'
