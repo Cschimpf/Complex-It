@@ -6,10 +6,13 @@ library(plot3D)
 library(shinyFiles)
 library(plotrix) 
 
+
+
 server <- function(input, output, session) {
   
-  output$complexit_logo <- renderImage(list(src="complexit_logo3.png"), 
-                                       deleteFile=FALSE)
+
+  output$complexit_logo <- renderImage({list(src="LOGO_Dec2017B_small.png")}, deleteFile = FALSE)
+
   
 
   #### Panel 'Import data'
@@ -173,12 +176,38 @@ server <- function(input, output, session) {
     else{
       ### post the quality control factors as well
       qc<-quality(current_som_solution)
+      Neurons<-current_som_solution[["clustering"]]
+      Cases<- current_som_solution[["data"]]
+      Cases_Neurons<-cbind(Cases,Neurons)
+      Neuron_Profiles<-current_som_solution[["prototypes"]]
+      write.csv(Neuron_Profiles, file = "./tmp/AgentQuadrantData.csv")
+      # now calculate the average overall distance using Euclidean
+      #first get the number of variables
+      SOMprofilecolumns<-ncol(Cases)
+      Distance_Cases_to_Neurons<-1:length(Cases_Neurons[,1])
+      #for each case, see how far it is away from it's neuron,then take the mean
+      for (i in 1:length(Cases_Neurons[,1])){ 
+        Distance_Cases_to_Neurons[i]<-dist(rbind(Cases_Neurons[i,1:SOMprofilecolumns],Neuron_Profiles[Cases_Neurons[i,SOMprofilecolumns+1],1:SOMprofilecolumns]),method =  "euclidean")
+      }
+      # here is the mean calculation for all cases in the SOM object
+      overallquant<-mean(Distance_Cases_to_Neurons)
+      #now print out the results
       tagList(
         p(paste("Trained SOM ", format(Sys.time(),format="%Y-%m-%d-%H:%M:%S"),sep=" ")),
         p(paste("Topo Error  ", format(qc$topographic,digits=4),sep=" ")),
-        p(paste("Quant Error ", format(qc$quantization,digits=4),sep=" "))
-        )
-    }
+        p(paste("Quant Error (Letremy) ", format(qc$quantization,digits=4),sep=" ")),
+        p(paste("Quant Error (Euclidean) ", format(overallquant,digits=4),sep=" "))
+      )}
+    })
+  output$somsummary <- renderUI({
+      if(input$trainbutton == 0){
+        return()
+      }
+      else{
+        ### post the summary data
+        somsummarydata<-capture.output(summary(current_som_solution))
+        paste(somsummarydata,collapse="\n\n")
+      }
   })
   #### Panel 'Plot Map'
   #############################################################################
@@ -209,9 +238,13 @@ server <- function(input, output, session) {
                                                        input$somplotvar2]
     }
     else {tmp.var <- input$somplotvar}
+
     #This if/else set is here to add cluster labels to neurons for observation plots only
+    temp.dim<-current_som_solution[["parameters"]][["the.grid"]][["dim"]] #gets the dimension of the grid
     if(input$somplotwhat =='obs'){plot(x=current_som_solution, what=input$somplotwhat, type=input$somplottype,
-                                       variable=tmp.var,view=tmp.view, print.title = TRUE)}
+                                       variable=tmp.var,view=tmp.view, print.title = TRUE,the.titles = paste("Quadrant ", 1:prod(temp.dim)))}
+    #if(input$somplotwhat =='obs'){plot(x=current_som_solution, what=input$somplotwhat, type=input$somplottype,
+    #                                   variable=tmp.var,view=tmp.view, print.title = TRUE)}
     else {
     plot(x=current_som_solution, what=input$somplotwhat, type=input$somplottype,
          variable=tmp.var,view=tmp.view)
@@ -228,6 +261,84 @@ server <- function(input, output, session) {
     paste("Saved SOM ", format(Sys.time(),format="%Y-%m-%d-%H:%M:%S"),sep=" ")
     
   })
+  
+  #### Panel 'Case Prediction'
+  #############################################################################
+  pInput <- reactive({
+    in.file_pred <- input$file_pred
+    if (is.null(in.file_pred))
+      return(NULL)
+    
+    the.sep_p <- switch(input$sep_pred, "Comma"=",", "Semicolon"=";", "Tab"="\t",
+                        "Space"="")
+    
+    the.quote_p <- switch(input$quote_pred, "None"="","Double Quote"='"',
+                          "Single Quote"="'")
+    
+    the.table_p <- na.omit(read.csv(in.file_pred$datapath, header=input$header_pred, 
+                                    sep=the.sep_p, quote=the.quote_p))
+    
+    numeric_only_columns <- column_type_identifier(the.table_p) 
+    the.table_p[numeric_only_columns]
+  })
+  
+  
+  observeEvent(input$classify_prof, {
+    temp_som <- current_som_solution
+    p.input <- pInput()
+    if (input$load_prev_som == TRUE) {
+      tryCatch(load("./tmp/SavedSOMObject"), error = function(e) NULL)
+      temp_som <- previous_som #if there is no file to load, previous_som will be NULL from global
+    }
+    if (is.null(p.input) | is.null(temp_som)) {
+      print("Nothing here!")
+      return(NULL)}
+    else {
+      # the predictions are made using SOMbrero predict function against the p.input data
+      predicted <- predict(temp_som, p.input)
+      temprowvector<-row(current_data_file)
+      p.input <- cbind('Case ID' = temprowvector[,1], p.input, 'Matched Neuron' = predicted)
+      # calculate the distances from each case to its closest, 2nd closest, and furthest neuron
+      Neurons<-temp_som[["clustering"]] #these are the cases and their neuron assignments
+      Cases<- temp_som[["data"]] #these are the cases
+      #SOMprofilecolumns<-ncol(Cases)
+      Cases_Neurons<-cbind(Cases,Neurons) #the cases with a new column for their predicted neuron
+      Neuron_Profiles<-temp_som[["prototypes"]] #these are the neuron's prototypes
+      #create an array intitialized to 1's to store all the BMUs as the loop itterates
+      BMUS<-array(1,c(length(Cases[,1]),6))
+      # Now loop through cases, each time appending the case to the existing neuron prototypes and recalculating
+      for (i in 1:length(Cases[,1])){ 
+      newguess<-Cases[i,]
+      D<-rbind(newguess,Neuron_Profiles) #append each case to first position with the neuron prototypes
+      B<-dist(D,method="euclidean",diag=TRUE) #calculate the distances from the case to each of the neuron prototypes
+      C<-rank(B[1:nrow(D)-1],ties.method= "first") #now rank the neuron prototype distance
+      BMU1<-B[which (C==1)]
+      BMU2<-B[which (C==2)]
+      BMUN<-B[which (C==max(C))]
+      BMUS[i,1]<-which(C==1)
+      BMUS[i,2]<-which(C==2)
+      BMUS[i,3]<-which(C==nrow(D)-1)
+      BMUS[i,4]<-BMU1
+      BMUS[i,5]<-BMU2
+      BMUS[i,6]<-BMUN
+      }
+      #
+      # Now append the BMUs to the file
+      p.input <- cbind(p.input, 'BMU1' = BMUS[,1])
+      p.input <- cbind(p.input, 'BMU2' = BMUS[,2])
+      p.input <- cbind(p.input, 'BMUN' = BMUS[,3])
+      p.input <- cbind(p.input, 'EUCDIS1' = BMUS[,4])
+      p.input <- cbind(p.input, 'EUCDIS2' = BMUS[,5])
+      p.input <- cbind(p.input, 'EUCDISN' = BMUS[,6])
+      #
+      write.csv(p.input, file = "./tmp/PredictQuadrantData.csv")
+      output$view_predict <- renderTable({
+        head(p.input, n=input$nrow.result_pred)
+      })
+    }
+  })
+  
+  
   
   #### Panel 'Agent-Model'
   #############################################################################
@@ -292,7 +403,7 @@ server <- function(input, output, session) {
   
 
   
-  
+}  
   
 #   output$somplotagent <- renderPlot({
 #    plot(x=Agent_SOM_loaded, what="obs", type="names",variable=NULL,view=NULL, print.title = TRUE)
@@ -378,7 +489,7 @@ server <- function(input, output, session) {
 #    })
 #    }
 #  })
-}
+#}
 
 
 ########################Discarded Code
