@@ -8,7 +8,7 @@ library(plotrix)
 
 server <- function(input, output, session) {
   
-  output$complexit_logo <- renderImage(list(src="complexit_logo_small2.jpg"), 
+  output$complexit_logo <- renderImage(list(src="complexit_logo3.png"), 
                                        deleteFile=FALSE)
   
 
