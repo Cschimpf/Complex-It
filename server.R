@@ -277,8 +277,9 @@ server <- function(input, output, session) {
     
     the.table_p <- na.omit(read.csv(in.file_pred$datapath, header=input$header_pred, 
                                     sep=the.sep_p, quote=the.quote_p))
-    
-    numeric_only_columns <- column_type_identifier(the.table_p) 
+  
+    numeric_only_columns <- column_type_identifier(the.table_p)
+
     the.table_p[numeric_only_columns]
   })
   
