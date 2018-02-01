@@ -18,6 +18,9 @@
     + FactoMineR
     + plot3D
     + shinyFiles
+    + plotrix
+    + rhandsontable
+    + ggplot2
 
 
 ### Detailed Installation Steps
