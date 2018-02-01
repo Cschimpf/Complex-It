@@ -14,4 +14,6 @@ install.packages("FactoMineR")
 install.packages("plot3D")
 install.packages("shinyFiles")
 install.packages("plotrix")
+install.packages("rhandsontable")
+install.packages("ggplot2")
 

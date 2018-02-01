@@ -5,13 +5,15 @@ library(FactoMineR)
 library(plot3D)
 library(shinyFiles)
 library(plotrix) 
+library(rhandsontable)
+library(ggplot2)
 
 
 
 server <- function(input, output, session) {
   
 
-  output$complexit_logo <- renderImage({list(src="LOGO_Dec2017B_small.png")}, deleteFile = FALSE)
+  output$complexit_logo <- renderImage({list(src="LOGO__smaller2018.png")}, deleteFile = FALSE)
 
   
 
@@ -45,7 +47,7 @@ server <- function(input, output, session) {
                              c("integer", "numeric")])), 
       actionButton(inputId = "subset_data", label = "Subset Data")))
     numeric_only_columns <- column_type_identifier(the.table) 
-    full_data <<- the.table ###this may be redundant and unnecessary??
+    full_data <<- the.table #check if needed
     current_data_file <<- the.table[numeric_only_columns]
     the.table#this is set such that the last thing in this method/function is the table and is therefore set to dInput
     
@@ -67,7 +69,6 @@ server <- function(input, output, session) {
   # data preview table
   # once data is populated, with the dInput call here, it will automatically be populated
   output$view <- renderTable({
-    #print(current_data_file)
     d.input <- dInput()
     if (is.null(d.input)) 
       return(NULL)
@@ -107,7 +108,6 @@ server <- function(input, output, session) {
     observeEvent(input$save, {
       
       fileinfo <- parseSavePath(roots, input$save)
-      
       k_data <- cbind(current_data_file, "clus_labels" = current_kmeans_solution@uclusters)
       
       write.csv(k_data, as.character(fileinfo$datapath))
@@ -128,7 +128,7 @@ server <- function(input, output, session) {
       
     })
     
-    #this function displays the pseudoF
+    #displays the pseudoF
     if (input$pseudo_f == TRUE) {
       FSTAT <- pseudoF(current_data_file, current_kmeans_solution,input$clusters) 
       output$pseudoF <- renderText({
@@ -343,15 +343,77 @@ server <- function(input, output, session) {
   
   #### Panel 'Agent-Model'
   #############################################################################
-  # Plot the SOM
-    #
+    agent_case_values <- reactiveValues(first = NA, second = NA, third = NA, fourth = NA, fifth = NA, sixth = NA)
   
     # Setup Button Pressed
     observeEvent(input$Agent_Setup,{
+      if(is.null(current_data_file)){
+        return()
+      }
+      
+      agent_case_tracker <<- create_track_agent_tab_state("first", "none")
+      erase_future_states(agent_case_tracker, 0, agent_case_values)
+      temp_logic_col <- generate_logic_column(current_data_file)
+      updateKey(cbind("Include" = temp_logic_col,current_data_file), agent_case_values, "first")
+      agent_case_tracker@terminal_state <<- "first"
+      output$cases_editable_table <- renderRHandsontable({
+        rhandsontable(agent_case_values[[agent_case_tracker@current_state]])
+      })
+      
       output$somplotagent <- renderPlot({
-        color2D.matplot(SOMgriddata, show.values = TRUE, axes = FALSE, xlab = "", ylab = "", vcex = 2, vcol = "black",extremes = c("red", "yellow"),na.color="black")
+        agent_grid_plot <<- generate_grid_template("")
+        agent_grid_plot
       })
     })
+  observeEvent(input$Agent_Run_Cases, {
+    if(is.null(agent_case_tracker)){
+      return()
+    }
+    if(!is.null(input$cases_editable_table)){
+    new_data_state <- hot_to_r(input$cases_editable_table)
+    state <- convert_state_to_numeric(agent_case_tracker, agent_case_tracker@current_state)
+    terminal <- convert_state_to_numeric(agent_case_tracker, agent_case_tracker@terminal_state)
+    if(state < 6 & state != terminal){
+      erase_future_states(agent_case_tracker, state, agent_case_values)
+    }
+    empty <- FALSE
+    for(i in 1:length(agent_case_tracker@possible_states))
+    {
+      if(is.na(reactiveValuesToList(agent_case_values)[agent_case_tracker@possible_states][i])){
+        empty <- TRUE
+        agent_case_tracker@terminal_state <<- agent_case_tracker@possible_states[i]
+        agent_case_tracker@current_state <<- agent_case_tracker@terminal_state
+        break
+      }
+    }
+    updateReactiveValues(agent_case_tracker, new_data_state, agent_case_values, empty)
+    }
+    else{new_data_state <-agent_case_values[[agent_case_tracker@current_state]]}
+    plot_agent_SOM(new_data_state)
+    output$somplotagent <- renderPlot({
+      agent_grid_plot + agent_grid_slots[["1"]] + agent_grid_slots[["2"]] + agent_grid_slots[["3"]] + agent_grid_slots[["4"]] + agent_grid_slots[["5"]] + agent_grid_slots[["6"]]
+      #new_grid_plot
+    })
+    
+    
+  })
+  observeEvent(input$back_case, {
+    newstate <- update_tracker_current_state(agent_case_tracker, agent_case_values, -1)
+    agent_case_tracker@current_state <<- agent_case_tracker@possible_states[newstate]
+    output$cases_editable_table <- renderRHandsontable({
+      rhandsontable(agent_case_values[[agent_case_tracker@current_state]])
+      })
+    #values$update_data <- values$update_data + 1
+  })
+  observeEvent(input$forward_case, {
+    newstate <- update_tracker_current_state(agent_case_tracker, agent_case_values, 1)
+    agent_case_tracker@current_state <<- agent_case_tracker@possible_states[newstate]
+    output$cases_editable_table <- renderRHandsontable({
+      rhandsontable(agent_case_values[[agent_case_tracker@current_state]])
+    })
+  })
+  
+
   
     # Run Clusters Button Pressed
     observeEvent(input$Agent_Run_Clusters,{
@@ -373,14 +435,7 @@ server <- function(input, output, session) {
     output$view_predict_clusters <- renderTable(the.table_agent_clusters)
     })
     
-  # Run Cases Button Pressed
-  observeEvent(input$Agent_Run_Cases,{
-    output$view_predict_cases <- renderTable(the.table_agent_cases)
-    tmp.var <- input$somplotvaragent
-    output$somplotagent <- renderPlot({
-    plot(x=Agent_SOM_loaded, what="obs", type="names",variable=NULL,view=NULL, print.title = TRUE)
-    }) 
-  })
+ 
   # Use Previous Button Pressed
   observeEvent(input$Agent_Use_Prev_SOM,{
     output$view_predict_cases <- renderTable(the.table_agent_cases)
@@ -422,7 +477,19 @@ server <- function(input, output, session) {
 #           variable=tmp.var,view=tmp.view)
 #    }
 #  })
-  
+
+# Run Cases Button Pressed
+# observeEvent(input$Agent_Run_Cases,{
+#   output$view_predict_cases <- renderTable(the.table_agent_cases)
+#   tmp.var <- input$somplotvaragent
+#   output$somplotagent <- renderPlot({
+#     plot(x=Agent_SOM_loaded, what="obs", type="names",variable=NULL,view=NULL, print.title = TRUE)
+#   }) 
+# })
+
+
+
+
   
     #  
   #  output$somplot <- renderPlot({
@@ -542,3 +609,12 @@ server <- function(input, output, session) {
 #   current_kmeans_solution_predicted<-current_kmeans_solution
 #   current_kmeans_solution_predicted@uclusters<-as.list(as.numeric(predicted_cluster_data))
 #   k_data <- append_cluster_labels(current_kmeans_solution_predicted, current_data_file)
+
+#output$cases_editable_table <- renderRHandsontable({
+#if(is.null(current_data_file)){
+#return()
+#}
+#new_data <- hot_to_r(input$cases_editable_table)
+#rhandsontable(new_data)
+# print(new_data)
+#})

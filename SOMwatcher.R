@@ -8,9 +8,10 @@
 suppressMessages(library(SOMbrero))
 library(plotrix) 
 
+setwd("C:\\Users\\Corey Schimpf\\Documents\\SACS for R\\new interface Complexit")
 
 #Load the previous SOM and rename the workspace variable then remove the old one
-load("./Agent_SOM_Object")
+load("Agent_SOM_Object")
 Agent_SOM <- previous_som
 
 #Input for a 5 X 5 SOM 
@@ -35,7 +36,7 @@ i=1
 #Plot the baseline plots of the clusters and neurons
 #plot the neuron map
 par(mfrow=c(2,2))
-color2D.matplot(SOMgriddatanew, show.values = TRUE, axes = FALSE, xlab = "clusters", ylab = "", vcex = 2, vcol = "black",extremes = c("white", "blue"),na.color="black")
+color2D.matplot(SOMgriddatanew, show.values = FALSE, axes = FALSE, xlab = "clusters", ylab = "", vcex = 2, vcol = "black",extremes = c("white", "blue"),na.color="black")
 plot(testrun,neuronnumber)
 points(testrun[i], neuronnumber[i], pch = 21, col = "red", bg = "yellow")
 color2D.matplot(SOMgriddatanewcases, show.values = TRUE, axes = FALSE, xlab = "cases", ylab = "", vcex = 2, vcol = "black",extremes = c("white", "blue"),na.color="black")
@@ -98,3 +99,6 @@ plot(testrun,neuronnumbercases)
 points(testrun[i], neuronnumbercases[i], pch = 21, col = "red", bg = "yellow")
 #
 i=i+1
+
+
+

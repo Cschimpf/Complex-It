@@ -1,6 +1,8 @@
 library(shiny)
 library(shinythemes)
 library(shinyFiles)
+library(rhandsontable)
+
 
 
 #ui <- fluidPage(
@@ -23,9 +25,6 @@ ui <- fluidPage(theme=shinytheme("cosmo"),
                 sidebarLayout(
                   
 
-#  Although we have been using sidebarPanel, I thought I would try 
-#  a wellPanel to see if it scales better - so far better on my browser
-#                  
                  sidebarPanel(
 #                  wellPanel(
                   imageOutput("complexit_logo", inline=TRUE),
@@ -181,9 +180,15 @@ ui <- fluidPage(theme=shinytheme("cosmo"),
                                
                       ),
                       tabPanel("Agent-Model", 
-                               h3("Case-Based Multi-Agent Modeling: Use your SOM solution to create a simulated multi-agent environment for evaluating how policies impact the cases in your study."),
-                               #p("   "),
-                               #br(),
+                               h3("Case-Based Multi-Agent Modeling"),
+                               p(HTML("Use your SOM solution to create a simulated multi-agent environment 
+                                      for evaluating how policies impact the cases in your study. NOTE. This
+                                      is an experimental tab. Not all features are currently integrated. 
+                                      The grid may not reflect the dimensions selected under Train SOM. The grid
+                                      is only populated with estimated data points when pressing Run Cases. Upload
+                                      features are not yet supported. This tab is under development with new updates
+                                      coming in February 2018")),
+                
                                hr(),
                                fluidRow(
                                  column(3,
@@ -293,26 +298,19 @@ ui <- fluidPage(theme=shinytheme("cosmo"),
                                         helpText("Note: Even if the preview only shows a restricted
                                                  number of observations, the map will be based on the full dataset.")
                                         ),
-                                 column(6,
-                                       #h4("Case-Based Multi-Agent Grid"),
-                                       plotOutput("somplotagent",width = "600px", height = "400px"),  
-                                       br(),
-                                       br(),
-                                       br(),
-                                       hr(),
-                                       #imageOutput("dummy_cluster_graphic", inline=TRUE),
-                                       tableOutput("view_predict_clusters"),
-                                       br(),
-                                       br(),
-                                       br(),
-                                       br(),
-                                       br(),
-                                       br(),
-                                       br(),
-                                       hr(),
-                                       #imageOutput("dummy_case_graphic", inline=TRUE)
-                                       tableOutput("view_predict_cases")
-                                       ))
+                                 column(7,
+                                       conditionalPanel("input.Agent_Setup > 0",
+                                       plotOutput("somplotagent", width ="600px", height = "600px"),
+                                       #width = "500px", height = "500px"),  
+                                       #br(),
+                                       #br(),
+                                     
+                                       #rHandsontableOutput("centroids_editable_table"),
+                                       
+                                       rHandsontableOutput("cases_editable_table"),
+                                       actionButton("back_case", "<<"),
+                                       actionButton("forward_case", ">>" )
+                                       )))
                                
                                #uiOutput("save_som_notice"),
                                #plotOutput(outputId = "som_3Dplot", width = "50%", height = "500px"),
