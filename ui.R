@@ -205,18 +205,18 @@ ui <- fluidPage(theme=shinytheme("cosmo"),
                                                      border-width: 5px"),
                                         br(),
                                         hr(),
-                                        actionButton(inputId = "Agent_Run_Clusters", label="Run Clusters",
-                                                     style = "foreground-color:white; 
-                                                     background-color:lavender; 
-                                                     color:black;
-                                                     height: 50px;
-                                                     width: 150px;
-                                                     text-align:center;
-                                                     border-color:lightslategray;
-                                                     border-radius: 5px;
-                                                     border-width: 5px"),
-                                        br(),
-                                        hr(),
+                                        # actionButton(inputId = "Agent_Run_Clusters", label="Run Clusters",
+                                        #              style = "foreground-color:white; 
+                                        #              background-color:lavender; 
+                                        #              color:black;
+                                        #              height: 50px;
+                                        #              width: 150px;
+                                        #              text-align:center;
+                                        #              border-color:lightslategray;
+                                        #              border-radius: 5px;
+                                        #              border-width: 5px"),
+                                        # br(),
+                                        # hr(),
                                         actionButton(inputId = "Agent_Run_Cases", label="Run Cases",
                                                      style = "foreground-color:white; 
                                                      background-color:lavender; 
