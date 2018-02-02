@@ -180,7 +180,8 @@ ui <- fluidPage(theme=shinytheme("cosmo"),
                                
                       ),
                       tabPanel("Agent-Model", 
-                               h3("Case-Based Multi-Agent Modeling"),
+                               h3("Case-Based Multi-Agent Modeling:", tags$b("UNDER DEVELOPMENT")),
+                                  
                                p(HTML("Use your SOM solution to create a simulated multi-agent environment 
                                       for evaluating how policies impact the cases in your study. NOTE. This
                                       is an experimental tab. Not all features are currently integrated. 
@@ -188,6 +189,15 @@ ui <- fluidPage(theme=shinytheme("cosmo"),
                                       is only populated with estimated data points when pressing Run Cases. Upload
                                       features are not yet supported. This tab is under development with new updates
                                       coming in February 2018")),
+                              tags$b("To Use:",
+                              tags$ol(tags$li("Upload data under Import Data"), 
+                                                         tags$li("Cluster data under Cluster"),
+                                                         tags$li("Train the SOM under Self-Organize"),
+                                                         tags$li("View the SOM plot Plot Map"),
+                                                         tags$li("Navigate to Agent tab and press Model Setup"),
+                                                         tags$li("Cases from your data will be selected randomly, only 6 can be selected"),
+                                                         tags$li("You can edit the data for the cases or which cases are included - MAX of 6 cases"),
+                                                         tags$li("Press Run Cases to see where the edited cases fall on the SOM grid. This is the same grid as Plot Map"))),
                 
                                hr(),
                                fluidRow(
