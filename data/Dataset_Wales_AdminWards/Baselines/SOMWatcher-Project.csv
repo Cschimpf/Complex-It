@@ -1,0 +1,4 @@
+Data File,Case Data Filename with color select column added,Trained SOM Object Filename,SOM Object Label,Description,SOM Quadrant Matcher
+WalesIMD2014-2016Change.csv,baseline1-6clusters-with-selections.csv,baseline1-SavedSOMObject,Baseline 1,Select cases 2 7 13 18 and 20,matcher1.csv
+WalesIMD2014-2016Change.csv,baseline2-6clusters-with-selections.csv,baseline2-SavedSOMObject,Baseline 2,Select cases 2 7 13 18 and 20,matcher2.csv
+ WalesIMD2014-2016Change-PolicyChange1,policy1-6clusters-with-selections.csv,baseline2-SavedSOMObject,Baseline 2,"Increased Income by 25% in 2016, reduced violence 20% in 2016; Select cases 2 7 13 18 and 20",matcher2.csv
