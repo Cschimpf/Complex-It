@@ -3,6 +3,9 @@
 # Opens a project csv file containing various baselines and changed files
 # then outputs a csv with 5 selected output cases as they travel through changes
 #
+# Revision History
+# 02/03/2018 Original
+# 02/04/2018 added better output plot formats
 
 # Load in the project csv file
 # Column 1 Data File
@@ -59,8 +62,10 @@ for(j in 1:nrow(case_data_file)){
 }
 
 #now use matplot to plot the final results
-matplot(xplot,yplot,type=c("l","l","l","l","l"),col=c("Black","Red","Green","Blue","Yellow"),xlab="row",ylab="quadrant", xaxt = "n")
-axis(1,at=1:output_point)
+matplot(xplot,yplot,type=c("b","b","b","b","b"),pch=c(1,1,1,1,1),col=c("Black","Red","Green","Blue","Yellow"),
+        xlab=" ",ylab="Quadrant",lty=c(1,1,1,1,1),lwd=c(3,3,3,3,3),xaxt = "n")
+axis(1,at=1:output_point,labels=final_output[1:output_point,11],las=2,label=NULL)
+#axis(2,at=1:output_point,labels=final_output[1:output_point,11],las=2,label=NULL)
 
 #save final_output to a csv
 write.csv(final_output,"results.csv")
