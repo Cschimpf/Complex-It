@@ -33,8 +33,31 @@ ui <- fluidPage(theme=shinytheme("cosmo"),
                   
                   mainPanel(
                     tabsetPanel(
-                      
-                      tabPanel("Import Data",
+                    
+                      tabPanel("Building the Model Case Map",
+                               h3(" "),
+                               p(HTML("Answer the following questions: <br>
+                                      Why do you think this data is complex? <br>
+                                      What do you think that means? <br>
+                                      What are cases? <br>
+                                      What factors should be in the profile? <br>
+                                      How do you operationalize the factors? <br>
+                                      Do you have data? <br>
+                                      What are your boundaries, or scope of you system? <br>
+                                      How well does it represent you factor? <br>
+                                      Is it a static study or longitudinal? <br>
+                                      Which do you think are the most important factors?")),
+                               br() 
+                               ),
+
+                      tabPanel("Building the Database",
+                               h3(" "),
+                               p(HTML("Answer the following questions: <br>
+                                      How do you put cases into CSV in the Import Cases tab?")),
+                               br() 
+                               ),
+                
+                      tabPanel("Import Cases",
                                h3("Import and Prepare Data"),
                                
                                p(HTML("To start an analysis session, import your data set using the
@@ -71,13 +94,30 @@ ui <- fluidPage(theme=shinytheme("cosmo"),
                                
                                ),
                       
-                      tabPanel("Cluster Data",
-                               h3("Cluster Data"),
+                      tabPanel("Thinking about Clusters",
+                               h3(" "),
+                               p(HTML("Answer the following questions: <br>
+                                      How many clusters do you think are in the data?  <br>
+                                      Why? Is it based on current literature, a hunch, or expertise?  <br>
+                                      (If you have no idea, you still need to pick a starting point, for example, 4 clusters.) <br>
+                                      What might you name these clusters?  How might you describe them? <br>
+                                      Building off of your rough sketch, how do you think variables or factors account for these clusters? (I don't know is unacceptable.)")),
+                               br() 
+                      ),
+                      
+                      tabPanel("Cluster Cases",
+                               h3("Cluster Cases"),
                                p(HTML("In this tab you can use the kmeans clustering algorithm to group the cases in your
                                       data into self-similar 'clusters'. The Pseudo F provides a measure of how distinct
                                       and well defined the clusters are. Silhouette plots display how well each case fits
                                       within its respective cluster, where 1 is a perfect fit with its clusterand -1 is a 
-                                      perfect fit with a different, neighboring cluster")),
+                                      perfect fit with a different, neighboring cluster <br>
+                                      How well did your solution fit? <br>
+                                      Is your pseudo F good? <br>
+                                      How are cases distributed (look at the silhouette)? <br>
+                                      Did the cases fit well? <br>
+                                      Should you go back and create more or less clusters? <br>
+                                      Do you want to save results?")),
                                br(),
                                helpText("Select display options."),
                                checkboxInput('silhouette', 'Silhouette?'),
@@ -91,13 +131,17 @@ ui <- fluidPage(theme=shinytheme("cosmo"),
                                plotOutput(outputId = "kmeans_silh", inline=TRUE)
                                ),
                       
-                      tabPanel("Self-Organize",
-                               h3("Train the Self-Organizing Map"),
-                               p(HTML("In this tab you can train the Self-Organizing Map (SOM) to project the cases in your
+                      tabPanel("Ask Brain",
+                               h3("Now time for the computer's turn!"),
+                               p(HTML("You are going to use artificial intelligence to check the accuracy or validate your cluster solutions
+                                       and see how cases are distributed for each cluster. <br>
+                                      In this tab you can train the Self-Organizing Map (SOM) to project the cases in your
                                       data onto an X * Y dimensional map, where each XiYi 'neuron' on the map represents
                                       a different vector of values for all the data variables. Set the SOM dimensions
                                       with the 'Map Dimension X & Y sliders and set a random seed between 1-9999 to
-                                      to set reproducible SOM results")),
+                                      to set reproducible SOM results <br>
+                                       Your Mapx and Mapy dimensions, when multiplied together, <br>
+                                      should be more that the number of clusters, otherwise use defaults.")),
                                
                                actionButton("trainbutton","Train SOM"),
                                #verbatimTextOutput("summary") #prints the output of a reactive variable, can show status of uploaded
@@ -125,11 +169,14 @@ ui <- fluidPage(theme=shinytheme("cosmo"),
                                
                                plotOutput(outputId = "som_3Dplot", width = "50%", height = "500px")
                                ),
-                      tabPanel("Plot Map",
-                               h3("Plot the Self-Organizing Map"),
-                               p("In this panel you can visualize the computed 
+                      tabPanel("Plot Results",
+                               h3("Explore your Data"),
+                               p(HTML("In this panel you can visualize the computed 
                                  self-organizing map. This panel contains several plots to analyze the map. The names plot
-                                 under 'Obs' will map previous kmeans labels to cases on their respective part of the SOM"),
+                                 under 'Obs' will map previous kmeans labels to cases on their respective part of the SOM <br>
+                                 How did the computer compare to yours? <br>
+                                 Where are the cases distributed? <br>
+                                 Do the groupings look good and match your clusters?")),
                                
                                h4("Options"),
                                selectInput("somplotwhat", "Plot what?", 
@@ -154,9 +201,37 @@ ui <- fluidPage(theme=shinytheme("cosmo"),
                                                 actionButton("save_som", "Save SOM Results")),
                                uiOutput("save_som_notice"),
                                plotOutput("somplot")),
+
                       
-                      tabPanel("Case Prediction", 
-                               h3("Use your SOM solution to predict the quadrant membership of new or different cases"),
+                      
+                      tabPanel("Opening the Black Box",
+                               h3(" "),
+                               p(HTML("Answer the following questions: <br>
+                                      Which factors did the computer find most important to map the cases and clusters? (See prototypes in the bar plot) <br>
+                                      Use prototypes to decide which variables to move. <br>
+                                      Look at the U Matrix distances - do you have to cross a mountain to move a case?")),
+                               br() 
+                               ),
+                      
+                      
+                      tabPanel("Assemble the Working Model",
+                               h3("Use everything so far to draw what you know"),
+                               p(HTML("Answer the following questions: <br>
+                                      Do you need to start all over? <br>
+                                      If so, should you add new data or more clusters? <br>
+                                      If satisfied, what next? Either Predict New Cases or Simulate Scenarios.")),
+                               br() 
+                               ),
+                      
+                      
+                      
+                      
+                      
+                      
+                      
+                                            
+                      tabPanel("Predict New Cases", 
+                               h3("Use your solution to predict the quadrant membership of new or different cases"),
                                p(HTML('Predict the classification of a new or different case
                                   <br><i>Goodness of fit for classification is based on a numeric tolerance defined as
                                   10^(-10)</i>'
@@ -179,7 +254,7 @@ ui <- fluidPage(theme=shinytheme("cosmo"),
                                                 tableOutput("view_predict"))
                                
                       ),
-                      tabPanel("Agent-Model", 
+                      tabPanel("Simulate Scenarios", 
                                h3("Case-Based Multi-Agent Modeling:", tags$b("UNDER DEVELOPMENT")),
                                   
                                p(HTML("Use your SOM solution to create a simulated multi-agent environment 
@@ -188,7 +263,9 @@ ui <- fluidPage(theme=shinytheme("cosmo"),
                                       The grid may not reflect the dimensions selected under Train SOM. The grid
                                       is only populated with estimated data points when pressing Run Cases. Upload
                                       features are not yet supported. This tab is under development with new updates
-                                      coming in February 2018")),
+                                      coming in February 2018 <br>
+                                      What constitutes the credibility of the results of policy? <br>
+                                      Are you going to be predicting? If so, consider pulling off a quarter of your data")),
                               tags$b("To Use:",
                               tags$ol(tags$li("Upload data under Import Data"), 
                                                          tags$li("Cluster data under Cluster"),
