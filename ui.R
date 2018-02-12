@@ -146,7 +146,7 @@ ui <- fluidPage(theme=shinytheme("cosmo"),
                                tags$b("STEP 2: RUN THE K-MEANS",
                                       tags$ol(tags$li("Run your k-means several times to see if you can improve the Pseudo F"),
                                               tags$li ("How strong is the Pseudo F for your solution?"), 
-                                              tags$li("looking at the Silhouette, how well are the cases distributed for each cluster?"),
+                                              tags$li("Looking at the Silhouette, how well are the cases distributed for each cluster?"),
                                               tags$li("Should you re-run k-means to look for more or less clsuters?"),
                                               tags$li("If satisfied, do you want to save your results?"))),
                       
@@ -184,9 +184,12 @@ ui <- fluidPage(theme=shinytheme("cosmo"),
                                               tags$li("If, however, you have more than 25 clusters, you need to make the map bigger, for example 6X6"))),
 
                                tags$b("EXPERIENCED USERS:",
-                                      tags$ol(tags$li("For those familiar with the SOM, go to the SOMbrero CRAN site for details about the algorithm"))), 
+                                      tags$ol(tags$li("The SOM algorithm we use comes from the SOMbrero R-Package"))), 
                                       p(HTML('To visit the SOMbrero CRAN site, including downloading its reference manual <a href="https://cran.r-project.org/web/packages/SOMbrero/index.html"
-                                      target="_blank">CLICK HERE</a>')),  
+                                      target="_blank">CLICK HERE</a>')),
+                               p(HTML('Here, also, is a link to the tutorial SOMbrero provides on how it employs the SOM algorithm. 
+                                      <a href="https://cran.r-project.org/web/packages/SOMbrero/vignettes/doc-numericSOM.html"
+                                      target="_blank">CLICK HERE</a>')), 
                                      
                                
                                actionButton("trainbutton","Train SOM"),
@@ -215,14 +218,40 @@ ui <- fluidPage(theme=shinytheme("cosmo"),
                                
                                plotOutput(outputId = "som_3Dplot", width = "50%", height = "500px")
                                ),
+                    
                       tabPanel("5. Compare and Visualize Results",
-                               h3("Explore your Data"),
-                               p(HTML("In this panel you can visualize the computed 
-                                 self-organizing map. This panel contains several plots to analyze the map. The names plot
-                                 under 'Obs' will map previous kmeans labels to cases on their respective part of the SOM <br>
-                                 How did the computer compare to yours? <br>
-                                 Where are the cases distributed? <br>
-                                 Do the groupings look good and match your clusters?")),
+                               h3("Here we visualize the results of the k-means and compare them to the Computer's results"),
+                               
+                                p(HTML("The utility of the SOM is that it plots your cases and their k-means cluster memberhip on a two-dimensional map,
+                                      based on the complex relationships amongst the profile of variables upon which they are based.
+                                      In this tab, this map can be visually explored to see how useful your k-means solution was,
+                                      as well as how the cases and clusters all relate to each other, based on differences in their respective variable profiles.")),
+                               p(HTML('NOTE! Most of the visualization options used here come from the SOMbrero R-Package.
+                                      We strongly recommend reviewing the tutorial they provide, as it walks users through many of the visualization options available here 
+                                      <a href="https://cran.r-project.org/web/packages/SOMbrero/vignettes/doc-numericSOM.html"
+                                      target="_blank">CLICK HERE</a>')),  
+                               
+                                                            
+                               tags$b("READING THE MAP:",
+                                      tags$ol(tags$li("To begin, we label each case with its CASE ID and K-MEANS ID."),
+                                              tags$li("To see these IDs, for 'PLOT WHAT?' select observations; and for 'TYPE OF PLOT' select names."),
+                                              tags$li("The first ID on the map is the k-means and the second ID is the case."), 
+                                              tags$li("The Map also places cases in the particular quadrant to which they below, based on profile differences."),
+                                              tags$li("The more similar the profile, the closer the cases; the more profiles differ, the further away cases are."),
+                                              tags$li("The PROTOTYPES option (i.e., variables) shows how the profile of variables influenced where cases are located."),
+                                              tags$li("The BARPLOT option for both OBSERVATIONS and PROTOTYPES shows the profile of variables for each quadrant."),
+                                              tags$li("The line in the BARPLOT is z-score=0; above the line is more of a variable;below the line is less."),
+                                              tags$li("For advanced users, the profiles are saved in an EXCEL file in R."))),
+ 
+                               tags$b("INTERPRETING YOUR RESULTS:",
+                                      tags$ol(tags$li("Looking at the Names Map, are cases with similar k-means IDs located in similar quadrants?"),
+                                              tags$li("If yes, do you think the SOM and k-means are reasonably similar solutions? Or, should you re=run your k-means?"),
+                                              tags$li("How do the profiles account for the different cluster solutions and the quadrant locations of the cases?"),
+                                              tags$li("What factors (i.e., variables) seem to have the biggest impact on different clusters or the model as a whole?"),
+                                              tags$li("How does the data solution differ from your hypotheses back at the design phase of COMPLEX-IT?"),
+                                              tags$li("Are you satisfied with your solution?  If so, CLICK on the Save SOM Results tab."))),
+                               
+
                                
                                h4("Options"),
                                selectInput("somplotwhat", "Plot what?", 
@@ -247,34 +276,41 @@ ui <- fluidPage(theme=shinytheme("cosmo"),
                                                 actionButton("save_som", "Save SOM Results")),
                                uiOutput("save_som_notice"),
                                plotOutput("somplot")),
-
-                      
-                      
-   #                   tabPanel("8. Debrief",
-  #                             h3(" "),
-  #                             p(HTML("Answer the following questions: <br>
-  #                                    Which factors did the computer find most important to map the cases and clusters? (See prototypes in the bar plot) <br>
-  #                                    Use prototypes to decide which variables to move. <br>
-  #                                    Look at the U Matrix distances - do you have to cross a mountain to move a case?")),
-  #                             br() 
-  #                             ),
-                      
-                      
+                    
+                    
                       tabPanel("6. Assemble Working Model",
-                               h3("Use everything so far to draw what you know"),
-                               p(HTML("Answer the following questions: <br>
-                                      Do you need to start all over? <br>
-                                      If so, should you add new data or more clusters? <br>
-                                      If satisfied, what next? Either Predict New Cases or Simulate Scenarios.")),
-                               br() 
+                               
+                               h3("Here we take everything you have so far learned and use it to update the initial model designed in the first tab."),
+                               
+                               p(HTML("To help with the process, answer the following questions.  
+                                      <BR> NOTE: Answers such as 'I do not know' or 'not sure' are still acceptable.")),
+                               
+                               tags$b("IS YOUR TOPIC A COMPLEX SYSTEM?",
+                                      tags$ol(tags$li("Provide a quick paragraph summary of your topic of study"), 
+                                              tags$li("What makes your topic complex?"),
+                                              tags$li("Can you still draw a boundary around your system?"))),
+                               
+                               tags$b("CASES, VARIABLES AND PROFILES:",
+                                      tags$ol(tags$li("What are the key clusters in your system?"), 
+                                              tags$li("Provide a name for each and brief description?"),
+                                              tags$li("Summarize the k-means and SOM statistics that support your updated model."),
+                                              tags$li("How do your variables go together to form a profile?"),
+                                              tags$li("Based on the SOM and k-means, how do the variables interact or infuence one another?"),
+                                              tags$li("Based on the SOM and k-means, which variables play the biggest role for each cluster?"),
+                                              tags$li("Which variables had the biggest impact on cases across all the clusters?"))),
+
+                                 br() 
                                ),
                       
   tabPanel("7. Decide Next Step",
-           h3("Use everything so far to draw what you know"),
-           p(HTML("Answer the following questions: <br>
-                  Do you need to start all over? <br>
-                  If so, should you add new data or more clusters? <br>
-                  If satisfied, what next? Either Predict New Cases or Simulate Scenarios.")),
+           h3("Here we decide what you want to do next."),
+           tags$b("FOUR OPTIONS:",
+                  tags$ol(tags$li("Do you want to re-run the entire modeling process?  If so, go back to the beginning"), 
+                          tags$li("Do you need to add more cases or variables; or remove cases or variables?  Then do so and restart."),
+                          tags$li("Do you want to use your model to predict new cases?  If so, go to the PREDICT CASES tab."),
+                          tags$li("Do you want to use your model to explore or simulate different policy-based scenarios? Then go to the SIMULATE SCENARIOS tab"))),
+           
+     
            br() 
            ),
   
