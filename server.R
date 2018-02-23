@@ -13,7 +13,7 @@ library(ggplot2)
 server <- function(input, output, session) {
   
 
-  output$complexit_logo <- renderImage({list(src="LOGO__smaller2018.png")}, deleteFile = FALSE)
+  output$complexit_logo <- renderImage({list(src="Complexit_LOGO3.png")}, deleteFile = FALSE)
 
   
 

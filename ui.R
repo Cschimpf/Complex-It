@@ -5,11 +5,9 @@ library(rhandsontable)
 
 
 
-#ui <- fluidPage(
 # here is the first option using shiny themes:  
-#----------------
 ui <- fluidPage(theme=shinytheme("cosmo"),
-#----------------
+
 
 # here is the next option embedding the tag in native html,
 # ----------
@@ -18,22 +16,24 @@ ui <- fluidPage(theme=shinytheme("cosmo"),
  #tags$style("#nrow.preview {font-size:10px;height:10px;}"),
 # ),
 # ----------
+                #imageOutput("complexit_logo", inline=TRUE),
 
-
-                titlePanel("Complex-It 0.1.6 Alpha"),
+                titlePanel("Complex-It 0.2.0 Alpha"),
                 
-                sidebarLayout(
+                #sidebarLayout(
                   
 
-                 sidebarPanel(
-#                  wellPanel(
-                  imageOutput("complexit_logo", inline=TRUE),
-                  width = 2
-                  ),
+                 #sidebarPanel(
                   
-                  mainPanel(
-                    tabsetPanel(
-                    
+                  #width = 2
+                  #),
+                  
+                  #mainPanel(
+                  navlistPanel(
+                    selected = "1. Design Initial Model",
+                    HTML("<img src='Complexit_LOGO4.png'>"),
+                    HTML("<br><br><br><br>"), HTML("<br><br><br><br>"), HTML("<br><br><br><br>"), HTML("<br>"),
+                    "Build the Model",
                       tabPanel("1. Design Initial Model",
                                h3("Before Any Data Can Be Analyzed, We Need to Design Your Initial Model and Research Questions"),
                                
@@ -167,7 +167,7 @@ ui <- fluidPage(theme=shinytheme("cosmo"),
                                textOutput("pseudoF"),
                                plotOutput(outputId = "kmeans_silh", inline=TRUE)
                                ),
-                      
+                      "Test the Model",
                       tabPanel("4. The Computer's Turn",
                                h3("Here we will use artificial intelligence to check the accuracy of your k-means cluster solution"),
 
@@ -319,7 +319,7 @@ ui <- fluidPage(theme=shinytheme("cosmo"),
                       
                       
                       
-                                            
+                      "Extend the Model",                      
                       tabPanel("8. Predict New Cases", 
                                h3("Use your solution to predict the quadrant membership of new or different cases"),
                                p(HTML('Predict the classification of a new or different case
@@ -478,9 +478,6 @@ ui <- fluidPage(theme=shinytheme("cosmo"),
                                  column(7,
                                        conditionalPanel("input.Agent_Setup > 0",
                                        plotOutput("somplotagent", width ="600px", height = "600px"),
-                                       #width = "500px", height = "500px"),  
-                                       #br(),
-                                       #br(),
                                      
                                        #rHandsontableOutput("centroids_editable_table"),
                                        
@@ -516,14 +513,15 @@ ui <- fluidPage(theme=shinytheme("cosmo"),
                       tabPanel("Help",
                                h3("Under Construction")
                                
-                      )
+                      ),
+                      widths = c(3,9)
                       
                       )
                       )
-                               )
+                               
                 
                 
-                               )
+                               
 
 
 
