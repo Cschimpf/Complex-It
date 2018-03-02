@@ -307,14 +307,27 @@ generate_grid_template <-function(dim_params){
 }
 
 generate_logic_column <- function(df){
-  #will need to add a check for how many rows in df
-  #and adjust below accordingly 
+  subset <- 6
+  if(nrow(df) < 6){
+    subset <- nrow(df)
+    }
   logic_col <- rep(FALSE, nrow(df))
-  active_cases <- sample(1:nrow(df), 6, replace=F)
+  active_cases <- sample(1:nrow(df), subset, replace=F)
   for(i in 1:length(active_cases)){
     logic_col[active_cases][i] <- TRUE
   }
   return(logic_col)
+}
+
+generate_cluster_table <- function(){
+  clus_label =c()
+  for(i in 1: nrow(current_kmeans_solution@ucenters)){
+    clus_label = c(clus_label, paste(c("Cluster"), toString(i), sep = " "))
+  }
+  predicted <- predict(current_som_solution, current_kmeans_solution@ucenters)
+  newdf <- cbind(as.data.frame(round(current_kmeans_solution@ucenters, 3)), "Cluster" = clus_label, "Quadrant" = predicted)
+  #newdf <- as.data.frame(cbind(round(current_kmeans_solution@ucenters, 3), "Cluster" = clus_label, "Quadrant" = predicted))
+  return(newdf)
 }
 
 plot_agent_SOM <-function(current_table) {
@@ -324,9 +337,13 @@ plot_agent_SOM <-function(current_table) {
       active_rows =c(active_rows, i)
     }
   }
-  subset_table <- current_table[active_rows,2:ncol(current_table)]
+  #2:ncol(df)-2 to remove the input col and the cluster and quadrant column
+  final_col <- ncol(current_table)-2
+  subset_table <- current_table[active_rows,2:final_col]
+  subsetdf <<- subset_table
   predicted_neuron <- predict(current_som_solution, subset_table)
   print(predicted_neuron)
+
   
   duplicate_neuron <-c(0,0,0,0,0,0)
   current_neurons <-c()

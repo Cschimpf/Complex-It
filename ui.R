@@ -40,28 +40,46 @@ ui <- fluidPage(theme=shinytheme("cosmo"),
                                p(HTML("To help with the process, answer the following questions.  
                                       <BR> NOTE: Answers such as 'I do not know' or 'not sure' are acceptable.")),
                                
-                               tags$b("IS YOUR TOPIC A COMPLEX SYSTEM?",
-                                      tags$ol(tags$li("Provide a quick paragraph summary of your topic of study"), 
-                                              tags$li("What makes your topic complex?"),
-                                              tags$li("Is it a complex system? And, if so, why or how?"),
-                                              tags$li("Can you draw a boundary around your system?"))),
+                               tags$b("IS YOUR TOPIC A COMPLEX SYSTEM?"),
+                                      p("1. Provide a quick paragraph summary of your topic of study"), 
+                                      textAreaInput(inputId = "dim-a1", label = NULL, value = "Enter Text", width = "800px", height = "100px"),
+                                      p("2. What makes your topic complex?"),
+                                      textAreaInput(inputId = "dim-a2", label = NULL, value = "Enter Text", width = "800px", height = "100px"),
+                                      p("3. Is it a complex system? And, if so, why or how?"),
+                                      textAreaInput(inputId = "dim-a3", label = NULL, value = "Enter Text", width = "800px", height = "100px"),
+                                      p("4. Can you draw a boundary around your system?"),
+                                      textAreaInput(inputId = "dim-a4", label = NULL, value = "Enter Text", width = "800px", height = "100px"),
 
-                               tags$b("CASES, VARIABLES AND PROFILES:",
-                                      tags$ol(tags$li("What are the cases in your system?"), 
-                                              tags$li("What are the key variables you want to study?"),
-                                              tags$li("How will you measure these variables?"),
-                                              tags$li("How do your variables go together to form a profile?"),
-                                              tags$li("How do the variables interact or infuence one another?"),
-                                              tags$li("Which variables do you think are the most important?"),
-                                              tags$li("Do you have data on these variables?"),
-                                              tags$li("If not, how do you plan to collect the data?"),
-                                              tags$li("Any concerns with the quality of data or missing data?"),
-                                              tags$li("Is this study cross-sectional or across time?"),
-                                              tags$li("If across time, how many time stamps will you use?"))),
+                               tags$b("CASES, VARIABLES AND PROFILES:"),
+                                      p("1. What are the cases in your system?"), 
+                                      textAreaInput(inputId = "dim-b1", label = NULL, value = "Enter Text", width = "800px", height = "100px"),
+                                      p("2. What are the key variables you want to study?"),
+                                      textAreaInput(inputId = "dim-b2", label = NULL, value = "Enter Text", width = "800px", height = "100px"),
+                                      p("3. How will you measure these variables?"),
+                                      textAreaInput(inputId = "dim-b3", label = NULL, value = "Enter Text", width = "800px", height = "100px"),
+                                      p("4. How do your variables go together to form a profile?"),
+                                      textAreaInput(inputId = "dim-b4", label = NULL, value = "Enter Text", width = "800px", height = "100px"),
+                                      p("5. How do the variables interact or infuence one another?"),
+                                      textAreaInput(inputId = "dim-b5", label = NULL, value = "Enter Text", width = "800px", height = "100px"),
+                                      p("6. Which variables do you think are the most important?"),
+                                      textAreaInput(inputId = "dim-b6", label = NULL, value = "Enter Text", width = "800px", height = "100px"),
+                                      p("7. Do you have data on these variables?"),
+                                      textAreaInput(inputId = "dim-b7", label = NULL, value = "Enter Text", width = "800px", height = "100px"),
+                                      p("8. If not, how do you plan to collect the data?"),
+                                      textAreaInput(inputId = "dim-b8", label = NULL, value = "Enter Text", width = "800px", height = "100px"),
+                                      p("9. Any concerns with the quality of data or missing data?"),
+                                      textAreaInput(inputId = "dim-b9", label = NULL, value = "Enter Text", width = "800px", height = "100px"),
+                                      p("10. Is this study cross-sectional or across time?"),
+                                      textAreaInput(inputId = "dim-b10", label = NULL, value = "Enter Text", width = "800px", height = "100px"),
+                                      p("11. If across time, how many time stamps will you use?"),
+                                      textAreaInput(inputId = "dim-b11", label = NULL, value = "Enter Text", width = "800px", height = "100px"),
  
-                               tags$b("RESEARCH QUESTIONS:",
-                                      tags$ol(tags$li("What is the question or questions you want to answer?"),
-                                              tags$li("Can you state them formally?"))),
+                               tags$b("RESEARCH QUESTIONS:"),
+                                     p("1. What is the question or questions you want to answer?"),
+                                     textAreaInput(inputId = "dim-c1", label = NULL, value = "Enter Text", width = "800px", height = "100px"),
+                                     p("2. Can you state them formally?"),
+                                     textAreaInput(inputId = "dim-c2", label = NULL, value = "Enter Text", width = "800px", height = "100px"),
+                               
                                                              
 
                                br() 
@@ -358,17 +376,15 @@ ui <- fluidPage(theme=shinytheme("cosmo"),
                                       Are you going to be predicting? If so, consider pulling off a quarter of your data")),
                               tags$b("To Use:",
                               tags$ol(tags$li("Upload data under Import Data"), 
-                                                         tags$li("Cluster data under Cluster"),
-                                                         tags$li("Train the SOM under Self-Organize"),
-                                                         tags$li("View the SOM plot Plot Map"),
-                                                         tags$li("Navigate to Agent tab and press Model Setup"),
-                                                         tags$li("Cases from your data will be selected randomly, only 6 can be selected"),
-                                                         tags$li("You can edit the data for the cases or which cases are included - MAX of 6 cases"),
-                                                         tags$li("Press Run Cases to see where the edited cases fall on the SOM grid. This is the same grid as Plot Map"))),
+                                                         tags$li("Press Model Setup"),
+                                                         tags$li("Clusters from your analysis will be selected randomly, only 6 can be selected"),
+                                                         tags$li("You can edit the data for the cluster or which clusters are included - MAX of 6 clusters"),
+                                                         tags$li("Press Run Cases to see where the edited cluster centroids fall on the SOM grid. This is the same grid as Plot Map"))),
+                              verbatimTextOutput("Agent_Warning"),
                 
                                hr(),
                                fluidRow(
-                                 column(3,
+                                 column(2,
                                         actionButton(inputId = "Agent_Setup", label="Model Setup",
                                                      style = "foreground-color:white; 
                                                      background-color:khaki;
@@ -382,7 +398,19 @@ ui <- fluidPage(theme=shinytheme("cosmo"),
                                                      border-width: 5px"),
                                         br(),
                                         hr(),
-                                        # actionButton(inputId = "Agent_Run_Clusters", label="Run Clusters",
+                                        actionButton(inputId = "Agent_Run_Clusters", label="Run Clusters",
+                                                     style = "foreground-color:white;
+                                                     background-color:lavender;
+                                                     color:black;
+                                                     height: 50px;
+                                                     width: 150px;
+                                                     text-align:center;
+                                                     border-color:lightslategray;
+                                                     border-radius: 5px;
+                                                     border-width: 5px"),
+                                        br(),
+                                        hr(),
+                                        # actionButton(inputId = "Agent_Run_Cases", label="Run Cases",
                                         #              style = "foreground-color:white; 
                                         #              background-color:lavender; 
                                         #              color:black;
@@ -394,97 +422,70 @@ ui <- fluidPage(theme=shinytheme("cosmo"),
                                         #              border-width: 5px"),
                                         # br(),
                                         # hr(),
-                                        actionButton(inputId = "Agent_Run_Cases", label="Run Cases",
-                                                     style = "foreground-color:white; 
-                                                     background-color:lavender; 
-                                                     color:black;
-                                                     height: 50px;
-                                                     width: 150px;
-                                                     text-align:center;
-                                                     border-color:lightslategray;
-                                                     border-radius: 5px;
-                                                     border-width: 5px"),
-                                        br(),
-                                        hr(),
-                                        actionButton(inputId = "Agent_Use_Prev_SOM", label="Use Previous SOM",
-                                                     style = "foreground-color:white; 
-                                                     background-color:turquoise; 
-                                                     color:black;
-                                                     height: 50px;
-                                                     width: 150px;
-                                                     text-align:center;
-                                                     border-color:seagreen;
-                                                     border-radius: 5px;
-                                                     border-width: 5px"),
-                                        br(),
-                                        hr(),
-                                        #select the various types of SOM Plots
-                                        selectInput("somplotwhatagent", "Plot what?", 
-                                                    choices= list("Observations"= "obs",
-                                                                  "Prototypes"= "prototypes")),
-                                        selectInput("somplottypeagent", "Type of plot:", 
-                                                    choices= c("color", "barplot", 
-                                                               "names", "boxplot")),
-                                        conditionalPanel("input.somplottypeagent == 'color' ||
-                                                         input.somplottypeagent == '3d'",
-                                                         selectInput("somplotvaragent", 
-                                                                     "Variable: (only used for '3d',
-                                                                     'color' and 'boxplot' plots if available)", 
-                                                                     choices= "(Not Available)")),
-                                        conditionalPanel("input.somplottypeagent == 'boxplot'",
-                                                         selectInput("somplotvar2agent", 
-                                                                     "Variable: (hold Ctrl to select
-                                                                     multiple variables)", 
-                                                                     choices= "(Not Available)", 
-                                                                     multiple= TRUE)),
-                                        br(),
-                                        hr(),
+                                        # actionButton(inputId = "Agent_Use_Prev_SOM", label="Use Previous SOM",
+                                        #              style = "foreground-color:white; 
+                                        #              background-color:turquoise; 
+                                        #              color:black;
+                                        #              height: 50px;
+                                        #              width: 150px;
+                                        #              text-align:center;
+                                        #              border-color:seagreen;
+                                        #              border-radius: 5px;
+                                        #              border-width: 5px"),
+                                        # br(),
+                                        hr()
+                                       
+                                        
+                                       
+                        
                                         #select the clusters
-                                        fileInput('file-acl', 'Upload Clusters', accept = c(
-                                          "text/csv",
-                                          "text/comma-separated-values,text/plain",
-                                          ".csv")),
-                                        checkboxInput('header-acl', ' Header?', TRUE),
-                                        selectInput('sep-acl', 'Separator:',
-                                                    c("Comma","Semicolon","Tab","Space"), 'Comma'),
-                                        selectInput('quote-acl', 'Quote:',
-                                                    c("None","Double Quote","Single Quote"), 
-                                                    'Double Quote'),
-                                        #uiOutput("varchoiceacl"),
-                                        numericInput('nrow.preview-acl','Number of rows in the preview:',20, min = 1, max = 100),
-                                        numericInput('ncol.preview-acl', 'Number of columns in the preview:',
-                                                     10,min = 1, max = 100),
-                                        helpText("Note: Even if the preview only shows a restricted
-                                        number of observations, the map will be based on the full dataset."),
-                                        hr(),
-                                        br(),
-                                        fileInput('file-acs', 'Upload Cases', accept = c(
-                                          "text/csv",
-                                          "text/comma-separated-values,text/plain",
-                                          ".csv")),
-                                        checkboxInput('header-acs', ' Header?', TRUE),
-                                        selectInput('sep-acs', 'Separator:',
-                                                    c("Comma","Semicolon","Tab","Space"), 'Comma'),
-                                        selectInput('quote-acs', 'Quote:',
-                                                    c("None","Double Quote","Single Quote"), 
-                                                    'Double Quote'),
-                                        #uiOutput("varchoiceacs"),
-                                        numericInput('nrow.preview-acs','Number of rows in the preview:',20, min = 1, max = 100),
-                                        numericInput('ncol.preview-acs', 'Number of columns in the preview:',
-                                                     10,min = 1, max = 100),
-                                        helpText("Note: Even if the preview only shows a restricted
-                                                 number of observations, the map will be based on the full dataset.")
+                                        # fileInput('file-acl', 'Upload Clusters', accept = c(
+                                        #   "text/csv",
+                                        #   "text/comma-separated-values,text/plain",
+                                        #   ".csv")),
+                                        # checkboxInput('header-acl', ' Header?', TRUE),
+                                        # selectInput('sep-acl', 'Separator:',
+                                        #             c("Comma","Semicolon","Tab","Space"), 'Comma'),
+                                        # selectInput('quote-acl', 'Quote:',
+                                        #             c("None","Double Quote","Single Quote"),
+                                        #             'Double Quote'),
+                                        # #uiOutput("varchoiceacl"),
+                                        # numericInput('nrow.preview-acl','Number of rows in the preview:',20, min = 1, max = 100),
+                                        # numericInput('ncol.preview-acl', 'Number of columns in the preview:',
+                                        #              10,min = 1, max = 100),
+                                        # helpText("Note: Even if the preview only shows a restricted
+                                        # number of observations, the map will be based on the full dataset."),
+                                        # hr(),
+                                        # br(),
+                                        # fileInput('file-acs', 'Upload Cases', accept = c(
+                                        #   "text/csv",
+                                        #   "text/comma-separated-values,text/plain",
+                                        #   ".csv")),
+                                        # checkboxInput('header-acs', ' Header?', TRUE),
+                                        # selectInput('sep-acs', 'Separator:',
+                                        #             c("Comma","Semicolon","Tab","Space"), 'Comma'),
+                                        # selectInput('quote-acs', 'Quote:',
+                                        #             c("None","Double Quote","Single Quote"),
+                                        #             'Double Quote'),
+                                        # #uiOutput("varchoiceacs"),
+                                        # numericInput('nrow.preview-acs','Number of rows in the preview:',20, min = 1, max = 100),
+                                        # numericInput('ncol.preview-acs', 'Number of columns in the preview:',
+                                        #              10,min = 1, max = 100),
+                                        # helpText("Note: Even if the preview only shows a restricted
+                                        #          number of observations, the map will be based on the full dataset.")
                                         ),
-                                 column(7,
+                                 column(10,
                                        conditionalPanel("input.Agent_Setup > 0",
                                        plotOutput("somplotagent", width ="600px", height = "600px"),
                                      
-                                       #rHandsontableOutput("centroids_editable_table"),
+                                       rHandsontableOutput("clusters_editable_table"),
+                                       actionButton("back_cluster", "<<"),
+                                       actionButton("forward_cluster", ">>")
                                        
-                                       rHandsontableOutput("cases_editable_table"),
-                                       actionButton("back_case", "<<"),
-                                       actionButton("forward_case", ">>" )
-                                       )))
+                                       # rHandsontableOutput("cases_editable_table"),
+                                       # actionButton("back_case", "<<"),
+                                       # actionButton("forward_case", ">>" )
+                                      )))
                                
                                #uiOutput("save_som_notice"),
                                #plotOutput(outputId = "som_3Dplot", width = "50%", height = "500px"),

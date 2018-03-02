@@ -92,14 +92,14 @@ server <- function(input, output, session) {
       
      
       #current_kmeans_solution <<- create_user_saved_kmeans_res("default_name", k$centers, k$cluster, k$size)
-      ### Save the original kmeans solution as well to more easily call off-the-shelf prediction routines
+      
       #current_kmeans_original_solution <<- k
       #this block creates the 'Cluster 1, 2...n' labels for the table display in Shiny
       clus_label =c()
       for(i in 1: nrow(current_kmeans_solution@ucenters)){
         clus_label = c(clus_label, paste(c("Cluster"), toString(i), sep = " "))
       }
-      cen_tab <<- cbind(clus_label, current_kmeans_solution@ucenters, size = current_kmeans_solution@usize)
+      cen_tab <- cbind("Cluster" = clus_label, current_kmeans_solution@ucenters, "Size" = current_kmeans_solution@usize)
       
     })
     #initializes the directory and save function
@@ -343,53 +343,62 @@ server <- function(input, output, session) {
   
   #### Panel 'Agent-Model'
   #############################################################################
-    agent_case_values <- reactiveValues(first = NA, second = NA, third = NA, fourth = NA, fifth = NA, sixth = NA)
+    agent_cluster_values <- reactiveValues(first = NA, second = NA, third = NA, fourth = NA, fifth = NA, sixth = NA)
   
     # Setup Button Pressed
     observeEvent(input$Agent_Setup,{
-      if(is.null(current_data_file)){
+      if(is.null(current_kmeans_solution) | is.null(current_som_solution)){
+        output$Agent_Warning <- renderText({"You must first run your own clusters and train the SOM"})
         return()
       }
       
-      agent_case_tracker <<- create_track_agent_tab_state("first", "none")
-      erase_future_states(agent_case_tracker, 0, agent_case_values)
-      temp_logic_col <- generate_logic_column(current_data_file)
-      updateKey(cbind("Include" = temp_logic_col,current_data_file), agent_case_values, "first")
-      agent_case_tracker@terminal_state <<- "first"
-      output$cases_editable_table <- renderRHandsontable({
-        rhandsontable(agent_case_values[[agent_case_tracker@current_state]])
+      agent_cluster_tracker <<- create_track_agent_tab_state("first", "none")
+      erase_future_states(agent_cluster_tracker, 0, agent_cluster_values)
+      cluster_df <<- generate_cluster_table()
+      temp_logic_col <- generate_logic_column(cluster_df)
+      updateKey(cbind("Include" = temp_logic_col,cluster_df), agent_cluster_values, "first")
+      agent_cluster_tracker@terminal_state <<- "first"
+     
+      output$clusters_editable_table <- renderRHandsontable({
+        rhandsontable(agent_cluster_values[[agent_cluster_tracker@current_state]])
+          #hot_col("Quadrant", readOnly = TRUE) 
       })
       
       output$somplotagent <- renderPlot({
         agent_grid_plot <<- generate_grid_template("")
         agent_grid_plot
       })
+      output$Agent_Warning <- renderText({})
     })
-  observeEvent(input$Agent_Run_Cases, {
-    if(is.null(agent_case_tracker)){
+    #still need to update case -> cluster in this function
+  observeEvent(input$Agent_Run_Clusters, {
+    if(is.null(agent_cluster_tracker)){
+      output$Agent_Warning <- renderText({"You must first Setup the Model"})
       return()
+    
     }
-    if(!is.null(input$cases_editable_table)){
-    new_data_state <- hot_to_r(input$cases_editable_table)
-    state <- convert_state_to_numeric(agent_case_tracker, agent_case_tracker@current_state)
-    terminal <- convert_state_to_numeric(agent_case_tracker, agent_case_tracker@terminal_state)
+    if(!is.null(input$clusters_editable_table)){
+    new_data_state <- hot_to_r(input$clusters_editable_table)
+    state <- convert_state_to_numeric(agent_cluster_tracker, agent_cluster_tracker@current_state)
+    terminal <- convert_state_to_numeric(agent_cluster_tracker, agent_cluster_tracker@terminal_state)
     if(state < 6 & state != terminal){
-      erase_future_states(agent_case_tracker, state, agent_case_values)
+      erase_future_states(agent_cluster_tracker, state, agent_cluster_values)
     }
     empty <- FALSE
-    for(i in 1:length(agent_case_tracker@possible_states))
+    for(i in 1:length(agent_cluster_tracker@possible_states))
     {
-      if(is.na(reactiveValuesToList(agent_case_values)[agent_case_tracker@possible_states][i])){
+      if(is.na(reactiveValuesToList(agent_cluster_values)[agent_cluster_tracker@possible_states][i])){
         empty <- TRUE
-        agent_case_tracker@terminal_state <<- agent_case_tracker@possible_states[i]
-        agent_case_tracker@current_state <<- agent_case_tracker@terminal_state
+        agent_cluster_tracker@terminal_state <<- agent_cluster_tracker@possible_states[i]
+        agent_cluster_tracker@current_state <<- agent_cluster_tracker@terminal_state
         break
       }
     }
-    updateReactiveValues(agent_case_tracker, new_data_state, agent_case_values, empty)
+    updateReactiveValues(agent_cluster_tracker, new_data_state, agent_cluster_values, empty)
     }
-    else{new_data_state <-agent_case_values[[agent_case_tracker@current_state]]}
+    else{new_data_state <-agent_cluster_values[[agent_cluster_tracker@current_state]]}
     plot_agent_SOM(new_data_state)
+    #need to add something here so it only plots the lower bound of data points
     output$somplotagent <- renderPlot({
       agent_grid_plot + agent_grid_slots[["1"]] + agent_grid_slots[["2"]] + agent_grid_slots[["3"]] + agent_grid_slots[["4"]] + agent_grid_slots[["5"]] + agent_grid_slots[["6"]]
       #new_grid_plot
@@ -397,65 +406,52 @@ server <- function(input, output, session) {
     
     
   })
-  observeEvent(input$back_case, {
-    newstate <- update_tracker_current_state(agent_case_tracker, agent_case_values, -1)
-    agent_case_tracker@current_state <<- agent_case_tracker@possible_states[newstate]
-    output$cases_editable_table <- renderRHandsontable({
-      rhandsontable(agent_case_values[[agent_case_tracker@current_state]])
+  observeEvent(input$back_cluster, {
+    newstate <- update_tracker_current_state(agent_cluster_tracker, agent_cluster_values, -1)
+    agent_cluster_tracker@current_state <<- agent_cluster_tracker@possible_states[newstate]
+    output$clusters_editable_table <- renderRHandsontable({
+      rhandsontable(agent_cluster_values[[agent_cluster_tracker@current_state]])
       })
     #values$update_data <- values$update_data + 1
   })
-  observeEvent(input$forward_case, {
-    newstate <- update_tracker_current_state(agent_case_tracker, agent_case_values, 1)
-    agent_case_tracker@current_state <<- agent_case_tracker@possible_states[newstate]
-    output$cases_editable_table <- renderRHandsontable({
-      rhandsontable(agent_case_values[[agent_case_tracker@current_state]])
+  observeEvent(input$forward_cluster, {
+    newstate <- update_tracker_current_state(agent_cluster_tracker, agent_cluster_values, 1)
+    agent_cluster_tracker@current_state <<- agent_cluster_tracker@possible_states[newstate]
+    output$clusters_editable_table <- renderRHandsontable({
+      rhandsontable(agent_cluster_values[[agent_cluster_tracker@current_state]])
     })
   })
   
 
   
     # Run Clusters Button Pressed
-    observeEvent(input$Agent_Run_Clusters,{
-    Agent_SOM <- Agent_SOM_loaded
-    SOMgriddatanew<-SOMgriddata
-    #Predict the Cluster Neurons from the centroids
-    Agents_Clusters_predicted <- predict(Agent_SOM, the.table_agent_clusters[,2:(as.numeric(length(the.table_agent_clusters))-1)])
-    #First, initialize the Agent_SOM to blanks creating an empty array
-    for (i in 1:length(SOMgriddatanew)){ 
-    SOMgriddatanew[i]<-NA
-    }
-    #Next replace the labels with the cluster neurons
-    for (i in 1:length(the.table_agent_clusters$clus_size)){
-      SOMgriddatanew[Agents_Clusters_predicted[i]]<-i
-    } 
-    output$somplotagent <- renderPlot({
-      color2D.matplot(SOMgriddatanew, show.values = TRUE, axes = FALSE, xlab = "", ylab = "", vcex = 2, vcol = "black",extremes = c("red", "yellow"),na.color="black")
-    })
-    output$view_predict_clusters <- renderTable(the.table_agent_clusters)
-    })
+    # observeEvent(input$Agent_Run_Clusters,{
+    # Agent_SOM <- Agent_SOM_loaded
+    # SOMgriddatanew<-SOMgriddata
+    # #Predict the Cluster Neurons from the centroids
+    # Agents_Clusters_predicted <- predict(Agent_SOM, the.table_agent_clusters[,2:(as.numeric(length(the.table_agent_clusters))-1)])
+    # #First, initialize the Agent_SOM to blanks creating an empty array
+    # for (i in 1:length(SOMgriddatanew)){ 
+    # SOMgriddatanew[i]<-NA
+    # }
+    # #Next replace the labels with the cluster neurons
+    # for (i in 1:length(the.table_agent_clusters$clus_size)){
+    #   SOMgriddatanew[Agents_Clusters_predicted[i]]<-i
+    # } 
+    # output$somplotagent <- renderPlot({
+    #   color2D.matplot(SOMgriddatanew, show.values = TRUE, axes = FALSE, xlab = "", ylab = "", vcex = 2, vcol = "black",extremes = c("red", "yellow"),na.color="black")
+    # })
+    # output$view_predict_clusters <- renderTable(the.table_agent_clusters)
+    # })
     
  
   # Use Previous Button Pressed
-  observeEvent(input$Agent_Use_Prev_SOM,{
-    output$view_predict_cases <- renderTable(the.table_agent_cases)
-  })
+  # observeEvent(input$Agent_Use_Prev_SOM,{
+  #   output$view_predict_cases <- renderTable(the.table_agent_cases)
+  # })
   
   
-  #Not sure what these two do
-  observe({
-    updateSelectInput(session, "somplottypeagent", 
-                      choices=all.somplot.types[["numeric"]][[
-                        input$somplotwhatagent]])
-  })
-    # update variables available for plotting
-  updatePlotSomVaragent <- function() observe({
-    tmp.names <- colnames(Agent_SOM$data)
-    
-    updateSelectInput(session, "somplotvaragent", choices=tmp.names)
-    updateSelectInput(session, "somplotvar2agent", choices=tmp.names, 
-                      selected=tmp.names[1:min(5,length(tmp.names))])
-  })
+ 
   
 
   
