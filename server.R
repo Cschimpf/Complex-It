@@ -360,8 +360,8 @@ server <- function(input, output, session) {
       agent_cluster_tracker@terminal_state <<- "first"
      
       output$clusters_editable_table <- renderRHandsontable({
-        rhandsontable(agent_cluster_values[[agent_cluster_tracker@current_state]])
-          #hot_col("Quadrant", readOnly = TRUE) 
+        rhandsontable(agent_cluster_values[[agent_cluster_tracker@current_state]]) %>%
+          hot_col("Quadrant", readOnly = TRUE) 
       })
       
       output$somplotagent <- renderPlot({
@@ -398,10 +398,14 @@ server <- function(input, output, session) {
     }
     else{new_data_state <-agent_cluster_values[[agent_cluster_tracker@current_state]]}
     plot_agent_SOM(new_data_state)
+   
     #need to add something here so it only plots the lower bound of data points
     output$somplotagent <- renderPlot({
-      agent_grid_plot + agent_grid_slots[["1"]] + agent_grid_slots[["2"]] + agent_grid_slots[["3"]] + agent_grid_slots[["4"]] + agent_grid_slots[["5"]] + agent_grid_slots[["6"]]
-      #new_grid_plot
+      #for(i in 1:print_number){
+        #agent_grid_plot <<- agent_grid_plot + agent_grid_slots[[as.character(i)]]
+      #}
+      agent_grid_plot + geom_point(aes(color=agentdf$groupnames), size =3) + scale_color_manual(values = grid_colors, name = "Clusters") + theme(legend.key = element_blank())
+      #agent_grid_plot
     })
     
     

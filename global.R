@@ -20,7 +20,8 @@ agent_grid_plot = NULL
 agentdf = NULL
 agent_grid_slots = NULL
 displacement = list("1" =c(0, 2), "2" =c(0,-2), "3" =c(2,0), "4" =c(-2,0), "5" =c(-5,0), "6" =c(0,5))
-
+grid_colors = c("red", "orange", "pink", "green", "blue", "purple")
+groupnames = c("Cluster 1", "Cluster 2", "Cluster 3", "Cluster 4", "Cluster 5", "Cluster 6")
 
 ####
 #numeric_only_columns = NULL
@@ -271,8 +272,8 @@ updateKey <- function(new_val, val_list, index){
 #dim_params is a dummy argument for future versions where it will dynamically generate grid sizes
 generate_grid_template <-function(dim_params){
 
-  agentdf <<- as.data.frame(cbind(x1=0, y1=0, x2=0, y2=0, x3=0, y3=0, x4=0, y4=0, x5=0, y5=0, x6=0, y6=0))
-  grid_template <- ggplot(agentdf) + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
+  agentdf <<- cbind(as.data.frame(cbind(x = rep(0, 6), y = rep(0,6))), groupnames = groupnames)
+  grid_template <- ggplot(agentdf, aes(x=agentdf$x, y=agentdf$y)) + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
                                 panel.background = element_blank(),axis.line = element_line(colour = "white"), 
                                 axis.title.x=element_blank(), axis.ticks.x=element_blank(), axis.text.x =element_blank(),
                                 axis.ticks.y=element_blank(), axis.text.y=element_blank(), axis.title.y=element_blank()) +
@@ -290,12 +291,12 @@ generate_grid_template <-function(dim_params){
     geom_segment(aes(x = 0, y = 60, xend = 100, yend = 60), size=1) + 
     geom_segment(aes(x = 0, y = 80, xend = 100, yend = 80), size=1)
   
-  agent_grid_slots <<- list("1" = geom_point(aes(x=agentdf$x1, y=agentdf$y1), size=3, colour="red"),
-                           "2" = geom_point(aes(x=agentdf$x2, y=agentdf$y2), size=3, colour="orange"),
-                           "3" = geom_point(aes(x=agentdf$x3, y=agentdf$y3), size=3, colour="pink"),
-                           "4" = geom_point(aes(x=agentdf$x4, y=agentdf$y4), size=3, colour="green"),
-                           "5" = geom_point(aes(x=agentdf$x5, y=agentdf$y5), size=3, colour="blue"),
-                           "6" =geom_point(aes(x=agentdf$x6, y=agentdf$y6), size=3, colour="purple"))
+  agent_grid_slots <<- list("1" = geom_point(aes(x=agentdf$x1, y=agentdf$y1, colour="point1"), size=3),
+                           "2" = geom_point(aes(x=agentdf$x2, y=agentdf$y2, colour="point2"), size=3),
+                           "3" = geom_point(aes(x=agentdf$x3, y=agentdf$y3, colour="point3"), size=3),
+                           "4" = geom_point(aes(x=agentdf$x4, y=agentdf$y4, colour="point4"), size=3),
+                           "5" = geom_point(aes(x=agentdf$x5, y=agentdf$y5, colour="point5"), size=3),
+                           "6" =geom_point(aes(x=agentdf$x6, y=agentdf$y6, colour="point6"), size=3))
   agent_grid_slots_index <<- list("1" =c(10,10), "2" =c(10,30), "3" =c(10,50), "4" =c(10,70), "5" =c(10,90),
                                   "6" =c(30,10), "7" =c(30,30), "8" =c(30,50), "9" =c(30,70), "10" =c(30,90),
                                   "11" =c(50,10), "12" =c(50,30), "13" =c(50,50), "14" =c(50,70), "15" =c(50,90),
@@ -325,7 +326,7 @@ generate_cluster_table <- function(){
     clus_label = c(clus_label, paste(c("Cluster"), toString(i), sep = " "))
   }
   predicted <- predict(current_som_solution, current_kmeans_solution@ucenters)
-  newdf <- cbind(as.data.frame(round(current_kmeans_solution@ucenters, 3)), "Cluster" = clus_label, "Quadrant" = predicted)
+  newdf <- cbind(as.data.frame(current_kmeans_solution@ucenters), "Cluster" = clus_label, "Quadrant" = predicted)
   #newdf <- as.data.frame(cbind(round(current_kmeans_solution@ucenters, 3), "Cluster" = clus_label, "Quadrant" = predicted))
   return(newdf)
 }
@@ -356,8 +357,8 @@ plot_agent_SOM <-function(current_table) {
     current_neurons <-c(current_neurons, as.integer(predicted_neuron[i]))
     
   }
-  x = 1
-  y = 2
+  # x = 1
+  # y = 2
   displace = 1
   for(i in 1:length(plot_locations)){
     if(duplicate_neuron[i] == 1){
@@ -365,12 +366,14 @@ plot_agent_SOM <-function(current_table) {
       plot_locations[[as.character(i)]][2] <- plot_locations[[as.character(i)]][2] + displacement[[as.character(displace)]][2] 
       displace = displace + 1
     }
-    agentdf[x] <<- plot_locations[[as.character(i)]][1]
-    agentdf[y] <<- plot_locations[[as.character(i)]][2]
-    x = x + 2
-    y = y + 2
-    
+    agentdf[i,1] <<- plot_locations[[as.character(i)]][1]
+    agentdf[i,2] <<- plot_locations[[as.character(i)]][2]
+  
+    # x = x + 2
+    # y = y + 2
+    #return(length(active_rows))
   }
+  print(agentdf)
 }
 
 ###############Still Under Development for Future Versions###############
