@@ -357,8 +357,6 @@ plot_agent_SOM <-function(current_table) {
     current_neurons <-c(current_neurons, as.integer(predicted_neuron[i]))
     
   }
-  # x = 1
-  # y = 2
   displace = 1
   for(i in 1:length(plot_locations)){
     if(duplicate_neuron[i] == 1){
@@ -369,11 +367,8 @@ plot_agent_SOM <-function(current_table) {
     agentdf[i,1] <<- plot_locations[[as.character(i)]][1]
     agentdf[i,2] <<- plot_locations[[as.character(i)]][2]
   
-    # x = x + 2
-    # y = y + 2
     #return(length(active_rows))
   }
-  print(agentdf)
 }
 
 ###############Still Under Development for Future Versions###############

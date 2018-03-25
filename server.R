@@ -297,8 +297,9 @@ server <- function(input, output, session) {
     else {
       # the predictions are made using SOMbrero predict function against the p.input data
       predicted <- predict(temp_som, p.input)
-      temprowvector<-row(current_data_file)
-      p.input <- cbind('Case ID' = temprowvector[,1], p.input, 'Matched Neuron' = predicted)
+      
+      #temprowvector<-row(current_data_file)
+      p.input <- cbind(p.input, 'Matched Neuron' = predicted)
       # calculate the distances from each case to its closest, 2nd closest, and furthest neuron
       Neurons<-temp_som[["clustering"]] #these are the cases and their neuron assignments
       Cases<- temp_som[["data"]] #these are the cases
@@ -309,19 +310,19 @@ server <- function(input, output, session) {
       BMUS<-array(1,c(length(Cases[,1]),6))
       # Now loop through cases, each time appending the case to the existing neuron prototypes and recalculating
       for (i in 1:length(Cases[,1])){ 
-      newguess<-Cases[i,]
-      D<-rbind(newguess,Neuron_Profiles) #append each case to first position with the neuron prototypes
-      B<-dist(D,method="euclidean",diag=TRUE) #calculate the distances from the case to each of the neuron prototypes
-      C<-rank(B[1:nrow(D)-1],ties.method= "first") #now rank the neuron prototype distance
-      BMU1<-B[which (C==1)]
-      BMU2<-B[which (C==2)]
-      BMUN<-B[which (C==max(C))]
-      BMUS[i,1]<-which(C==1)
-      BMUS[i,2]<-which(C==2)
-      BMUS[i,3]<-which(C==nrow(D)-1)
-      BMUS[i,4]<-BMU1
-      BMUS[i,5]<-BMU2
-      BMUS[i,6]<-BMUN
+        newguess<-Cases[i,]
+        D<-rbind(newguess,Neuron_Profiles) #append each case to first position with the neuron prototypes
+        B<-dist(D,method="euclidean",diag=TRUE) #calculate the distances from the case to each of the neuron prototypes
+        C<-rank(B[1:nrow(D)-1],ties.method= "first") #now rank the neuron prototype distance
+        BMU1<-B[which (C==1)]
+        BMU2<-B[which (C==2)]
+        BMUN<-B[which (C==max(C))]
+        BMUS[i,1]<-which(C==1)
+        BMUS[i,2]<-which(C==2)
+        BMUS[i,3]<-which(C==nrow(D)-1)
+        BMUS[i,4]<-BMU1
+        BMUS[i,5]<-BMU2
+        BMUS[i,6]<-BMUN
       }
       #
       # Now append the BMUs to the file
@@ -332,7 +333,7 @@ server <- function(input, output, session) {
       p.input <- cbind(p.input, 'EUCDIS2' = BMUS[,5])
       p.input <- cbind(p.input, 'EUCDISN' = BMUS[,6])
       #
-      write.csv(p.input, file = "./tmp/PredictQuadrantData.csv")
+      
       output$view_predict <- renderTable({
         head(p.input, n=input$nrow.result_pred)
       })
