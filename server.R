@@ -155,6 +155,15 @@ server <- function(input, output, session) {
   })
   
   observeEvent(input$trainbutton, {
+    if(input$dimx < 3 | input$dimy < 3 | input$dimx > 15 | input$dimy > 15)
+    {
+      output$som_dimwarning <- renderText({"SOM dimensions must be 3 or greater and 15 or lesser."})
+      return()
+    }
+    else
+    {
+      output$som_dimwarning <- renderText({""})
+    }
     tmp_data <- current_data_file
     mapped_labels = NULL
     if(!is.null(current_kmeans_solution)){
@@ -366,7 +375,7 @@ server <- function(input, output, session) {
       })
       
       output$somplotagent <- renderPlot({
-        agent_grid_plot <<- generate_grid_template("")
+        agent_grid_plot <<- generate_grid_template(current_som_solution$parameters$the.grid$dim, length(current_kmeans_solution@usize))#this will need to be updated with new vals for gen grid
         agent_grid_plot
       })
       output$Agent_Warning <- renderText({})
@@ -405,7 +414,7 @@ server <- function(input, output, session) {
       #for(i in 1:print_number){
         #agent_grid_plot <<- agent_grid_plot + agent_grid_slots[[as.character(i)]]
       #}
-      agent_grid_plot + geom_point(aes(color=agentdf$groupnames), size =3) + scale_color_manual(values = grid_colors, name = "Clusters") + theme(legend.key = element_blank())
+      agent_grid_plot + geom_point(aes(color=agentdf$groupnames), size =4) + scale_color_manual(values = agent_drawtools@plot_colors, name = "Clusters") + theme(legend.key = element_blank())
       #agent_grid_plot
     })
     

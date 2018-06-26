@@ -18,10 +18,10 @@ agent_case_tracker = NULL
 agent_cluster_tracker = NULL
 agent_grid_plot = NULL
 agentdf = NULL
-agent_grid_slots = NULL
+agent_drawtools = NULL
 displacement = list("1" =c(0, 2), "2" =c(0,-2), "3" =c(2,0), "4" =c(-2,0), "5" =c(-5,0), "6" =c(0,5))
-grid_colors = c("red", "orange", "pink", "green", "blue", "purple")
-groupnames = c("Cluster 1", "Cluster 2", "Cluster 3", "Cluster 4", "Cluster 5", "Cluster 6")
+#grid_colors = c("red", "orange", "pink", "green", "blue", "purple")
+#groupnames = c("Cluster 1", "Cluster 2", "Cluster 3", "Cluster 4", "Cluster 5", "Cluster 6")
 
 ####
 #numeric_only_columns = NULL
@@ -47,14 +47,14 @@ create_user_gen_kmeans_solution <- function(objectname, km){
                                             
                     
 
-setClass("user_saved_kmeans_res", representation(save_name = "character", ucentroids = "list", uclusters = "list", usize = "integer"))
-
-create_user_saved_kmeans_res <- function(objectname, ucenters, cluster_labels, k_size){
-  new_labels <- list_cluster_labels(cluster_labels)
-  ucenters <- list(ucenters)
-  new_class = new("user_saved_kmeans_res", save_name = objectname, ucentroids = ucenters, uclusters = new_labels, usize = k_size)
-  return(new_class)
-}
+# setClass("user_saved_kmeans_res", representation(save_name = "character", ucentroids = "list", uclusters = "list", usize = "integer"))
+# 
+# create_user_saved_kmeans_res <- function(objectname, ucenters, cluster_labels, k_size){
+#   new_labels <- list_cluster_labels(cluster_labels)
+#   ucenters <- list(ucenters)
+#   new_class = new("user_saved_kmeans_res", save_name = objectname, ucentroids = ucenters, uclusters = new_labels, usize = k_size)
+#   return(new_class)
+# }
 
 list_cluster_labels <-function(unlist){
   new_list = list()
@@ -270,46 +270,44 @@ updateKey <- function(new_val, val_list, index){
          })}
 #generates plot template and associated data.frame for plotting to grid and indexes for neurons
 #dim_params is a dummy argument for future versions where it will dynamically generate grid sizes
-generate_grid_template <-function(dim_params){
-
-  agentdf <<- cbind(as.data.frame(cbind(x = rep(0, 6), y = rep(0,6))), groupnames = groupnames)
+generate_grid_template <-function(dims, knum){
+  groupnames <- c("Cluster 1", "Cluster 2", "Cluster 3", "Cluster 4", "Cluster 5", "Cluster 6", "Cluster 7", "Cluster 8", "Cluster 9")
+  if (knum <9) {groupnames <- groupnames[1:knum]}
+  
+  agentdf <<- cbind(as.data.frame(cbind(x = rep(0, knum), y = rep(0,knum))), groupnames = groupnames)
   grid_template <- ggplot(agentdf, aes(x=agentdf$x, y=agentdf$y)) + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
-                                panel.background = element_blank(),axis.line = element_line(colour = "white"), 
-                                axis.title.x=element_blank(), axis.ticks.x=element_blank(), axis.text.x =element_blank(),
-                                axis.ticks.y=element_blank(), axis.text.y=element_blank(), axis.title.y=element_blank()) +
+                                                                          panel.background = element_blank(),axis.line = element_line(colour = "white"), 
+                                                                          axis.title.x=element_blank(), axis.ticks.x=element_blank(), axis.text.x =element_blank(),
+                                                                          axis.ticks.y=element_blank(), axis.text.y=element_blank(), axis.title.y=element_blank()) +
     scale_y_continuous(limits=c(0,100)) +scale_x_continuous(limits=c(0,100)) +
     geom_segment(aes(x = 0, y = 0, xend = 100, yend = 0), size=1) + 
     geom_segment(aes(x = 0, y = 100, xend = 100, yend = 100), size=1) + 
     geom_segment(aes(x = 0, y = 0, xend = 0, yend = 100), size=1) + 
-    geom_segment(aes(x = 100, y = 0, xend = 100, yend = 100), size=1) +
-    geom_segment(aes(x = 20, y = 0, xend = 20, yend = 100), size=1) + 
-    geom_segment(aes(x = 40, y = 0, xend = 40, yend = 100), size=1)  + 
-    geom_segment(aes(x = 60, y = 0, xend = 60, yend = 100), size=1) + 
-    geom_segment(aes(x = 80, y = 0, xend = 80, yend = 100), size=1) + 
-    geom_segment(aes(x = 0, y = 20, xend = 100, yend = 20), size=1) + 
-    geom_segment(aes(x = 0, y = 40, xend = 100, yend = 40), size=1) + 
-    geom_segment(aes(x = 0, y = 60, xend = 100, yend = 60), size=1) + 
-    geom_segment(aes(x = 0, y = 80, xend = 100, yend = 80), size=1)
+    geom_segment(aes(x = 100, y = 0, xend = 100, yend = 100), size=1) 
   
-  agent_grid_slots <<- list("1" = geom_point(aes(x=agentdf$x1, y=agentdf$y1, colour="point1"), size=3),
-                           "2" = geom_point(aes(x=agentdf$x2, y=agentdf$y2, colour="point2"), size=3),
-                           "3" = geom_point(aes(x=agentdf$x3, y=agentdf$y3, colour="point3"), size=3),
-                           "4" = geom_point(aes(x=agentdf$x4, y=agentdf$y4, colour="point4"), size=3),
-                           "5" = geom_point(aes(x=agentdf$x5, y=agentdf$y5, colour="point5"), size=3),
-                           "6" =geom_point(aes(x=agentdf$x6, y=agentdf$y6, colour="point6"), size=3))
-  agent_grid_slots_index <<- list("1" =c(10,10), "2" =c(10,30), "3" =c(10,50), "4" =c(10,70), "5" =c(10,90),
-                                  "6" =c(30,10), "7" =c(30,30), "8" =c(30,50), "9" =c(30,70), "10" =c(30,90),
-                                  "11" =c(50,10), "12" =c(50,30), "13" =c(50,50), "14" =c(50,70), "15" =c(50,90),
-                                  "16" =c(70,10), "17" =c(70,30), "18" =c(70,50), "19" =c(70,70), "20" =c(70,90),
-                                  "21" =c(90,10), "22" =c(90,30), "23" =c(90,50), "24" =c(90,70), "25" =c(90,90))
-
+  xincr <- 100/dims[1]
+  yincr <-100/dims[2]
+  
+  tick <- 0
+  
+  for (i in 1:(dims[1]-1))
+  {
+    tick <- tick + xincr
+    grid_template <- grid_template + geom_segment(aes_string(x = tick, y = 0, xend = tick, yend = 100), size=1)
+  }
+  tick <- 0 
+  for (j in 1:(dims[2]-1))
+  {
+    tick <- tick + yincr
+    grid_template <- grid_template + geom_segment(aes_string(x=0, y=tick, xend=100, yend = tick), size=1)
+  }
   
   return(grid_template)
 }
 
 generate_logic_column <- function(df){
-  subset <- 6
-  if(nrow(df) < 6){
+  subset <- 9
+  if(nrow(df) < 9){
     subset <- nrow(df)
     }
   logic_col <- rep(FALSE, nrow(df))
@@ -331,44 +329,97 @@ generate_cluster_table <- function(){
   return(newdf)
 }
 
+
 plot_agent_SOM <-function(current_table) {
+  agent_drawtools <<- create_SOMdrawtools(current_som_solution$parameters$the.grid$dim, length(current_kmeans_solution@usize))
+  
   active_rows =c()
   for(i in 1:nrow(current_table)){
     if(current_table[i, 1] == TRUE) {
-      active_rows =c(active_rows, i)
+      active_rows <- c(active_rows, i)
     }
   }
+  temp_active <<- active_rows
   #2:ncol(df)-2 to remove the input col and the cluster and quadrant column
   final_col <- ncol(current_table)-2
   subset_table <- current_table[active_rows,2:final_col]
-  subsetdf <<- subset_table
   predicted_neuron <- predict(current_som_solution, subset_table)
-  print(predicted_neuron)
-
-  
-  duplicate_neuron <-c(0,0,0,0,0,0)
-  current_neurons <-c()
-  plot_locations <-list()
-  for(i in 1:length(predicted_neuron)){
-    plot_locations[[as.character(i)]] <- agent_grid_slots_index[[as.character(predicted_neuron[i])]]
-    if(as.integer(predicted_neuron[i] %in% current_neurons)){
-      duplicate_neuron[i] <- 1
-    }
-    current_neurons <-c(current_neurons, as.integer(predicted_neuron[i]))
-    
+ 
+  plot_locations <-list() #need to build up plot locations so it reflects the active_rows
+  index = 1
+  for(i in active_rows){
+    plot_locations[[as.character(i)]] <- agent_drawtools@neuron_centers[[as.character(predicted_neuron[index])]]
+   
+    index = index + 1
   }
-  displace = 1
-  for(i in 1:length(plot_locations)){
-    if(duplicate_neuron[i] == 1){
-      plot_locations[[as.character(i)]][1] <- plot_locations[[as.character(i)]][1] + displacement[[as.character(displace)]][1] 
-      plot_locations[[as.character(i)]][2] <- plot_locations[[as.character(i)]][2] + displacement[[as.character(displace)]][2] 
-      displace = displace + 1
+  
+  index = 1
+  for(i in active_rows){
+    if(agent_drawtools@displace_tracker[[as.character(predicted_neuron[index])]] > 0){
+      print('why am I here')
+      plot_locations[[as.character(i)]][1] <- plot_locations[[as.character(i)]][1] + agent_drawtools@displace_vector[[as.character(agent_drawtools@displace_tracker[[as.character(predicted_neuron[index])]])]][1] 
+      plot_locations[[as.character(i)]][2] <- plot_locations[[as.character(i)]][2] + agent_drawtools@displace_vector[[as.character(agent_drawtools@displace_tracker[[as.character(predicted_neuron[index])]])]][2] 
+      
     }
+    #updates the values to be plotted
     agentdf[i,1] <<- plot_locations[[as.character(i)]][1]
     agentdf[i,2] <<- plot_locations[[as.character(i)]][2]
-  
-    #return(length(active_rows))
+    agent_drawtools@displace_tracker[[as.character(predicted_neuron[index])]] <- agent_drawtools@displace_tracker[[as.character(predicted_neuron[index])]] +1
+    index = index + 1
+    
   }
+}
+
+setClass("SOMdrawtools", representation(neuron_centers = "list", displace_vector = "list", 
+                                        displace_tracker = "list", plot_colors = "character"))
+
+create_SOMdrawtools <- function(dims, knum){
+  vectors <- list("1" =c(2,0), "2" =c(0,2), "3" =c(-2,0), "4" =c(0,-2), "5" = c(2,2), "6" =c(-2,2), 
+                  "7"=c(2,-2),"8" =c(-2,-2))
+  centers_displace <- generate_neuron_centers(dims)
+  centers <- centers_displace$neurons
+  tracker <- centers_displace$displace
+  colors <- grid_color_subset(knum)
+  new_class <- new("SOMdrawtools", neuron_centers = centers, displace_vector = vectors, 
+                   displace_tracker = tracker, plot_colors = colors)
+}
+
+generate_neuron_centers <- function(dims){
+  xincr <- 100/dims[1]
+  yincr <- 100/dims[2]
+  neuron_centers <- list()
+  
+  entry = 1
+  tickx = 0
+  for(i in 1:dims[1]){
+    ticky <- 0
+    tempx <- tickx+ xincr/2 
+    for(j in 1:dims[2]){
+      tempy <- ticky + yincr/2
+      neuron_centers[[as.character(entry)]] <- c(tempx, tempy)
+      ticky <- ticky + yincr
+      entry <- entry + 1
+      
+    }
+    tickx <- tickx + xincr 
+  }
+  displacement_tracker <- list()
+  for(i in 1:(dims[1]*dims[2])){
+    displacement_tracker[[as.character(i)]] <- 0
+  }
+  return_list <- list("neurons" = neuron_centers, "displace" = displacement_tracker)
+  return(return_list)
+  
+}
+
+grid_color_subset <- function(knum) {
+  colors <- c("darkblue", "purple1", "red", "green4", "deeppink1", "indianred4", "seagreen3", "gray55", "goldenrod1", "burlywood4", "darkorange2", "darkorchid4")
+  subset <- sample(1:9, knum)
+  case_colors =c()
+  for(i in subset){
+    case_colors <- c(case_colors, colors[i])
+  }
+  return(case_colors)
 }
 
 ###############Still Under Development for Future Versions###############

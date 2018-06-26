@@ -214,15 +214,15 @@ ui <- fluidPage(theme=shinytheme("cosmo"),
                                #verbatimTextOutput("summary") #prints the output of a reactive variable, can show status of uploaded
                                #data, check the original SOMbrero 
                                br(), br(),
-                               
+                               verbatimTextOutput("som_dimwarning"),
                                uiOutput("trainnotice"),
                                br(),
                                uiOutput("somsummary"),
                                br(), 
                                h4("Options"),
                                
-                               numericInput("dimx", "Map dimension X:", 5, min= 1),
-                               numericInput("dimy", "Map dimension Y:", 5, min= 1),
+                               numericInput("dimx", "Map dimension X:", 5, min= 3, max= 15),
+                               numericInput("dimy", "Map dimension Y:", 5, min= 3, max= 15),
                                h4("Advanced options"),
                                uiOutput("initproto"),
                                numericInput("maxit", "Max. iterations:", 500),
@@ -476,7 +476,7 @@ ui <- fluidPage(theme=shinytheme("cosmo"),
                                         ),
                                  column(10,
                                        conditionalPanel("input.Agent_Setup > 0",
-                                       plotOutput("somplotagent", width ="600px", height = "600px"),
+                                       plotOutput("somplotagent", width ="700px", height = "600px"),
                                      
                                        rHandsontableOutput("clusters_editable_table"),
                                        actionButton("back_cluster", "<<"),
