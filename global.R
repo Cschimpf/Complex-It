@@ -356,7 +356,6 @@ plot_agent_SOM <-function(current_table) {
   index = 1
   for(i in active_rows){
     if(agent_drawtools@displace_tracker[[as.character(predicted_neuron[index])]] > 0){
-      print('why am I here')
       plot_locations[[as.character(i)]][1] <- plot_locations[[as.character(i)]][1] + agent_drawtools@displace_vector[[as.character(agent_drawtools@displace_tracker[[as.character(predicted_neuron[index])]])]][1] 
       plot_locations[[as.character(i)]][2] <- plot_locations[[as.character(i)]][2] + agent_drawtools@displace_vector[[as.character(agent_drawtools@displace_tracker[[as.character(predicted_neuron[index])]])]][2] 
       

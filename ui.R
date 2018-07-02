@@ -350,7 +350,7 @@ ui <- fluidPage(theme=shinytheme("cosmo"),
                                  "text/comma-separated-values,text/plain",
                                  ".csv")),
                                checkboxInput('header_pred', ' Header?', TRUE),
-                               checkboxInput('load_prev_som', 'Use Previous SOM Results?'),
+                               checkboxInput('load_prev_som', 'Use Previous SOM Solution? If unchecked it will use SOM solution from this session.'),
                                selectInput('sep_pred', 'Separator:',
                                            c("Comma","Semicolon","Tab","Space"), 'Comma'),
                                selectInput('quote_pred', 'Quote:',
@@ -363,15 +363,11 @@ ui <- fluidPage(theme=shinytheme("cosmo"),
                                
                       ),
                       tabPanel("9. Simulate Policy Scenarios", 
-                               h3("Case-Based Multi-Agent Modeling:", tags$b("UNDER DEVELOPMENT")),
+                               h3("Case-Based Multi-Agent Modeling:"),
                                   
                                p(HTML("Use your SOM solution to create a simulated multi-agent environment 
                                       for evaluating how policies impact the cases in your study. NOTE. This
-                                      is an experimental tab. Not all features are currently integrated. 
-                                      The grid may not reflect the dimensions selected under Train SOM. The grid
-                                      is only populated with estimated data points when pressing Run Cases. Upload
-                                      features are not yet supported. This tab is under development with new updates
-                                      coming in February 2018 <br>
+                                      is an experimental tab. <br>
                                       What constitutes the credibility of the results of policy? <br>
                                       Are you going to be predicting? If so, consider pulling off a quarter of your data")),
                               tags$b("To Use:",

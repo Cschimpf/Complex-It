@@ -307,41 +307,25 @@ server <- function(input, output, session) {
       # the predictions are made using SOMbrero predict function against the p.input data
       predicted <- predict(temp_som, p.input)
       
-      #temprowvector<-row(current_data_file)
-      p.input <- cbind(p.input, 'Matched Neuron' = predicted)
+      
       # calculate the distances from each case to its closest, 2nd closest, and furthest neuron
-      Neurons<-temp_som[["clustering"]] #these are the cases and their neuron assignments
-      Cases<- temp_som[["data"]] #these are the cases
-      #SOMprofilecolumns<-ncol(Cases)
-      Cases_Neurons<-cbind(Cases,Neurons) #the cases with a new column for their predicted neuron
+ 
       Neuron_Profiles<-temp_som[["prototypes"]] #these are the neuron's prototypes
       #create an array intitialized to 1's to store all the BMUs as the loop itterates
-      BMUS<-array(1,c(length(Cases[,1]),6))
+      BMUS<-array(1,c(nrow(p.input),6))
       # Now loop through cases, each time appending the case to the existing neuron prototypes and recalculating
-      for (i in 1:length(Cases[,1])){ 
-        newguess<-Cases[i,]
+      for (i in 1:nrow(p.input)){ 
+        newguess<-p.input[i,]
         D<-rbind(newguess,Neuron_Profiles) #append each case to first position with the neuron prototypes
         B<-dist(D,method="euclidean",diag=TRUE) #calculate the distances from the case to each of the neuron prototypes
         C<-rank(B[1:nrow(D)-1],ties.method= "first") #now rank the neuron prototype distance
-        BMU1<-B[which (C==1)]
-        BMU2<-B[which (C==2)]
-        BMUN<-B[which (C==max(C))]
-        BMUS[i,1]<-which(C==1)
+      
         BMUS[i,2]<-which(C==2)
-        BMUS[i,3]<-which(C==nrow(D)-1)
-        BMUS[i,4]<-BMU1
-        BMUS[i,5]<-BMU2
-        BMUS[i,6]<-BMUN
+      
       }
-      #
+      
       # Now append the BMUs to the file
-      p.input <- cbind(p.input, 'BMU1' = BMUS[,1])
-      p.input <- cbind(p.input, 'BMU2' = BMUS[,2])
-      p.input <- cbind(p.input, 'BMUN' = BMUS[,3])
-      p.input <- cbind(p.input, 'EUCDIS1' = BMUS[,4])
-      p.input <- cbind(p.input, 'EUCDIS2' = BMUS[,5])
-      p.input <- cbind(p.input, 'EUCDISN' = BMUS[,6])
-      #
+      p.input <- cbind(p.input, 'Matched Neuron' = predicted, '2nd Best Match' = BMUS[,2])
       
       output$view_predict <- renderTable({
         head(p.input, n=input$nrow.result_pred)
