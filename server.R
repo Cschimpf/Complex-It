@@ -345,6 +345,10 @@ server <- function(input, output, session) {
         output$Agent_Warning <- renderText({"You must first run your own clusters and train the SOM"})
         return()
       }
+      if(length(current_kmeans_solution@usize) > 9){
+        output$Agent_Warning <- renderText({"You must use 9 or fewer clusters"})
+        return()
+      }
       
       agent_cluster_tracker <<- create_track_agent_tab_state("first", "none")
       erase_future_states(agent_cluster_tracker, 0, agent_cluster_values)

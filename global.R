@@ -17,6 +17,7 @@ previous_som = NULL
 agent_case_tracker = NULL
 agent_cluster_tracker = NULL
 agent_grid_plot = NULL
+agent_grid_colors = NULL
 agentdf = NULL
 agent_drawtools = NULL
 displacement = list("1" =c(0, 2), "2" =c(0,-2), "3" =c(2,0), "4" =c(-2,0), "5" =c(-5,0), "6" =c(0,5))
@@ -273,6 +274,9 @@ updateKey <- function(new_val, val_list, index){
 generate_grid_template <-function(dims, knum){
   groupnames <- c("Cluster 1", "Cluster 2", "Cluster 3", "Cluster 4", "Cluster 5", "Cluster 6", "Cluster 7", "Cluster 8", "Cluster 9")
   if (knum <9) {groupnames <- groupnames[1:knum]}
+  agent_drawtools <<- create_SOMdrawtools(current_som_solution$parameters$the.grid$dim, length(current_kmeans_solution@usize))
+  
+  #agent_grid_colors <<- grid_color_subset(knum)
   
   agentdf <<- cbind(as.data.frame(cbind(x = rep(0, knum), y = rep(0,knum))), groupnames = groupnames)
   grid_template <- ggplot(agentdf, aes(x=agentdf$x, y=agentdf$y)) + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
@@ -305,6 +309,7 @@ generate_grid_template <-function(dims, knum){
   return(grid_template)
 }
 
+
 generate_logic_column <- function(df){
   subset <- 9
   if(nrow(df) < 9){
@@ -331,7 +336,6 @@ generate_cluster_table <- function(){
 
 
 plot_agent_SOM <-function(current_table) {
-  agent_drawtools <<- create_SOMdrawtools(current_som_solution$parameters$the.grid$dim, length(current_kmeans_solution@usize))
   
   active_rows =c()
   for(i in 1:nrow(current_table)){
@@ -420,6 +424,7 @@ grid_color_subset <- function(knum) {
   }
   return(case_colors)
 }
+
 
 ###############Still Under Development for Future Versions###############
 
