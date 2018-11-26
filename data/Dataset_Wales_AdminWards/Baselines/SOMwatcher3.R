@@ -1,5 +1,9 @@
 # SOMwatcher3.r 2/20/2018
 #
+
+#for my own experiments with this, adjust working directory to test this code out
+setwd("C:\\Users\\Corey Schimpf\\Documents\\SACS for R\\new interface Complexit\\data\\Dataset_Wales_AdminWards\\Baselines")
+
 # Runs a monte carlo analysis on a SOM Object
 # and returns results to a text file and a latex file format
 #

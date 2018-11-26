@@ -1,0 +1,55 @@
+\begin{table}[h]
+\centering
+\resizebox{ 1 \textwidth}{!}{%
+\begin{tabular}{ rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr }
+\hline\hline\\\\
+ Employ2016 && \multicolumn{ 11 }{c}{ 14 } &  &  & \multicolumn{ 11 }{c}{ 16 } &  &  & \multicolumn{ 11 }{c}{ 18 } \\ 
+ Employ2014 && \multicolumn{ 3 }{c}{ 19 } &  & \multicolumn{ 3 }{c}{ 20 } &  & \multicolumn{ 3 }{c}{ 21 } &  &  & \multicolumn{ 3 }{c}{ 19 } &  & \multicolumn{ 3 }{c}{ 20 } &  & \multicolumn{ 3 }{c}{ 21 } &  &  & \multicolumn{ 3 }{c}{ 19 } &  & \multicolumn{ 3 }{c}{ 20 } &  & \multicolumn{ 3 }{c}{ 21 } \\ 
+Income2014/Income2016 &  & 21 & 22 & 23 &  & 21 & 22 & 23 &  & 21 & 22 & 23 &  &  & 21 & 22 & 23 &  & 21 & 22 & 23 &  & 21 & 22 & 23 &  &  & 21 & 22 & 23 &  & 21 & 22 & 23 &  & 21 & 22 & 23 \\ 
+ &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  &  \\ 
+23.7429315708578 &  & 5.00 & 5.00 & 5.00 &  & 5.00 & 5.00 & 5.00 &  & 5.00 & 5.00 & 5.00 &  &  & 5.00 & 5.00 & 5.00 &  & 5.00 & 5.00 & 5.00 &  & 5.00 & 5.00 & 5.00 &  &  & 5.00 & 5.00 & 5.00 &  & 5.00 & 5.00 & 5.00 &  & 5.00 & 5.00 & 5.00 \\ 
+25.1595217259601 &  & 5.00 & 5.00 & 5.00 &  & 5.00 & 5.00 & 5.00 &  & 5.00 & 5.00 & 5.00 &  &  & 5.00 & 5.00 & 5.00 &  & 5.00 & 5.00 & 5.00 &  & 5.00 & 5.00 & 5.00 &  &  & 5.00 & 5.00 & 5.00 &  & 5.00 & 5.00 & 5.00 &  & 5.00 & 5.00 & 5.00 \\ 
+24.7431060960516 &  & 5.00 & 5.00 & 5.00 &  & 5.00 & 5.00 & 5.00 &  & 5.00 & 5.00 & 5.00 &  &  & 5.00 & 5.00 & 5.00 &  & 5.00 & 5.00 & 5.00 &  & 5.00 & 5.00 & 5.00 &  &  & 5.00 & 5.00 & 5.00 &  & 5.00 & 5.00 & 5.00 &  & 5.00 & 5.00 & 5.00 \\ 
+\\
+\\
+\hline\hline
+\end{tabular}%
+}
+\caption{ neuron BirthWeight2014=6.8,BirthWeight2016=6.4,Death2014=1234.4,Death2016=1225.7,Stage4Capped2014=299,Stage4Capped2016=323,Violence2014=1.54,Violence2016=2.09,Theft2014=0.78,Theft2016=0.82 }
+\end{table}
+%
+%  transform = NULL 
+%  collapse:  mean 
+% 
+%  Simulation of function:  
+%   
+%  function(Income2014,Income2016,Employ2014,Employ2016,BirthWeight2014,BirthWeight2016,Death2014,Death2016,Stage4Capped2014,Stage4Capped2016,Violence2014,Violence2016,Theft2014,Theft2016){ 
+%    # predict neuron: 
+%    xnew<-c(Income2014,Income2016,Employ2014,Employ2016,BirthWeight2014,BirthWeight2016,Death2014,Death2016,Stage4Capped2014,Stage4Capped2016,Violence2014,Violence2016,Theft2014,Theft2016) 
+%    neuron <- predict(Agent_SOM,xnew) 
+%    # return result: 
+%    return(list("neuron"=unname(neuron))) 
+%  } 
+%  <bytecode: 0x00000000163d8898> 
+%   
+%  Required time: 25.55 secs for nrep = 100  repetitions on 1 CPUs  
+%   
+%  Parameter grid:  
+%   
+%         Income2014 : 23.74293 25.15952 24.74311  
+%         Income2016 : 21 22 23  
+%         Employ2014 : 19 20 21  
+%         Employ2016 : 14 16 18  
+%    BirthWeight2014 : 6.8  
+%    BirthWeight2016 : 6.4  
+%          Death2014 : 1234.4  
+%          Death2016 : 1225.7  
+%   Stage4Capped2014 : 299  
+%   Stage4Capped2016 : 323  
+%       Violence2014 : 1.54  
+%       Violence2016 : 2.09  
+%          Theft2014 : 0.78  
+%          Theft2016 : 0.82  
+%   
+%    
+%  1 output arrays of dimensions: 3 3 3 3 1 1 1 1 1 1 1 1 1 1 100 

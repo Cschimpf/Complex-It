@@ -18,7 +18,7 @@ ui <- fluidPage(theme=shinytheme("cosmo"),
 # ----------
                 #imageOutput("complexit_logo", inline=TRUE),
 
-                titlePanel("Complex-It 0.2.0 Alpha"),
+                titlePanel("Complex-It 0.2.5 Alpha"),
                 
                 #sidebarLayout(
                   
@@ -30,62 +30,12 @@ ui <- fluidPage(theme=shinytheme("cosmo"),
                   
                   #mainPanel(
                   navlistPanel(
-                    selected = "1. Design Initial Model",
+                    selected = "1. Build Database and Import Cases",
                     HTML("<img src='Complexit_LOGO4.png'>"),
                     HTML("<br><br><br><br>"), HTML("<br><br><br><br>"), HTML("<br><br><br><br>"), HTML("<br>"),
                     "Build the Model",
-                      tabPanel("1. Design Initial Model",
-                               h3("Before Any Data Can Be Analyzed, We Need to Design Your Initial Model and Research Questions"),
-                               
-                               p(HTML("To help with the process, answer the following questions.  
-                                      <BR> NOTE: Answers such as 'I do not know' or 'not sure' are acceptable.")),
-                               
-                               tags$b("IS YOUR TOPIC A COMPLEX SYSTEM?"),
-                                      p("1. Provide a quick paragraph summary of your topic of study"), 
-                                      textAreaInput(inputId = "dim-a1", label = NULL, value = "Enter Text", width = "800px", height = "100px"),
-                                      p("2. What makes your topic complex?"),
-                                      textAreaInput(inputId = "dim-a2", label = NULL, value = "Enter Text", width = "800px", height = "100px"),
-                                      p("3. Is it a complex system? And, if so, why or how?"),
-                                      textAreaInput(inputId = "dim-a3", label = NULL, value = "Enter Text", width = "800px", height = "100px"),
-                                      p("4. Can you draw a boundary around your system?"),
-                                      textAreaInput(inputId = "dim-a4", label = NULL, value = "Enter Text", width = "800px", height = "100px"),
-
-                               tags$b("CASES, VARIABLES AND PROFILES:"),
-                                      p("1. What are the cases in your system?"), 
-                                      textAreaInput(inputId = "dim-b1", label = NULL, value = "Enter Text", width = "800px", height = "100px"),
-                                      p("2. What are the key variables you want to study?"),
-                                      textAreaInput(inputId = "dim-b2", label = NULL, value = "Enter Text", width = "800px", height = "100px"),
-                                      p("3. How will you measure these variables?"),
-                                      textAreaInput(inputId = "dim-b3", label = NULL, value = "Enter Text", width = "800px", height = "100px"),
-                                      p("4. How do your variables go together to form a profile?"),
-                                      textAreaInput(inputId = "dim-b4", label = NULL, value = "Enter Text", width = "800px", height = "100px"),
-                                      p("5. How do the variables interact or infuence one another?"),
-                                      textAreaInput(inputId = "dim-b5", label = NULL, value = "Enter Text", width = "800px", height = "100px"),
-                                      p("6. Which variables do you think are the most important?"),
-                                      textAreaInput(inputId = "dim-b6", label = NULL, value = "Enter Text", width = "800px", height = "100px"),
-                                      p("7. Do you have data on these variables?"),
-                                      textAreaInput(inputId = "dim-b7", label = NULL, value = "Enter Text", width = "800px", height = "100px"),
-                                      p("8. If not, how do you plan to collect the data?"),
-                                      textAreaInput(inputId = "dim-b8", label = NULL, value = "Enter Text", width = "800px", height = "100px"),
-                                      p("9. Any concerns with the quality of data or missing data?"),
-                                      textAreaInput(inputId = "dim-b9", label = NULL, value = "Enter Text", width = "800px", height = "100px"),
-                                      p("10. Is this study cross-sectional or across time?"),
-                                      textAreaInput(inputId = "dim-b10", label = NULL, value = "Enter Text", width = "800px", height = "100px"),
-                                      p("11. If across time, how many time stamps will you use?"),
-                                      textAreaInput(inputId = "dim-b11", label = NULL, value = "Enter Text", width = "800px", height = "100px"),
- 
-                               tags$b("RESEARCH QUESTIONS:"),
-                                     p("1. What is the question or questions you want to answer?"),
-                                     textAreaInput(inputId = "dim-c1", label = NULL, value = "Enter Text", width = "800px", height = "100px"),
-                                     p("2. Can you state them formally?"),
-                                     textAreaInput(inputId = "dim-c2", label = NULL, value = "Enter Text", width = "800px", height = "100px"),
-                               
-                                                             
-
-                               br() 
-                               ),
            
-                      tabPanel("2. Build Database and Import Cases",
+                      tabPanel("1. Build Database and Import Cases",
                                h3("Here we will create your EXCEL database and import it into COMPLEX-IT"),
                              
                                p(HTML("To help with the process, complete the following two steps.")),
@@ -145,7 +95,7 @@ ui <- fluidPage(theme=shinytheme("cosmo"),
                                
                                ),
 
-                      tabPanel("3. Cluster Cases",
+                      tabPanel("2. Cluster Cases",
                                h3("Here we will use k-means (a clustering algorithm) to group your cases into self-similar 'clusters'"),
 
                                p(HTML('For a basic introduction to k-means, See <a href= 
@@ -186,7 +136,7 @@ ui <- fluidPage(theme=shinytheme("cosmo"),
                                plotOutput(outputId = "kmeans_silh", inline=TRUE)
                                ),
                       "Test the Model",
-                      tabPanel("4. The Computer's Turn",
+                      tabPanel("3. The Computer's Turn",
                                h3("Here we will use artificial intelligence to check the accuracy of your k-means cluster solution"),
 
                                p(HTML('For a basic introduction to the Kohonen Self-Organizing Map (SOM), which is the artificial intelligence we will use, <a href= 
@@ -237,7 +187,7 @@ ui <- fluidPage(theme=shinytheme("cosmo"),
                                plotOutput(outputId = "som_3Dplot", width = "50%", height = "500px")
                                ),
                     
-                      tabPanel("5. Compare and Visualize Results",
+                      tabPanel("4. Compare and Visualize Results",
                                h3("Here we visualize the results of the k-means and compare them to the Computer's results"),
                                
                                 p(HTML("The utility of the SOM is that it plots your cases and their k-means cluster memberhip on a two-dimensional map,
@@ -295,50 +245,10 @@ ui <- fluidPage(theme=shinytheme("cosmo"),
                                uiOutput("save_som_notice"),
                                plotOutput("somplot")),
                     
-                    
-                      tabPanel("6. Assemble Working Model",
-                               
-                               h3("Here we take everything you have so far learned and use it to update the initial model designed in the first tab."),
-                               
-                               p(HTML("To help with the process, answer the following questions.  
-                                      <BR> NOTE: Answers such as 'I do not know' or 'not sure' are still acceptable.")),
-                               
-                               tags$b("IS YOUR TOPIC A COMPLEX SYSTEM?",
-                                      tags$ol(tags$li("Provide a quick paragraph summary of your topic of study"), 
-                                              tags$li("What makes your topic complex?"),
-                                              tags$li("Can you still draw a boundary around your system?"))),
-                               
-                               tags$b("CASES, VARIABLES AND PROFILES:",
-                                      tags$ol(tags$li("What are the key clusters in your system?"), 
-                                              tags$li("Provide a name for each and brief description?"),
-                                              tags$li("Summarize the k-means and SOM statistics that support your updated model."),
-                                              tags$li("How do your variables go together to form a profile?"),
-                                              tags$li("Based on the SOM and k-means, how do the variables interact or infuence one another?"),
-                                              tags$li("Based on the SOM and k-means, which variables play the biggest role for each cluster?"),
-                                              tags$li("Which variables had the biggest impact on cases across all the clusters?"))),
-
-                                 br() 
-                               ),
-                      
-  tabPanel("7. Decide Next Step",
-           h3("Here we decide what you want to do next."),
-           tags$b("FOUR OPTIONS:",
-                  tags$ol(tags$li("Do you want to re-run the entire modeling process?  If so, go back to the beginning"), 
-                          tags$li("Do you need to add more cases or variables; or remove cases or variables?  Then do so and restart."),
-                          tags$li("Do you want to use your model to predict new cases?  If so, go to the PREDICT CASES tab."),
-                          tags$li("Do you want to use your model to explore or simulate different policy-based scenarios? Then go to the SIMULATE SCENARIOS tab"))),
-           
-     
-           br() 
-           ),
-  
-                      
-                      
-                      
-                      
+                  
                       
                       "Extend the Model",                      
-                      tabPanel("8. Predict New Cases", 
+                      tabPanel("5. Predict New Cases", 
                                h3("Use your solution to predict the quadrant membership of new or different cases"),
                                p(HTML('Predict the classification of a new or different case
                                   <br><i>Goodness of fit for classification is based on a numeric tolerance defined as
@@ -362,7 +272,7 @@ ui <- fluidPage(theme=shinytheme("cosmo"),
                                                 tableOutput("view_predict"))
                                
                       ),
-                      tabPanel("9. Simulate Policy Scenarios", 
+                      tabPanel("6. Simulate Policy Scenarios", 
                                h3("Case-Based Multi-Agent Modeling:"),
                                   
                                p(HTML("Use your SOM solution to create a simulated multi-agent environment 
@@ -406,18 +316,19 @@ ui <- fluidPage(theme=shinytheme("cosmo"),
                                                      border-width: 5px"),
                                         br(),
                                         hr(),
-                                        # actionButton(inputId = "Agent_Run_Cases", label="Run Cases",
-                                        #              style = "foreground-color:white; 
-                                        #              background-color:lavender; 
-                                        #              color:black;
-                                        #              height: 50px;
-                                        #              width: 150px;
-                                        #              text-align:center;
-                                        #              border-color:lightslategray;
-                                        #              border-radius: 5px;
-                                        #              border-width: 5px"),
-                                        # br(),
-                                        # hr(),
+                                         actionButton(inputId = "SensitivityAnalysis", label="Sensitivity",
+                                                      style = "foreground-color:white; 
+                                                    background-color:darksalmon; 
+                                                    color:black;
+                                                    height: 50px;
+                                                    width: 150px;
+                                                    text-align:center;
+                                                    border-color:lightslategray;
+                                                    border-radius: 5px;
+                                                    border-width: 5px"),
+                                        uiOutput('cluster_sensitivity'),
+                                        
+                                        hr()
                                         # actionButton(inputId = "Agent_Use_Prev_SOM", label="Use Previous SOM",
                                         #              style = "foreground-color:white; 
                                         #              background-color:turquoise; 
@@ -429,46 +340,7 @@ ui <- fluidPage(theme=shinytheme("cosmo"),
                                         #              border-radius: 5px;
                                         #              border-width: 5px"),
                                         # br(),
-                                        hr()
-                                       
                                         
-                                       
-                        
-                                        #select the clusters
-                                        # fileInput('file-acl', 'Upload Clusters', accept = c(
-                                        #   "text/csv",
-                                        #   "text/comma-separated-values,text/plain",
-                                        #   ".csv")),
-                                        # checkboxInput('header-acl', ' Header?', TRUE),
-                                        # selectInput('sep-acl', 'Separator:',
-                                        #             c("Comma","Semicolon","Tab","Space"), 'Comma'),
-                                        # selectInput('quote-acl', 'Quote:',
-                                        #             c("None","Double Quote","Single Quote"),
-                                        #             'Double Quote'),
-                                        # #uiOutput("varchoiceacl"),
-                                        # numericInput('nrow.preview-acl','Number of rows in the preview:',20, min = 1, max = 100),
-                                        # numericInput('ncol.preview-acl', 'Number of columns in the preview:',
-                                        #              10,min = 1, max = 100),
-                                        # helpText("Note: Even if the preview only shows a restricted
-                                        # number of observations, the map will be based on the full dataset."),
-                                        # hr(),
-                                        # br(),
-                                        # fileInput('file-acs', 'Upload Cases', accept = c(
-                                        #   "text/csv",
-                                        #   "text/comma-separated-values,text/plain",
-                                        #   ".csv")),
-                                        # checkboxInput('header-acs', ' Header?', TRUE),
-                                        # selectInput('sep-acs', 'Separator:',
-                                        #             c("Comma","Semicolon","Tab","Space"), 'Comma'),
-                                        # selectInput('quote-acs', 'Quote:',
-                                        #             c("None","Double Quote","Single Quote"),
-                                        #             'Double Quote'),
-                                        # #uiOutput("varchoiceacs"),
-                                        # numericInput('nrow.preview-acs','Number of rows in the preview:',20, min = 1, max = 100),
-                                        # numericInput('ncol.preview-acs', 'Number of columns in the preview:',
-                                        #              10,min = 1, max = 100),
-                                        # helpText("Note: Even if the preview only shows a restricted
-                                        #          number of observations, the map will be based on the full dataset.")
                                         ),
                                  column(10,
                                        conditionalPanel("input.Agent_Setup > 0",
@@ -506,7 +378,11 @@ ui <- fluidPage(theme=shinytheme("cosmo"),
                               # 
                               ),
                               
-                      
+                    "Export Results",                      
+                    tabPanel("7. Generate Report", 
+                             h3("Generate a report and exportable datasets from your analysis"),
+                             h3("Under Construction")
+                    ),
                       tabPanel("Help",
                                h3("Under Construction")
                                

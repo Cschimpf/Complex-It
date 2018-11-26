@@ -323,11 +323,16 @@ generate_logic_column <- function(df){
   return(logic_col)
 }
 
-generate_cluster_table <- function(){
+generate_cluster_labels <-function(){
   clus_label =c()
   for(i in 1: nrow(current_kmeans_solution@ucenters)){
     clus_label = c(clus_label, paste(c("Cluster"), toString(i), sep = " "))
   }
+  return(clus_label)
+}
+
+generate_cluster_table <- function(){
+  clus_label = generate_cluster_labels()
   predicted <- predict(current_som_solution, current_kmeans_solution@ucenters)
   newdf <- cbind(as.data.frame(current_kmeans_solution@ucenters), "Cluster" = clus_label, "Quadrant" = predicted)
   #newdf <- as.data.frame(cbind(round(current_kmeans_solution@ucenters, 3), "Cluster" = clus_label, "Quadrant" = predicted))
@@ -423,6 +428,81 @@ grid_color_subset <- function(knum) {
     case_colors <- c(case_colors, colors[i])
   }
   return(case_colors)
+}
+snip_state <- function(state, select_clus){
+  state <- state[names(current_data_file)]
+  row <- substr(select_clus, nchar(select_clus)-1, nchar(select_clus))
+  state <- state[as.integer(row), ]
+  for(i in 1:length(state)){
+    state[i] = round(state[i], 2)
+  }
+  
+  return(state)
+}
+detect_change_direction <- function(baseline, change_state){
+  if(baseline > change_state){sign = "negative"}
+  else{sign = "positive"}
+  return(sign)
+}
+
+zero_order_change <- function(baseline, change_state){
+  if(baseline == 0){
+    pdiff = change_state * 100
+  }
+  else{pdiff = baseline * 100}
+  return(pdiff)
+}
+
+evaluate_state_change <- function(state_vals, select_clus) {
+ 
+  baseline <- state_vals[['first']]
+  change_state <- state_vals[[agent_cluster_tracker@current_state]]
+  
+  baseline <- snip_state(baseline, select_clus)
+  change_state <- snip_state(change_state, select_clus)
+  
+  pdiff_vector <- rep(0, length(baseline))
+  for(i in 1:length(baseline)){
+    if(baseline[i] != change_state[i]){
+      sign = detect_change_direction(baseline[i], change_state[i])
+      if(baseline[i] == 0 | change_state[i] == 0){
+        pdiff = zero_order_change(baseline[i], change_state[i])
+      }
+      else{
+        diff = abs(baseline[i] - change_state[i])
+        pdiff = diff/baseline[i]
+        if(sign == "negative"){pdiff =-pdiff}
+      }
+      pdiff_vector[i] = round(pdiff *100, digits=2)
+    }
+    
+  }
+  change = FALSE 
+  for(i in 1:length(pdiff_vector)){
+    if(pdiff_vector[i] != 0){
+      change = TRUE
+    }
+  }
+  if(change == TRUE){return(pdiff_vector)}
+  else{return("There were no changes to the target cluster for sensitivity analysis")}
+  
+}
+dataModal <- function(names, change, failed = FALSE) {
+  modalDialog(
+    p("Select a range in which each projected change may deviate"),
+    lapply(1:length(names), function(y, n, i) 
+      { sliderInput(paste0("pont.dev", i), paste0(n[i], " : Potential Deviation", " (User Change: ", y[i], "%)"), min =0, max=100, value=0, width="400px") }, y=change, n=names),
+    
+    #sliderInput(paste0("pontdev", i), paste0(name[i], " : Potential Deviation", " (User Change: ", change[i], ")"), min = 0, max=100, value=0, width='400px')
+    
+    if (failed)
+      div(tags$b("Invalid name of data object", style = "color: red;")),
+    
+    footer = tagList(
+      modalButton("Cancel"),
+      actionButton("ok", "OK")
+    )
+  )
 }
 
 

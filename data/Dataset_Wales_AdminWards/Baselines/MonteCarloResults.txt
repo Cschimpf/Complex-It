@@ -1,0 +1,780 @@
+$neuron
+, , Employ2014=19, Employ2016=14, BirthWeight2014=6.8, BirthWeight2016=6.4, Death2014=1234.4, Death2016=1225.7, Stage4Capped2014=299, Stage4Capped2016=323, Violence2014=1.54, Violence2016=2.09, Theft2014=0.78, Theft2016=0.82, rep=1
+
+                            Income2016=21 Income2016=22 Income2016=23
+Income2014=23.7429315708578             5             5             5
+Income2014=25.1595217259601             5             5             5
+Income2014=24.7431060960516             5             5             5
+
+, , Employ2014=20, Employ2016=14, BirthWeight2014=6.8, BirthWeight2016=6.4, Death2014=1234.4, Death2016=1225.7, Stage4Capped2014=299, Stage4Capped2016=323, Violence2014=1.54, Violence2016=2.09, Theft2014=0.78, Theft2016=0.82, rep=1
+
+                            Income2016=21 Income2016=22 Income2016=23
+Income2014=23.7429315708578             5             5             5
+Income2014=25.1595217259601             5             5             5
+Income2014=24.7431060960516             5             5             5
+
+, , Employ2014=21, Employ2016=14, BirthWeight2014=6.8, BirthWeight2016=6.4, Death2014=1234.4, Death2016=1225.7, Stage4Capped2014=299, Stage4Capped2016=323, Violence2014=1.54, Violence2016=2.09, Theft2014=0.78, Theft2016=0.82, rep=1
+
+                            Income2016=21 Income2016=22 Income2016=23
+Income2014=23.7429315708578             5             5             5
+Income2014=25.1595217259601             5             5             5
+Income2014=24.7431060960516             5             5             5
+
+, , Employ2014=19, Employ2016=16, BirthWeight2014=6.8, BirthWeight2016=6.4, Death2014=1234.4, Death2016=1225.7, Stage4Capped2014=299, Stage4Capped2016=323, Violence2014=1.54, Violence2016=2.09, Theft2014=0.78, Theft2016=0.82, rep=1
+
+                            Income2016=21 Income2016=22 Income2016=23
+Income2014=23.7429315708578             5             5             5
+Income2014=25.1595217259601             5             5             5
+Income2014=24.7431060960516             5             5             5
+
+, , Employ2014=20, Employ2016=16, BirthWeight2014=6.8, BirthWeight2016=6.4, Death2014=1234.4, Death2016=1225.7, Stage4Capped2014=299, Stage4Capped2016=323, Violence2014=1.54, Violence2016=2.09, Theft2014=0.78, Theft2016=0.82, rep=1
+
+                            Income2016=21 Income2016=22 Income2016=23
+Income2014=23.7429315708578             5             5             5
+Income2014=25.1595217259601             5             5             5
+Income2014=24.7431060960516             5             5             5
+
+, , Employ2014=21, Employ2016=16, BirthWeight2014=6.8, BirthWeight2016=6.4, Death2014=1234.4, Death2016=1225.7, Stage4Capped2014=299, Stage4Capped2016=323, Violence2014=1.54, Violence2016=2.09, Theft2014=0.78, Theft2016=0.82, rep=1
+
+                            Income2016=21 Income2016=22 Income2016=23
+Income2014=23.7429315708578             5             5             5
+Income2014=25.1595217259601             5             5             5
+Income2014=24.7431060960516             5             5             5
+
+, , Employ2014=19, Employ2016=18, BirthWeight2014=6.8, BirthWeight2016=6.4, Death2014=1234.4, Death2016=1225.7, Stage4Capped2014=299, Stage4Capped2016=323, Violence2014=1.54, Violence2016=2.09, Theft2014=0.78, Theft2016=0.82, rep=1
+
+                            Income2016=21 Income2016=22 Income2016=23
+Income2014=23.7429315708578             5             5             5
+Income2014=25.1595217259601             5             5             5
+Income2014=24.7431060960516             5             5             5
+
+, , Employ2014=20, Employ2016=18, BirthWeight2014=6.8, BirthWeight2016=6.4, Death2014=1234.4, Death2016=1225.7, Stage4Capped2014=299, Stage4Capped2016=323, Violence2014=1.54, Violence2016=2.09, Theft2014=0.78, Theft2016=0.82, rep=1
+
+                            Income2016=21 Income2016=22 Income2016=23
+Income2014=23.7429315708578             5             5             5
+Income2014=25.1595217259601             5             5             5
+Income2014=24.7431060960516             5             5             5
+
+, , Employ2014=21, Employ2016=18, BirthWeight2014=6.8, BirthWeight2016=6.4, Death2014=1234.4, Death2016=1225.7, Stage4Capped2014=299, Stage4Capped2016=323, Violence2014=1.54, Violence2016=2.09, Theft2014=0.78, Theft2016=0.82, rep=1
+
+                            Income2016=21 Income2016=22 Income2016=23
+Income2014=23.7429315708578             5             5             5
+Income2014=25.1595217259601             5             5             5
+Income2014=24.7431060960516             5             5             5
+
+, , Employ2014=19, Employ2016=14, BirthWeight2014=6.8, BirthWeight2016=6.4, Death2014=1234.4, Death2016=1225.7, Stage4Capped2014=299, Stage4Capped2016=323, Violence2014=1.54, Violence2016=2.09, Theft2014=0.78, Theft2016=0.82, rep=2
+
+                            Income2016=21 Income2016=22 Income2016=23
+Income2014=23.7429315708578             5             5             5
+Income2014=25.1595217259601             5             5             5
+Income2014=24.7431060960516             5             5             5
+
+, , Employ2014=20, Employ2016=14, BirthWeight2014=6.8, BirthWeight2016=6.4, Death2014=1234.4, Death2016=1225.7, Stage4Capped2014=299, Stage4Capped2016=323, Violence2014=1.54, Violence2016=2.09, Theft2014=0.78, Theft2016=0.82, rep=2
+
+                            Income2016=21 Income2016=22 Income2016=23
+Income2014=23.7429315708578             5             5             5
+Income2014=25.1595217259601             5             5             5
+Income2014=24.7431060960516             5             5             5
+
+, , Employ2014=21, Employ2016=14, BirthWeight2014=6.8, BirthWeight2016=6.4, Death2014=1234.4, Death2016=1225.7, Stage4Capped2014=299, Stage4Capped2016=323, Violence2014=1.54, Violence2016=2.09, Theft2014=0.78, Theft2016=0.82, rep=2
+
+                            Income2016=21 Income2016=22 Income2016=23
+Income2014=23.7429315708578             5             5             5
+Income2014=25.1595217259601             5             5             5
+Income2014=24.7431060960516             5             5             5
+
+, , Employ2014=19, Employ2016=16, BirthWeight2014=6.8, BirthWeight2016=6.4, Death2014=1234.4, Death2016=1225.7, Stage4Capped2014=299, Stage4Capped2016=323, Violence2014=1.54, Violence2016=2.09, Theft2014=0.78, Theft2016=0.82, rep=2
+
+                            Income2016=21 Income2016=22 Income2016=23
+Income2014=23.7429315708578             5             5             5
+Income2014=25.1595217259601             5             5             5
+Income2014=24.7431060960516             5             5             5
+
+, , Employ2014=20, Employ2016=16, BirthWeight2014=6.8, BirthWeight2016=6.4, Death2014=1234.4, Death2016=1225.7, Stage4Capped2014=299, Stage4Capped2016=323, Violence2014=1.54, Violence2016=2.09, Theft2014=0.78, Theft2016=0.82, rep=2
+
+                            Income2016=21 Income2016=22 Income2016=23
+Income2014=23.7429315708578             5             5             5
+Income2014=25.1595217259601             5             5             5
+Income2014=24.7431060960516             5             5             5
+
+, , Employ2014=21, Employ2016=16, BirthWeight2014=6.8, BirthWeight2016=6.4, Death2014=1234.4, Death2016=1225.7, Stage4Capped2014=299, Stage4Capped2016=323, Violence2014=1.54, Violence2016=2.09, Theft2014=0.78, Theft2016=0.82, rep=2
+
+                            Income2016=21 Income2016=22 Income2016=23
+Income2014=23.7429315708578             5             5             5
+Income2014=25.1595217259601             5             5             5
+Income2014=24.7431060960516             5             5             5
+
+, , Employ2014=19, Employ2016=18, BirthWeight2014=6.8, BirthWeight2016=6.4, Death2014=1234.4, Death2016=1225.7, Stage4Capped2014=299, Stage4Capped2016=323, Violence2014=1.54, Violence2016=2.09, Theft2014=0.78, Theft2016=0.82, rep=2
+
+                            Income2016=21 Income2016=22 Income2016=23
+Income2014=23.7429315708578             5             5             5
+Income2014=25.1595217259601             5             5             5
+Income2014=24.7431060960516             5             5             5
+
+, , Employ2014=20, Employ2016=18, BirthWeight2014=6.8, BirthWeight2016=6.4, Death2014=1234.4, Death2016=1225.7, Stage4Capped2014=299, Stage4Capped2016=323, Violence2014=1.54, Violence2016=2.09, Theft2014=0.78, Theft2016=0.82, rep=2
+
+                            Income2016=21 Income2016=22 Income2016=23
+Income2014=23.7429315708578             5             5             5
+Income2014=25.1595217259601             5             5             5
+Income2014=24.7431060960516             5             5             5
+
+, , Employ2014=21, Employ2016=18, BirthWeight2014=6.8, BirthWeight2016=6.4, Death2014=1234.4, Death2016=1225.7, Stage4Capped2014=299, Stage4Capped2016=323, Violence2014=1.54, Violence2016=2.09, Theft2014=0.78, Theft2016=0.82, rep=2
+
+                            Income2016=21 Income2016=22 Income2016=23
+Income2014=23.7429315708578             5             5             5
+Income2014=25.1595217259601             5             5             5
+Income2014=24.7431060960516             5             5             5
+
+, , Employ2014=19, Employ2016=14, BirthWeight2014=6.8, BirthWeight2016=6.4, Death2014=1234.4, Death2016=1225.7, Stage4Capped2014=299, Stage4Capped2016=323, Violence2014=1.54, Violence2016=2.09, Theft2014=0.78, Theft2016=0.82, rep=3
+
+                            Income2016=21 Income2016=22 Income2016=23
+Income2014=23.7429315708578             5             5             5
+Income2014=25.1595217259601             5             5             5
+Income2014=24.7431060960516             5             5             5
+
+, , Employ2014=20, Employ2016=14, BirthWeight2014=6.8, BirthWeight2016=6.4, Death2014=1234.4, Death2016=1225.7, Stage4Capped2014=299, Stage4Capped2016=323, Violence2014=1.54, Violence2016=2.09, Theft2014=0.78, Theft2016=0.82, rep=3
+
+                            Income2016=21 Income2016=22 Income2016=23
+Income2014=23.7429315708578             5             5             5
+Income2014=25.1595217259601             5             5             5
+Income2014=24.7431060960516             5             5             5
+
+, , Employ2014=21, Employ2016=14, BirthWeight2014=6.8, BirthWeight2016=6.4, Death2014=1234.4, Death2016=1225.7, Stage4Capped2014=299, Stage4Capped2016=323, Violence2014=1.54, Violence2016=2.09, Theft2014=0.78, Theft2016=0.82, rep=3
+
+                            Income2016=21 Income2016=22 Income2016=23
+Income2014=23.7429315708578             5             5             5
+Income2014=25.1595217259601             5             5             5
+Income2014=24.7431060960516             5             5             5
+
+, , Employ2014=19, Employ2016=16, BirthWeight2014=6.8, BirthWeight2016=6.4, Death2014=1234.4, Death2016=1225.7, Stage4Capped2014=299, Stage4Capped2016=323, Violence2014=1.54, Violence2016=2.09, Theft2014=0.78, Theft2016=0.82, rep=3
+
+                            Income2016=21 Income2016=22 Income2016=23
+Income2014=23.7429315708578             5             5             5
+Income2014=25.1595217259601             5             5             5
+Income2014=24.7431060960516             5             5             5
+
+, , Employ2014=20, Employ2016=16, BirthWeight2014=6.8, BirthWeight2016=6.4, Death2014=1234.4, Death2016=1225.7, Stage4Capped2014=299, Stage4Capped2016=323, Violence2014=1.54, Violence2016=2.09, Theft2014=0.78, Theft2016=0.82, rep=3
+
+                            Income2016=21 Income2016=22 Income2016=23
+Income2014=23.7429315708578             5             5             5
+Income2014=25.1595217259601             5             5             5
+Income2014=24.7431060960516             5             5             5
+
+, , Employ2014=21, Employ2016=16, BirthWeight2014=6.8, BirthWeight2016=6.4, Death2014=1234.4, Death2016=1225.7, Stage4Capped2014=299, Stage4Capped2016=323, Violence2014=1.54, Violence2016=2.09, Theft2014=0.78, Theft2016=0.82, rep=3
+
+                            Income2016=21 Income2016=22 Income2016=23
+Income2014=23.7429315708578             5             5             5
+Income2014=25.1595217259601             5             5             5
+Income2014=24.7431060960516             5             5             5
+
+, , Employ2014=19, Employ2016=18, BirthWeight2014=6.8, BirthWeight2016=6.4, Death2014=1234.4, Death2016=1225.7, Stage4Capped2014=299, Stage4Capped2016=323, Violence2014=1.54, Violence2016=2.09, Theft2014=0.78, Theft2016=0.82, rep=3
+
+                            Income2016=21 Income2016=22 Income2016=23
+Income2014=23.7429315708578             5             5             5
+Income2014=25.1595217259601             5             5             5
+Income2014=24.7431060960516             5             5             5
+
+, , Employ2014=20, Employ2016=18, BirthWeight2014=6.8, BirthWeight2016=6.4, Death2014=1234.4, Death2016=1225.7, Stage4Capped2014=299, Stage4Capped2016=323, Violence2014=1.54, Violence2016=2.09, Theft2014=0.78, Theft2016=0.82, rep=3
+
+                            Income2016=21 Income2016=22 Income2016=23
+Income2014=23.7429315708578             5             5             5
+Income2014=25.1595217259601             5             5             5
+Income2014=24.7431060960516             5             5             5
+
+, , Employ2014=21, Employ2016=18, BirthWeight2014=6.8, BirthWeight2016=6.4, Death2014=1234.4, Death2016=1225.7, Stage4Capped2014=299, Stage4Capped2016=323, Violence2014=1.54, Violence2016=2.09, Theft2014=0.78, Theft2016=0.82, rep=3
+
+                            Income2016=21 Income2016=22 Income2016=23
+Income2014=23.7429315708578             5             5             5
+Income2014=25.1595217259601             5             5             5
+Income2014=24.7431060960516             5             5             5
+
+, , Employ2014=19, Employ2016=14, BirthWeight2014=6.8, BirthWeight2016=6.4, Death2014=1234.4, Death2016=1225.7, Stage4Capped2014=299, Stage4Capped2016=323, Violence2014=1.54, Violence2016=2.09, Theft2014=0.78, Theft2016=0.82, rep=4
+
+                            Income2016=21 Income2016=22 Income2016=23
+Income2014=23.7429315708578             5             5             5
+Income2014=25.1595217259601             5             5             5
+Income2014=24.7431060960516             5             5             5
+
+, , Employ2014=20, Employ2016=14, BirthWeight2014=6.8, BirthWeight2016=6.4, Death2014=1234.4, Death2016=1225.7, Stage4Capped2014=299, Stage4Capped2016=323, Violence2014=1.54, Violence2016=2.09, Theft2014=0.78, Theft2016=0.82, rep=4
+
+                            Income2016=21 Income2016=22 Income2016=23
+Income2014=23.7429315708578             5             5             5
+Income2014=25.1595217259601             5             5             5
+Income2014=24.7431060960516             5             5             5
+
+, , Employ2014=21, Employ2016=14, BirthWeight2014=6.8, BirthWeight2016=6.4, Death2014=1234.4, Death2016=1225.7, Stage4Capped2014=299, Stage4Capped2016=323, Violence2014=1.54, Violence2016=2.09, Theft2014=0.78, Theft2016=0.82, rep=4
+
+                            Income2016=21 Income2016=22 Income2016=23
+Income2014=23.7429315708578             5             5             5
+Income2014=25.1595217259601             5             5             5
+Income2014=24.7431060960516             5             5             5
+
+, , Employ2014=19, Employ2016=16, BirthWeight2014=6.8, BirthWeight2016=6.4, Death2014=1234.4, Death2016=1225.7, Stage4Capped2014=299, Stage4Capped2016=323, Violence2014=1.54, Violence2016=2.09, Theft2014=0.78, Theft2016=0.82, rep=4
+
+                            Income2016=21 Income2016=22 Income2016=23
+Income2014=23.7429315708578             5             5             5
+Income2014=25.1595217259601             5             5             5
+Income2014=24.7431060960516             5             5             5
+
+, , Employ2014=20, Employ2016=16, BirthWeight2014=6.8, BirthWeight2016=6.4, Death2014=1234.4, Death2016=1225.7, Stage4Capped2014=299, Stage4Capped2016=323, Violence2014=1.54, Violence2016=2.09, Theft2014=0.78, Theft2016=0.82, rep=4
+
+                            Income2016=21 Income2016=22 Income2016=23
+Income2014=23.7429315708578             5             5             5
+Income2014=25.1595217259601             5             5             5
+Income2014=24.7431060960516             5             5             5
+
+, , Employ2014=21, Employ2016=16, BirthWeight2014=6.8, BirthWeight2016=6.4, Death2014=1234.4, Death2016=1225.7, Stage4Capped2014=299, Stage4Capped2016=323, Violence2014=1.54, Violence2016=2.09, Theft2014=0.78, Theft2016=0.82, rep=4
+
+                            Income2016=21 Income2016=22 Income2016=23
+Income2014=23.7429315708578             5             5             5
+Income2014=25.1595217259601             5             5             5
+Income2014=24.7431060960516             5             5             5
+
+, , Employ2014=19, Employ2016=18, BirthWeight2014=6.8, BirthWeight2016=6.4, Death2014=1234.4, Death2016=1225.7, Stage4Capped2014=299, Stage4Capped2016=323, Violence2014=1.54, Violence2016=2.09, Theft2014=0.78, Theft2016=0.82, rep=4
+
+                            Income2016=21 Income2016=22 Income2016=23
+Income2014=23.7429315708578             5             5             5
+Income2014=25.1595217259601             5             5             5
+Income2014=24.7431060960516             5             5             5
+
+, , Employ2014=20, Employ2016=18, BirthWeight2014=6.8, BirthWeight2016=6.4, Death2014=1234.4, Death2016=1225.7, Stage4Capped2014=299, Stage4Capped2016=323, Violence2014=1.54, Violence2016=2.09, Theft2014=0.78, Theft2016=0.82, rep=4
+
+                            Income2016=21 Income2016=22 Income2016=23
+Income2014=23.7429315708578             5             5             5
+Income2014=25.1595217259601             5             5             5
+Income2014=24.7431060960516             5             5             5
+
+, , Employ2014=21, Employ2016=18, BirthWeight2014=6.8, BirthWeight2016=6.4, Death2014=1234.4, Death2016=1225.7, Stage4Capped2014=299, Stage4Capped2016=323, Violence2014=1.54, Violence2016=2.09, Theft2014=0.78, Theft2016=0.82, rep=4
+
+                            Income2016=21 Income2016=22 Income2016=23
+Income2014=23.7429315708578             5             5             5
+Income2014=25.1595217259601             5             5             5
+Income2014=24.7431060960516             5             5             5
+
+, , Employ2014=19, Employ2016=14, BirthWeight2014=6.8, BirthWeight2016=6.4, Death2014=1234.4, Death2016=1225.7, Stage4Capped2014=299, Stage4Capped2016=323, Violence2014=1.54, Violence2016=2.09, Theft2014=0.78, Theft2016=0.82, rep=5
+
+                            Income2016=21 Income2016=22 Income2016=23
+Income2014=23.7429315708578             5             5             5
+Income2014=25.1595217259601             5             5             5
+Income2014=24.7431060960516             5             5             5
+
+, , Employ2014=20, Employ2016=14, BirthWeight2014=6.8, BirthWeight2016=6.4, Death2014=1234.4, Death2016=1225.7, Stage4Capped2014=299, Stage4Capped2016=323, Violence2014=1.54, Violence2016=2.09, Theft2014=0.78, Theft2016=0.82, rep=5
+
+                            Income2016=21 Income2016=22 Income2016=23
+Income2014=23.7429315708578             5             5             5
+Income2014=25.1595217259601             5             5             5
+Income2014=24.7431060960516             5             5             5
+
+, , Employ2014=21, Employ2016=14, BirthWeight2014=6.8, BirthWeight2016=6.4, Death2014=1234.4, Death2016=1225.7, Stage4Capped2014=299, Stage4Capped2016=323, Violence2014=1.54, Violence2016=2.09, Theft2014=0.78, Theft2016=0.82, rep=5
+
+                            Income2016=21 Income2016=22 Income2016=23
+Income2014=23.7429315708578             5             5             5
+Income2014=25.1595217259601             5             5             5
+Income2014=24.7431060960516             5             5             5
+
+, , Employ2014=19, Employ2016=16, BirthWeight2014=6.8, BirthWeight2016=6.4, Death2014=1234.4, Death2016=1225.7, Stage4Capped2014=299, Stage4Capped2016=323, Violence2014=1.54, Violence2016=2.09, Theft2014=0.78, Theft2016=0.82, rep=5
+
+                            Income2016=21 Income2016=22 Income2016=23
+Income2014=23.7429315708578             5             5             5
+Income2014=25.1595217259601             5             5             5
+Income2014=24.7431060960516             5             5             5
+
+, , Employ2014=20, Employ2016=16, BirthWeight2014=6.8, BirthWeight2016=6.4, Death2014=1234.4, Death2016=1225.7, Stage4Capped2014=299, Stage4Capped2016=323, Violence2014=1.54, Violence2016=2.09, Theft2014=0.78, Theft2016=0.82, rep=5
+
+                            Income2016=21 Income2016=22 Income2016=23
+Income2014=23.7429315708578             5             5             5
+Income2014=25.1595217259601             5             5             5
+Income2014=24.7431060960516             5             5             5
+
+, , Employ2014=21, Employ2016=16, BirthWeight2014=6.8, BirthWeight2016=6.4, Death2014=1234.4, Death2016=1225.7, Stage4Capped2014=299, Stage4Capped2016=323, Violence2014=1.54, Violence2016=2.09, Theft2014=0.78, Theft2016=0.82, rep=5
+
+                            Income2016=21 Income2016=22 Income2016=23
+Income2014=23.7429315708578             5             5             5
+Income2014=25.1595217259601             5             5             5
+Income2014=24.7431060960516             5             5             5
+
+, , Employ2014=19, Employ2016=18, BirthWeight2014=6.8, BirthWeight2016=6.4, Death2014=1234.4, Death2016=1225.7, Stage4Capped2014=299, Stage4Capped2016=323, Violence2014=1.54, Violence2016=2.09, Theft2014=0.78, Theft2016=0.82, rep=5
+
+                            Income2016=21 Income2016=22 Income2016=23
+Income2014=23.7429315708578             5             5             5
+Income2014=25.1595217259601             5             5             5
+Income2014=24.7431060960516             5             5             5
+
+, , Employ2014=20, Employ2016=18, BirthWeight2014=6.8, BirthWeight2016=6.4, Death2014=1234.4, Death2016=1225.7, Stage4Capped2014=299, Stage4Capped2016=323, Violence2014=1.54, Violence2016=2.09, Theft2014=0.78, Theft2016=0.82, rep=5
+
+                            Income2016=21 Income2016=22 Income2016=23
+Income2014=23.7429315708578             5             5             5
+Income2014=25.1595217259601             5             5             5
+Income2014=24.7431060960516             5             5             5
+
+, , Employ2014=21, Employ2016=18, BirthWeight2014=6.8, BirthWeight2016=6.4, Death2014=1234.4, Death2016=1225.7, Stage4Capped2014=299, Stage4Capped2016=323, Violence2014=1.54, Violence2016=2.09, Theft2014=0.78, Theft2016=0.82, rep=5
+
+                            Income2016=21 Income2016=22 Income2016=23
+Income2014=23.7429315708578             5             5             5
+Income2014=25.1595217259601             5             5             5
+Income2014=24.7431060960516             5             5             5
+
+, , Employ2014=19, Employ2016=14, BirthWeight2014=6.8, BirthWeight2016=6.4, Death2014=1234.4, Death2016=1225.7, Stage4Capped2014=299, Stage4Capped2016=323, Violence2014=1.54, Violence2016=2.09, Theft2014=0.78, Theft2016=0.82, rep=6
+
+                            Income2016=21 Income2016=22 Income2016=23
+Income2014=23.7429315708578             5             5             5
+Income2014=25.1595217259601             5             5             5
+Income2014=24.7431060960516             5             5             5
+
+, , Employ2014=20, Employ2016=14, BirthWeight2014=6.8, BirthWeight2016=6.4, Death2014=1234.4, Death2016=1225.7, Stage4Capped2014=299, Stage4Capped2016=323, Violence2014=1.54, Violence2016=2.09, Theft2014=0.78, Theft2016=0.82, rep=6
+
+                            Income2016=21 Income2016=22 Income2016=23
+Income2014=23.7429315708578             5             5             5
+Income2014=25.1595217259601             5             5             5
+Income2014=24.7431060960516             5             5             5
+
+, , Employ2014=21, Employ2016=14, BirthWeight2014=6.8, BirthWeight2016=6.4, Death2014=1234.4, Death2016=1225.7, Stage4Capped2014=299, Stage4Capped2016=323, Violence2014=1.54, Violence2016=2.09, Theft2014=0.78, Theft2016=0.82, rep=6
+
+                            Income2016=21 Income2016=22 Income2016=23
+Income2014=23.7429315708578             5             5             5
+Income2014=25.1595217259601             5             5             5
+Income2014=24.7431060960516             5             5             5
+
+, , Employ2014=19, Employ2016=16, BirthWeight2014=6.8, BirthWeight2016=6.4, Death2014=1234.4, Death2016=1225.7, Stage4Capped2014=299, Stage4Capped2016=323, Violence2014=1.54, Violence2016=2.09, Theft2014=0.78, Theft2016=0.82, rep=6
+
+                            Income2016=21 Income2016=22 Income2016=23
+Income2014=23.7429315708578             5             5             5
+Income2014=25.1595217259601             5             5             5
+Income2014=24.7431060960516             5             5             5
+
+, , Employ2014=20, Employ2016=16, BirthWeight2014=6.8, BirthWeight2016=6.4, Death2014=1234.4, Death2016=1225.7, Stage4Capped2014=299, Stage4Capped2016=323, Violence2014=1.54, Violence2016=2.09, Theft2014=0.78, Theft2016=0.82, rep=6
+
+                            Income2016=21 Income2016=22 Income2016=23
+Income2014=23.7429315708578             5             5             5
+Income2014=25.1595217259601             5             5             5
+Income2014=24.7431060960516             5             5             5
+
+, , Employ2014=21, Employ2016=16, BirthWeight2014=6.8, BirthWeight2016=6.4, Death2014=1234.4, Death2016=1225.7, Stage4Capped2014=299, Stage4Capped2016=323, Violence2014=1.54, Violence2016=2.09, Theft2014=0.78, Theft2016=0.82, rep=6
+
+                            Income2016=21 Income2016=22 Income2016=23
+Income2014=23.7429315708578             5             5             5
+Income2014=25.1595217259601             5             5             5
+Income2014=24.7431060960516             5             5             5
+
+, , Employ2014=19, Employ2016=18, BirthWeight2014=6.8, BirthWeight2016=6.4, Death2014=1234.4, Death2016=1225.7, Stage4Capped2014=299, Stage4Capped2016=323, Violence2014=1.54, Violence2016=2.09, Theft2014=0.78, Theft2016=0.82, rep=6
+
+                            Income2016=21 Income2016=22 Income2016=23
+Income2014=23.7429315708578             5             5             5
+Income2014=25.1595217259601             5             5             5
+Income2014=24.7431060960516             5             5             5
+
+, , Employ2014=20, Employ2016=18, BirthWeight2014=6.8, BirthWeight2016=6.4, Death2014=1234.4, Death2016=1225.7, Stage4Capped2014=299, Stage4Capped2016=323, Violence2014=1.54, Violence2016=2.09, Theft2014=0.78, Theft2016=0.82, rep=6
+
+                            Income2016=21 Income2016=22 Income2016=23
+Income2014=23.7429315708578             5             5             5
+Income2014=25.1595217259601             5             5             5
+Income2014=24.7431060960516             5             5             5
+
+, , Employ2014=21, Employ2016=18, BirthWeight2014=6.8, BirthWeight2016=6.4, Death2014=1234.4, Death2016=1225.7, Stage4Capped2014=299, Stage4Capped2016=323, Violence2014=1.54, Violence2016=2.09, Theft2014=0.78, Theft2016=0.82, rep=6
+
+                            Income2016=21 Income2016=22 Income2016=23
+Income2014=23.7429315708578             5             5             5
+Income2014=25.1595217259601             5             5             5
+Income2014=24.7431060960516             5             5             5
+
+, , Employ2014=19, Employ2016=14, BirthWeight2014=6.8, BirthWeight2016=6.4, Death2014=1234.4, Death2016=1225.7, Stage4Capped2014=299, Stage4Capped2016=323, Violence2014=1.54, Violence2016=2.09, Theft2014=0.78, Theft2016=0.82, rep=7
+
+                            Income2016=21 Income2016=22 Income2016=23
+Income2014=23.7429315708578             5             5             5
+Income2014=25.1595217259601             5             5             5
+Income2014=24.7431060960516             5             5             5
+
+, , Employ2014=20, Employ2016=14, BirthWeight2014=6.8, BirthWeight2016=6.4, Death2014=1234.4, Death2016=1225.7, Stage4Capped2014=299, Stage4Capped2016=323, Violence2014=1.54, Violence2016=2.09, Theft2014=0.78, Theft2016=0.82, rep=7
+
+                            Income2016=21 Income2016=22 Income2016=23
+Income2014=23.7429315708578             5             5             5
+Income2014=25.1595217259601             5             5             5
+Income2014=24.7431060960516             5             5             5
+
+, , Employ2014=21, Employ2016=14, BirthWeight2014=6.8, BirthWeight2016=6.4, Death2014=1234.4, Death2016=1225.7, Stage4Capped2014=299, Stage4Capped2016=323, Violence2014=1.54, Violence2016=2.09, Theft2014=0.78, Theft2016=0.82, rep=7
+
+                            Income2016=21 Income2016=22 Income2016=23
+Income2014=23.7429315708578             5             5             5
+Income2014=25.1595217259601             5             5             5
+Income2014=24.7431060960516             5             5             5
+
+, , Employ2014=19, Employ2016=16, BirthWeight2014=6.8, BirthWeight2016=6.4, Death2014=1234.4, Death2016=1225.7, Stage4Capped2014=299, Stage4Capped2016=323, Violence2014=1.54, Violence2016=2.09, Theft2014=0.78, Theft2016=0.82, rep=7
+
+                            Income2016=21 Income2016=22 Income2016=23
+Income2014=23.7429315708578             5             5             5
+Income2014=25.1595217259601             5             5             5
+Income2014=24.7431060960516             5             5             5
+
+, , Employ2014=20, Employ2016=16, BirthWeight2014=6.8, BirthWeight2016=6.4, Death2014=1234.4, Death2016=1225.7, Stage4Capped2014=299, Stage4Capped2016=323, Violence2014=1.54, Violence2016=2.09, Theft2014=0.78, Theft2016=0.82, rep=7
+
+                            Income2016=21 Income2016=22 Income2016=23
+Income2014=23.7429315708578             5             5             5
+Income2014=25.1595217259601             5             5             5
+Income2014=24.7431060960516             5             5             5
+
+, , Employ2014=21, Employ2016=16, BirthWeight2014=6.8, BirthWeight2016=6.4, Death2014=1234.4, Death2016=1225.7, Stage4Capped2014=299, Stage4Capped2016=323, Violence2014=1.54, Violence2016=2.09, Theft2014=0.78, Theft2016=0.82, rep=7
+
+                            Income2016=21 Income2016=22 Income2016=23
+Income2014=23.7429315708578             5             5             5
+Income2014=25.1595217259601             5             5             5
+Income2014=24.7431060960516             5             5             5
+
+, , Employ2014=19, Employ2016=18, BirthWeight2014=6.8, BirthWeight2016=6.4, Death2014=1234.4, Death2016=1225.7, Stage4Capped2014=299, Stage4Capped2016=323, Violence2014=1.54, Violence2016=2.09, Theft2014=0.78, Theft2016=0.82, rep=7
+
+                            Income2016=21 Income2016=22 Income2016=23
+Income2014=23.7429315708578             5             5             5
+Income2014=25.1595217259601             5             5             5
+Income2014=24.7431060960516             5             5             5
+
+, , Employ2014=20, Employ2016=18, BirthWeight2014=6.8, BirthWeight2016=6.4, Death2014=1234.4, Death2016=1225.7, Stage4Capped2014=299, Stage4Capped2016=323, Violence2014=1.54, Violence2016=2.09, Theft2014=0.78, Theft2016=0.82, rep=7
+
+                            Income2016=21 Income2016=22 Income2016=23
+Income2014=23.7429315708578             5             5             5
+Income2014=25.1595217259601             5             5             5
+Income2014=24.7431060960516             5             5             5
+
+, , Employ2014=21, Employ2016=18, BirthWeight2014=6.8, BirthWeight2016=6.4, Death2014=1234.4, Death2016=1225.7, Stage4Capped2014=299, Stage4Capped2016=323, Violence2014=1.54, Violence2016=2.09, Theft2014=0.78, Theft2016=0.82, rep=7
+
+                            Income2016=21 Income2016=22 Income2016=23
+Income2014=23.7429315708578             5             5             5
+Income2014=25.1595217259601             5             5             5
+Income2014=24.7431060960516             5             5             5
+
+, , Employ2014=19, Employ2016=14, BirthWeight2014=6.8, BirthWeight2016=6.4, Death2014=1234.4, Death2016=1225.7, Stage4Capped2014=299, Stage4Capped2016=323, Violence2014=1.54, Violence2016=2.09, Theft2014=0.78, Theft2016=0.82, rep=8
+
+                            Income2016=21 Income2016=22 Income2016=23
+Income2014=23.7429315708578             5             5             5
+Income2014=25.1595217259601             5             5             5
+Income2014=24.7431060960516             5             5             5
+
+, , Employ2014=20, Employ2016=14, BirthWeight2014=6.8, BirthWeight2016=6.4, Death2014=1234.4, Death2016=1225.7, Stage4Capped2014=299, Stage4Capped2016=323, Violence2014=1.54, Violence2016=2.09, Theft2014=0.78, Theft2016=0.82, rep=8
+
+                            Income2016=21 Income2016=22 Income2016=23
+Income2014=23.7429315708578             5             5             5
+Income2014=25.1595217259601             5             5             5
+Income2014=24.7431060960516             5             5             5
+
+, , Employ2014=21, Employ2016=14, BirthWeight2014=6.8, BirthWeight2016=6.4, Death2014=1234.4, Death2016=1225.7, Stage4Capped2014=299, Stage4Capped2016=323, Violence2014=1.54, Violence2016=2.09, Theft2014=0.78, Theft2016=0.82, rep=8
+
+                            Income2016=21 Income2016=22 Income2016=23
+Income2014=23.7429315708578             5             5             5
+Income2014=25.1595217259601             5             5             5
+Income2014=24.7431060960516             5             5             5
+
+, , Employ2014=19, Employ2016=16, BirthWeight2014=6.8, BirthWeight2016=6.4, Death2014=1234.4, Death2016=1225.7, Stage4Capped2014=299, Stage4Capped2016=323, Violence2014=1.54, Violence2016=2.09, Theft2014=0.78, Theft2016=0.82, rep=8
+
+                            Income2016=21 Income2016=22 Income2016=23
+Income2014=23.7429315708578             5             5             5
+Income2014=25.1595217259601             5             5             5
+Income2014=24.7431060960516             5             5             5
+
+, , Employ2014=20, Employ2016=16, BirthWeight2014=6.8, BirthWeight2016=6.4, Death2014=1234.4, Death2016=1225.7, Stage4Capped2014=299, Stage4Capped2016=323, Violence2014=1.54, Violence2016=2.09, Theft2014=0.78, Theft2016=0.82, rep=8
+
+                            Income2016=21 Income2016=22 Income2016=23
+Income2014=23.7429315708578             5             5             5
+Income2014=25.1595217259601             5             5             5
+Income2014=24.7431060960516             5             5             5
+
+, , Employ2014=21, Employ2016=16, BirthWeight2014=6.8, BirthWeight2016=6.4, Death2014=1234.4, Death2016=1225.7, Stage4Capped2014=299, Stage4Capped2016=323, Violence2014=1.54, Violence2016=2.09, Theft2014=0.78, Theft2016=0.82, rep=8
+
+                            Income2016=21 Income2016=22 Income2016=23
+Income2014=23.7429315708578             5             5             5
+Income2014=25.1595217259601             5             5             5
+Income2014=24.7431060960516             5             5             5
+
+, , Employ2014=19, Employ2016=18, BirthWeight2014=6.8, BirthWeight2016=6.4, Death2014=1234.4, Death2016=1225.7, Stage4Capped2014=299, Stage4Capped2016=323, Violence2014=1.54, Violence2016=2.09, Theft2014=0.78, Theft2016=0.82, rep=8
+
+                            Income2016=21 Income2016=22 Income2016=23
+Income2014=23.7429315708578             5             5             5
+Income2014=25.1595217259601             5             5             5
+Income2014=24.7431060960516             5             5             5
+
+, , Employ2014=20, Employ2016=18, BirthWeight2014=6.8, BirthWeight2016=6.4, Death2014=1234.4, Death2016=1225.7, Stage4Capped2014=299, Stage4Capped2016=323, Violence2014=1.54, Violence2016=2.09, Theft2014=0.78, Theft2016=0.82, rep=8
+
+                            Income2016=21 Income2016=22 Income2016=23
+Income2014=23.7429315708578             5             5             5
+Income2014=25.1595217259601             5             5             5
+Income2014=24.7431060960516             5             5             5
+
+, , Employ2014=21, Employ2016=18, BirthWeight2014=6.8, BirthWeight2016=6.4, Death2014=1234.4, Death2016=1225.7, Stage4Capped2014=299, Stage4Capped2016=323, Violence2014=1.54, Violence2016=2.09, Theft2014=0.78, Theft2016=0.82, rep=8
+
+                            Income2016=21 Income2016=22 Income2016=23
+Income2014=23.7429315708578             5             5             5
+Income2014=25.1595217259601             5             5             5
+Income2014=24.7431060960516             5             5             5
+
+, , Employ2014=19, Employ2016=14, BirthWeight2014=6.8, BirthWeight2016=6.4, Death2014=1234.4, Death2016=1225.7, Stage4Capped2014=299, Stage4Capped2016=323, Violence2014=1.54, Violence2016=2.09, Theft2014=0.78, Theft2016=0.82, rep=9
+
+                            Income2016=21 Income2016=22 Income2016=23
+Income2014=23.7429315708578             5             5             5
+Income2014=25.1595217259601             5             5             5
+Income2014=24.7431060960516             5             5             5
+
+, , Employ2014=20, Employ2016=14, BirthWeight2014=6.8, BirthWeight2016=6.4, Death2014=1234.4, Death2016=1225.7, Stage4Capped2014=299, Stage4Capped2016=323, Violence2014=1.54, Violence2016=2.09, Theft2014=0.78, Theft2016=0.82, rep=9
+
+                            Income2016=21 Income2016=22 Income2016=23
+Income2014=23.7429315708578             5             5             5
+Income2014=25.1595217259601             5             5             5
+Income2014=24.7431060960516             5             5             5
+
+, , Employ2014=21, Employ2016=14, BirthWeight2014=6.8, BirthWeight2016=6.4, Death2014=1234.4, Death2016=1225.7, Stage4Capped2014=299, Stage4Capped2016=323, Violence2014=1.54, Violence2016=2.09, Theft2014=0.78, Theft2016=0.82, rep=9
+
+                            Income2016=21 Income2016=22 Income2016=23
+Income2014=23.7429315708578             5             5             5
+Income2014=25.1595217259601             5             5             5
+Income2014=24.7431060960516             5             5             5
+
+, , Employ2014=19, Employ2016=16, BirthWeight2014=6.8, BirthWeight2016=6.4, Death2014=1234.4, Death2016=1225.7, Stage4Capped2014=299, Stage4Capped2016=323, Violence2014=1.54, Violence2016=2.09, Theft2014=0.78, Theft2016=0.82, rep=9
+
+                            Income2016=21 Income2016=22 Income2016=23
+Income2014=23.7429315708578             5             5             5
+Income2014=25.1595217259601             5             5             5
+Income2014=24.7431060960516             5             5             5
+
+, , Employ2014=20, Employ2016=16, BirthWeight2014=6.8, BirthWeight2016=6.4, Death2014=1234.4, Death2016=1225.7, Stage4Capped2014=299, Stage4Capped2016=323, Violence2014=1.54, Violence2016=2.09, Theft2014=0.78, Theft2016=0.82, rep=9
+
+                            Income2016=21 Income2016=22 Income2016=23
+Income2014=23.7429315708578             5             5             5
+Income2014=25.1595217259601             5             5             5
+Income2014=24.7431060960516             5             5             5
+
+, , Employ2014=21, Employ2016=16, BirthWeight2014=6.8, BirthWeight2016=6.4, Death2014=1234.4, Death2016=1225.7, Stage4Capped2014=299, Stage4Capped2016=323, Violence2014=1.54, Violence2016=2.09, Theft2014=0.78, Theft2016=0.82, rep=9
+
+                            Income2016=21 Income2016=22 Income2016=23
+Income2014=23.7429315708578             5             5             5
+Income2014=25.1595217259601             5             5             5
+Income2014=24.7431060960516             5             5             5
+
+, , Employ2014=19, Employ2016=18, BirthWeight2014=6.8, BirthWeight2016=6.4, Death2014=1234.4, Death2016=1225.7, Stage4Capped2014=299, Stage4Capped2016=323, Violence2014=1.54, Violence2016=2.09, Theft2014=0.78, Theft2016=0.82, rep=9
+
+                            Income2016=21 Income2016=22 Income2016=23
+Income2014=23.7429315708578             5             5             5
+Income2014=25.1595217259601             5             5             5
+Income2014=24.7431060960516             5             5             5
+
+, , Employ2014=20, Employ2016=18, BirthWeight2014=6.8, BirthWeight2016=6.4, Death2014=1234.4, Death2016=1225.7, Stage4Capped2014=299, Stage4Capped2016=323, Violence2014=1.54, Violence2016=2.09, Theft2014=0.78, Theft2016=0.82, rep=9
+
+                            Income2016=21 Income2016=22 Income2016=23
+Income2014=23.7429315708578             5             5             5
+Income2014=25.1595217259601             5             5             5
+Income2014=24.7431060960516             5             5             5
+
+, , Employ2014=21, Employ2016=18, BirthWeight2014=6.8, BirthWeight2016=6.4, Death2014=1234.4, Death2016=1225.7, Stage4Capped2014=299, Stage4Capped2016=323, Violence2014=1.54, Violence2016=2.09, Theft2014=0.78, Theft2016=0.82, rep=9
+
+                            Income2016=21 Income2016=22 Income2016=23
+Income2014=23.7429315708578             5             5             5
+Income2014=25.1595217259601             5             5             5
+Income2014=24.7431060960516             5             5             5
+
+, , Employ2014=19, Employ2016=14, BirthWeight2014=6.8, BirthWeight2016=6.4, Death2014=1234.4, Death2016=1225.7, Stage4Capped2014=299, Stage4Capped2016=323, Violence2014=1.54, Violence2016=2.09, Theft2014=0.78, Theft2016=0.82, rep=10
+
+                            Income2016=21 Income2016=22 Income2016=23
+Income2014=23.7429315708578             5             5             5
+Income2014=25.1595217259601             5             5             5
+Income2014=24.7431060960516             5             5             5
+
+, , Employ2014=20, Employ2016=14, BirthWeight2014=6.8, BirthWeight2016=6.4, Death2014=1234.4, Death2016=1225.7, Stage4Capped2014=299, Stage4Capped2016=323, Violence2014=1.54, Violence2016=2.09, Theft2014=0.78, Theft2016=0.82, rep=10
+
+                            Income2016=21 Income2016=22 Income2016=23
+Income2014=23.7429315708578             5             5             5
+Income2014=25.1595217259601             5             5             5
+Income2014=24.7431060960516             5             5             5
+
+, , Employ2014=21, Employ2016=14, BirthWeight2014=6.8, BirthWeight2016=6.4, Death2014=1234.4, Death2016=1225.7, Stage4Capped2014=299, Stage4Capped2016=323, Violence2014=1.54, Violence2016=2.09, Theft2014=0.78, Theft2016=0.82, rep=10
+
+                            Income2016=21 Income2016=22 Income2016=23
+Income2014=23.7429315708578             5             5             5
+Income2014=25.1595217259601             5             5             5
+Income2014=24.7431060960516             5             5             5
+
+, , Employ2014=19, Employ2016=16, BirthWeight2014=6.8, BirthWeight2016=6.4, Death2014=1234.4, Death2016=1225.7, Stage4Capped2014=299, Stage4Capped2016=323, Violence2014=1.54, Violence2016=2.09, Theft2014=0.78, Theft2016=0.82, rep=10
+
+                            Income2016=21 Income2016=22 Income2016=23
+Income2014=23.7429315708578             5             5             5
+Income2014=25.1595217259601             5             5             5
+Income2014=24.7431060960516             5             5             5
+
+, , Employ2014=20, Employ2016=16, BirthWeight2014=6.8, BirthWeight2016=6.4, Death2014=1234.4, Death2016=1225.7, Stage4Capped2014=299, Stage4Capped2016=323, Violence2014=1.54, Violence2016=2.09, Theft2014=0.78, Theft2016=0.82, rep=10
+
+                            Income2016=21 Income2016=22 Income2016=23
+Income2014=23.7429315708578             5             5             5
+Income2014=25.1595217259601             5             5             5
+Income2014=24.7431060960516             5             5             5
+
+, , Employ2014=21, Employ2016=16, BirthWeight2014=6.8, BirthWeight2016=6.4, Death2014=1234.4, Death2016=1225.7, Stage4Capped2014=299, Stage4Capped2016=323, Violence2014=1.54, Violence2016=2.09, Theft2014=0.78, Theft2016=0.82, rep=10
+
+                            Income2016=21 Income2016=22 Income2016=23
+Income2014=23.7429315708578             5             5             5
+Income2014=25.1595217259601             5             5             5
+Income2014=24.7431060960516             5             5             5
+
+, , Employ2014=19, Employ2016=18, BirthWeight2014=6.8, BirthWeight2016=6.4, Death2014=1234.4, Death2016=1225.7, Stage4Capped2014=299, Stage4Capped2016=323, Violence2014=1.54, Violence2016=2.09, Theft2014=0.78, Theft2016=0.82, rep=10
+
+                            Income2016=21 Income2016=22 Income2016=23
+Income2014=23.7429315708578             5             5             5
+Income2014=25.1595217259601             5             5             5
+Income2014=24.7431060960516             5             5             5
+
+, , Employ2014=20, Employ2016=18, BirthWeight2014=6.8, BirthWeight2016=6.4, Death2014=1234.4, Death2016=1225.7, Stage4Capped2014=299, Stage4Capped2016=323, Violence2014=1.54, Violence2016=2.09, Theft2014=0.78, Theft2016=0.82, rep=10
+
+                            Income2016=21 Income2016=22 Income2016=23
+Income2014=23.7429315708578             5             5             5
+Income2014=25.1595217259601             5             5             5
+Income2014=24.7431060960516             5             5             5
+
+, , Employ2014=21, Employ2016=18, BirthWeight2014=6.8, BirthWeight2016=6.4, Death2014=1234.4, Death2016=1225.7, Stage4Capped2014=299, Stage4Capped2016=323, Violence2014=1.54, Violence2016=2.09, Theft2014=0.78, Theft2016=0.82, rep=10
+
+                            Income2016=21 Income2016=22 Income2016=23
+Income2014=23.7429315708578             5             5             5
+Income2014=25.1595217259601             5             5             5
+Income2014=24.7431060960516             5             5             5
+
+, , Employ2014=19, Employ2016=14, BirthWeight2014=6.8, BirthWeight2016=6.4, Death2014=1234.4, Death2016=1225.7, Stage4Capped2014=299, Stage4Capped2016=323, Violence2014=1.54, Violence2016=2.09, Theft2014=0.78, Theft2016=0.82, rep=11
+
+                            Income2016=21 Income2016=22 Income2016=23
+Income2014=23.7429315708578             5             5             5
+Income2014=25.1595217259601             5             5             5
+Income2014=24.7431060960516             5             5             5
+
+, , Employ2014=20, Employ2016=14, BirthWeight2014=6.8, BirthWeight2016=6.4, Death2014=1234.4, Death2016=1225.7, Stage4Capped2014=299, Stage4Capped2016=323, Violence2014=1.54, Violence2016=2.09, Theft2014=0.78, Theft2016=0.82, rep=11
+
+                            Income2016=21 Income2016=22 Income2016=23
+Income2014=23.7429315708578             5             5             5
+Income2014=25.1595217259601             5             5             5
+Income2014=24.7431060960516             5             5             5
+
+, , Employ2014=21, Employ2016=14, BirthWeight2014=6.8, BirthWeight2016=6.4, Death2014=1234.4, Death2016=1225.7, Stage4Capped2014=299, Stage4Capped2016=323, Violence2014=1.54, Violence2016=2.09, Theft2014=0.78, Theft2016=0.82, rep=11
+
+                            Income2016=21 Income2016=22 Income2016=23
+Income2014=23.7429315708578             5             5             5
+Income2014=25.1595217259601             5             5             5
+Income2014=24.7431060960516             5             5             5
+
+, , Employ2014=19, Employ2016=16, BirthWeight2014=6.8, BirthWeight2016=6.4, Death2014=1234.4, Death2016=1225.7, Stage4Capped2014=299, Stage4Capped2016=323, Violence2014=1.54, Violence2016=2.09, Theft2014=0.78, Theft2016=0.82, rep=11
+
+                            Income2016=21 Income2016=22 Income2016=23
+Income2014=23.7429315708578             5             5             5
+Income2014=25.1595217259601             5             5             5
+Income2014=24.7431060960516             5             5             5
+
+, , Employ2014=20, Employ2016=16, BirthWeight2014=6.8, BirthWeight2016=6.4, Death2014=1234.4, Death2016=1225.7, Stage4Capped2014=299, Stage4Capped2016=323, Violence2014=1.54, Violence2016=2.09, Theft2014=0.78, Theft2016=0.82, rep=11
+
+                            Income2016=21 Income2016=22 Income2016=23
+Income2014=23.7429315708578             5             5             5
+Income2014=25.1595217259601             5             5             5
+Income2014=24.7431060960516             5             5             5
+
+, , Employ2014=21, Employ2016=16, BirthWeight2014=6.8, BirthWeight2016=6.4, Death2014=1234.4, Death2016=1225.7, Stage4Capped2014=299, Stage4Capped2016=323, Violence2014=1.54, Violence2016=2.09, Theft2014=0.78, Theft2016=0.82, rep=11
+
+                            Income2016=21 Income2016=22 Income2016=23
+Income2014=23.7429315708578             5             5             5
+Income2014=25.1595217259601             5             5             5
+Income2014=24.7431060960516             5             5             5
+
+, , Employ2014=19, Employ2016=18, BirthWeight2014=6.8, BirthWeight2016=6.4, Death2014=1234.4, Death2016=1225.7, Stage4Capped2014=299, Stage4Capped2016=323, Violence2014=1.54, Violence2016=2.09, Theft2014=0.78, Theft2016=0.82, rep=11
+
+                            Income2016=21 Income2016=22 Income2016=23
+Income2014=23.7429315708578             5             5             5
+Income2014=25.1595217259601             5             5             5
+Income2014=24.7431060960516             5             5             5
+
+, , Employ2014=20, Employ2016=18, BirthWeight2014=6.8, BirthWeight2016=6.4, Death2014=1234.4, Death2016=1225.7, Stage4Capped2014=299, Stage4Capped2016=323, Violence2014=1.54, Violence2016=2.09, Theft2014=0.78, Theft2016=0.82, rep=11
+
+                            Income2016=21 Income2016=22 Income2016=23
+Income2014=23.7429315708578             5             5             5
+Income2014=25.1595217259601             5             5             5
+Income2014=24.7431060960516             5             5             5
+
+, , Employ2014=21, Employ2016=18, BirthWeight2014=6.8, BirthWeight2016=6.4, Death2014=1234.4, Death2016=1225.7, Stage4Capped2014=299, Stage4Capped2016=323, Violence2014=1.54, Violence2016=2.09, Theft2014=0.78, Theft2016=0.82, rep=11
+
+                            Income2016=21 Income2016=22 Income2016=23
+Income2014=23.7429315708578             5             5             5
+Income2014=25.1595217259601             5             5             5
+Income2014=24.7431060960516             5             5             5
+
+, , Employ2014=19, Employ2016=14, BirthWeight2014=6.8, BirthWeight2016=6.4, Death2014=1234.4, Death2016=1225.7, Stage4Capped2014=299, Stage4Capped2016=323, Violence2014=1.54, Violence2016=2.09, Theft2014=0.78, Theft2016=0.82, rep=12
+
+                            Income2016=21 Income2016=22 Income2016=23
+Income2014=23.7429315708578             5             5             5
+Income2014=25.1595217259601             5             5             5
+Income2014=24.7431060960516             5             5             5
+
+, , Employ2014=20, Employ2016=14, BirthWeight2014=6.8, BirthWeight2016=6.4, Death2014=1234.4, Death2016=1225.7, Stage4Capped2014=299, Stage4Capped2016=323, Violence2014=1.54, Violence2016=2.09, Theft2014=0.78, Theft2016=0.82, rep=12
+
+                            Income2016=21 Income2016=22 Income2016=23
+Income2014=23.7429315708578             5             5             5
+Income2014=25.1595217259601             5             5             5
+Income2014=24.7431060960516             5             5             5
+
+, , Employ2014=21, Employ2016=14, BirthWeight2014=6.8, BirthWeight2016=6.4, Death2014=1234.4, Death2016=1225.7, Stage4Capped2014=299, Stage4Capped2016=323, Violence2014=1.54, Violence2016=2.09, Theft2014=0.78, Theft2016=0.82, rep=12
+
+                            Income2016=21 Income2016=22 Income2016=23
+Income2014=23.7429315708578             5             5             5
+Income2014=25.1595217259601             5             5             5
+Income2014=24.7431060960516             5             5             5
+
+, , Employ2014=19, Employ2016=16, BirthWeight2014=6.8, BirthWeight2016=6.4, Death2014=1234.4, Death2016=1225.7, Stage4Capped2014=299, Stage4Capped2016=323, Violence2014=1.54, Violence2016=2.09, Theft2014=0.78, Theft2016=0.82, rep=12
+
+                            Income2016=21 Income2016=22 Income2016=23
+Income2014=23.7429315708578             5             5             5
+Income2014=25.1595217259601             5             5             5
+Income2014=24.7431060960516             5             5             5
+
+, , Employ2014=20, Employ2016=16, BirthWeight2014=6.8, BirthWeight2016=6.4, Death2014=1234.4, Death2016=1225.7, Stage4Capped2014=299, Stage4Capped2016=323, Violence2014=1.54, Violence2016=2.09, Theft2014=0.78, Theft2016=0.82, rep=12
+
+                            Income2016=21 Income2016=22 Income2016=23
+Income2014=23.7429315708578             5             5             5
+Income2014=25.1595217259601             5             5             5
+Income2014=24.7431060960516             5             5             5
+
+, , Employ2014=21, Employ2016=16, BirthWeight2014=6.8, BirthWeight2016=6.4, Death2014=1234.4, Death2016=1225.7, Stage4Capped2014=299, Stage4Capped2016=323, Violence2014=1.54, Violence2016=2.09, Theft2014=0.78, Theft2016=0.82, rep=12
+
+                            Income2016=21 Income2016=22 Income2016=23
+Income2014=23.7429315708578             5             5             5
+Income2014=25.1595217259601             5             5             5
+Income2014=24.7431060960516             5             5             5
+
+, , Employ2014=19, Employ2016=18, BirthWeight2014=6.8, BirthWeight2016=6.4, Death2014=1234.4, Death2016=1225.7, Stage4Capped2014=299, Stage4Capped2016=323, Violence2014=1.54, Violence2016=2.09, Theft2014=0.78, Theft2016=0.82, rep=12
+
+                            Income2016=21 Income2016=22 Income2016=23
+Income2014=23.7429315708578             5             5             5
+Income2014=25.1595217259601             5             5             5
+Income2014=24.7431060960516             5             5             5
+
+, , Employ2014=20, Employ2016=18, BirthWeight2014=6.8, BirthWeight2016=6.4, Death2014=1234.4, Death2016=1225.7, Stage4Capped2014=299, Stage4Capped2016=323, Violence2014=1.54, Violence2016=2.09, Theft2014=0.78, Theft2016=0.82, rep=12
+
+                            Income2016=21 Income2016=22 Income2016=23
+Income2014=23.7429315708578             5             5             5
+Income2014=25.1595217259601             5             5             5
+Income2014=24.7431060960516             5             5             5
+
+, , Employ2014=21, Employ2016=18, BirthWeight2014=6.8, BirthWeight2016=6.4, Death2014=1234.4, Death2016=1225.7, Stage4Capped2014=299, Stage4Capped2016=323, Violence2014=1.54, Violence2016=2.09, Theft2014=0.78, Theft2016=0.82, rep=12
+
+                            Income2016=21 Income2016=22 Income2016=23
+Income2014=23.7429315708578             5             5             5
+Income2014=25.1595217259601             5             5             5
+Income2014=24.7431060960516             5             5             5
+
+, , Employ2014=19, Employ2016=14, BirthWeight2014=6.8, BirthWeight2016=6.4, Death2014=1234.4, Death2016=1225.7, Stage4Capped2014=299, Stage4Capped2016=323, Violence2014=1.54, Violence2016=2.09, Theft2014=0.78, Theft2016=0.82, rep=13
+
+                            Income2016=21 Income2016=22 Income2016=23
+Income2014=23.7429315708578             5             5             5
+Income2014=25.1595217259601             5             5             5
+Income2014=24.7431060960516             5             5             5
+
+, , Employ2014=20, Employ2016=14, BirthWeight2014=6.8, BirthWeight2016=6.4, Death2014=1234.4, Death2016=1225.7, Stage4Capped2014=299, Stage4Capped2016=323, Violence2014=1.54, Violence2016=2.09, Theft2014=0.78, Theft2016=0.82, rep=13
+
+                            Income2016=21 Income2016=22 Income2016=23
+Income2014=23.7429315708578             5             5             5
+Income2014=25.1595217259601             5             5             5
+Income2014=24.7431060960516             5             5             5
+
+, , Employ2014=21, Employ2016=14, BirthWeight2014=6.8, BirthWeight2016=6.4, Death2014=1234.4, Death2016=1225.7, Stage4Capped2014=299, Stage4Capped2016=323, Violence2014=1.54, Violence2016=2.09, Theft2014=0.78, Theft2016=0.82, rep=13
+
+                            Income2016=21 Income2016=22 Income2016=23
+Income2014=23.7429315708578             5             5             5
+Income2014=25.1595217259601             5             5             5
+Income2014=24.7431060960516             5             5             5
+
+ [ reached getOption("max.print") -- omitted 789 matrix slice(s) ]
+

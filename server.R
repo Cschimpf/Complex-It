@@ -95,10 +95,8 @@ server <- function(input, output, session) {
       
       #current_kmeans_original_solution <<- k
       #this block creates the 'Cluster 1, 2...n' labels for the table display in Shiny
-      clus_label =c()
-      for(i in 1: nrow(current_kmeans_solution@ucenters)){
-        clus_label = c(clus_label, paste(c("Cluster"), toString(i), sep = " "))
-      }
+      clus_label = generate_cluster_labels()
+      
       cen_tab <- cbind("Cluster" = clus_label, current_kmeans_solution@ucenters, "Size" = current_kmeans_solution@usize)
       
     })
@@ -366,6 +364,10 @@ server <- function(input, output, session) {
         agent_grid_plot <<- generate_grid_template(current_som_solution$parameters$the.grid$dim, length(current_kmeans_solution@usize))#this will need to be updated with new vals for gen grid
         agent_grid_plot
       })
+      output$cluster_sensitivity = renderUI({
+        clus_label = generate_cluster_labels()
+        selectInput('cluster_select', 'Select Cluster', clus_label)
+      })
       output$Agent_Warning <- renderText({})
     })
     #still need to update case -> cluster in this function
@@ -399,9 +401,6 @@ server <- function(input, output, session) {
    
     #need to add something here so it only plots the lower bound of data points
     output$somplotagent <- renderPlot({
-      #for(i in 1:print_number){
-        #agent_grid_plot <<- agent_grid_plot + agent_grid_slots[[as.character(i)]]
-      #}
       agent_grid_plot + geom_point(aes(color=agentdf$groupnames), size =4) + scale_color_manual(values = agent_drawtools@plot_colors, name = "Clusters") + theme(legend.key = element_blank())
       #agent_grid_plot
     })
@@ -422,9 +421,31 @@ server <- function(input, output, session) {
     output$clusters_editable_table <- renderRHandsontable({
       rhandsontable(agent_cluster_values[[agent_cluster_tracker@current_state]])
     })
+
   })
   
-
+  observeEvent(input$SensitivityAnalysis, {
+    handson_store <<- reactiveValuesToList(agent_cluster_values)
+    select_cluster <- input$cluster_select
+    eval_change <- evaluate_state_change(handson_store, select_cluster)
+    if(is.character(eval_change)){
+      output$Agent_Warning <- renderText({eval_change})
+    }
+    else{
+        full_var_names = names(current_data_file)
+        current_var_names = c()
+        change_vector =c()
+        for(i in 1:length(eval_change)){
+          if(eval_change[i] != 0){
+            current_var_names =c(current_var_names, full_var_names[i])
+            change_vector=c(change_vector, eval_change[i])
+          }
+        }
+      showModal(dataModal(current_var_names, change_vector))  #note the change is currently fixed, these lists need to be generated dynamically by a  prior function
+    }
+  })
+  
+ 
   
     # Run Clusters Button Pressed
     # observeEvent(input$Agent_Run_Clusters,{
