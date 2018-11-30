@@ -177,10 +177,10 @@ create_kmeans_SOM_mapping <- function(){
 
 #### Panel 'Agent-Model'
 ####################################
-setClass("track_agent_tab_state", representation(current_state = "character", terminal_state = "character", possible_states = "character"))
+setClass("track_agent_tab_state", representation(current_state = "character", terminal_state = "character", possible_states = "character", sensitivity_test = "list"))
 
 create_track_agent_tab_state <- function(start, end){
-  new_class = new("track_agent_tab_state", current_state = start, terminal_state = end, possible_states = c("first", "second", "third", "fourth", "fifth", "sixth"))
+  new_class = new("track_agent_tab_state", current_state = start, terminal_state = end, possible_states = c("first", "second", "third", "fourth", "fifth", "sixth"), sensitivity_test = list())
   return(new_class)
 }
 
@@ -490,6 +490,8 @@ evaluate_state_change <- function(state_vals, select_clus) {
 dataModal <- function(names, change, failed = FALSE) {
   modalDialog(
     p("Select a range in which each projected change may deviate"),
+    numericInput("montecarlo_nrep", "Trials", value = 500, min = 100, max = 10000, step = 100, width ="100px"),
+    numericInput("montecarlo_incr", "Trial Increment", value = .1, min = .01,  step = .1, width ="100px"),
     lapply(1:length(names), function(y, n, i) 
       { sliderInput(paste0("pont.dev", i), paste0(n[i], " : Potential Deviation", " (User Change: ", y[i], "%)"), min =0, max=100, value=0, width="400px") }, y=change, n=names),
     
@@ -500,7 +502,7 @@ dataModal <- function(names, change, failed = FALSE) {
     
     footer = tagList(
       modalButton("Cancel"),
-      actionButton("ok", "OK")
+      actionButton("sa_ok", "OK")
     )
   )
 }

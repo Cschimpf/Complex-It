@@ -7,6 +7,7 @@ library(shinyFiles)
 library(plotrix) 
 library(rhandsontable)
 library(ggplot2)
+library(MonteCarlo)
 
 
 
@@ -366,7 +367,14 @@ server <- function(input, output, session) {
       })
       output$cluster_sensitivity = renderUI({
         clus_label = generate_cluster_labels()
-        selectInput('cluster_select', 'Select Cluster', clus_label)
+        selectInput('cluster_select', 'Select Cluster for Sensitivity', clus_label)
+      })
+      output$agent_somplot <- renderPlot({
+
+        #This is here to add cluster labels to neurons for observation plots only
+        temp.dim<-current_som_solution[["parameters"]][["the.grid"]][["dim"]] #gets the dimension of the grid
+        plot(x=current_som_solution, what="obs", type="barplot",
+                                           print.title = TRUE,the.titles = paste("Quadrant ", 1:prod(temp.dim)))
       })
       output$Agent_Warning <- renderText({})
     })
@@ -426,13 +434,14 @@ server <- function(input, output, session) {
   
   observeEvent(input$SensitivityAnalysis, {
     handson_store <<- reactiveValuesToList(agent_cluster_values)
-    select_cluster <- input$cluster_select
-    eval_change <- evaluate_state_change(handson_store, select_cluster)
+    eval_change <- evaluate_state_change(handson_store, input$cluster_select)
     if(is.character(eval_change)){
       output$Agent_Warning <- renderText({eval_change})
     }
     else{
-        full_var_names = names(current_data_file)
+      #need to have this here and for the observe event sa_ok, how to have it in both spaces?
+      agent_cluster_tracker@sensitivity_test = eval_change  
+      full_var_names = names(current_data_file)
         current_var_names = c()
         change_vector =c()
         for(i in 1:length(eval_change)){
@@ -441,10 +450,14 @@ server <- function(input, output, session) {
             change_vector=c(change_vector, eval_change[i])
           }
         }
-      showModal(dataModal(current_var_names, change_vector))  #note the change is currently fixed, these lists need to be generated dynamically by a  prior function
+      showModal(dataModal(current_var_names, change_vector))  
     }
   })
   
+  observeEvent(input$sa_ok, {
+    print("Im working I think!")
+    removeModal()
+  })
  
   
     # Run Clusters Button Pressed
