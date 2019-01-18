@@ -349,6 +349,7 @@ ui <- fluidPage(theme=shinytheme("cosmo"),
                                        rHandsontableOutput("clusters_editable_table"),
                                        actionButton("back_cluster", "<<"),
                                        actionButton("forward_cluster", ">>"),
+                                       plotOutput("sensitivity_barplot"),
                                        plotOutput("agent_somplot")
                                        
                                        # rHandsontableOutput("cases_editable_table"),

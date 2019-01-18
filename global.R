@@ -64,25 +64,25 @@ list_cluster_labels <-function(unlist){
   }
   return(new_list)
 }
-
-setGeneric(name="append_cluster_labels", 
-           def = function(cluster_obj, data_obj){
-             
-             standardGeneric("append_cluster_labels")
-           })
-
-setMethod(f = "append_cluster_labels", 
-          signature = "user_saved_kmeans_res",
-          definition = function(cluster_obj, data_obj){
-            
-            clus_labels =c()
-            for(i in 1: length(cluster_obj@uclusters)){
-              newnum <- as.numeric(cluster_obj@uclusters[i])
-              clus_labels = c(clus_labels, newnum)
-            }
-            appended_labels <- cbind(data_obj, clus_labels)
-            return(appended_labels)
-          })
+###########Can all of this be removed??
+# setGeneric(name="append_cluster_labels", 
+#            def = function(cluster_obj, data_obj){
+#              
+#              standardGeneric("append_cluster_labels")
+#            })
+# 
+# setMethod(f = "append_cluster_labels", 
+#           signature = "user_saved_kmeans_res",
+#           definition = function(cluster_obj, data_obj){
+#             
+#             clus_labels =c()
+#             for(i in 1: length(cluster_obj@uclusters)){
+#               newnum <- as.numeric(cluster_obj@uclusters[i])
+#               clus_labels = c(clus_labels, newnum)
+#             }
+#             appended_labels <- cbind(data_obj, clus_labels)
+#             return(appended_labels)
+#           })
 
 
 #####General Purpose Functions####
@@ -429,6 +429,9 @@ grid_color_subset <- function(knum) {
   }
   return(case_colors)
 }
+
+###MONTE CARLO FUNCTIONS###
+
 snip_state <- function(state, select_clus){
   state <- state[names(current_data_file)]
   row <- substr(select_clus, nchar(select_clus)-1, nchar(select_clus))
@@ -490,8 +493,7 @@ evaluate_state_change <- function(state_vals, select_clus) {
 dataModal <- function(names, change, failed = FALSE) {
   modalDialog(
     p("Select a range in which each projected change may deviate"),
-    numericInput("montecarlo_nrep", "Trials", value = 500, min = 100, max = 10000, step = 100, width ="100px"),
-    numericInput("montecarlo_incr", "Trial Increment", value = .1, min = .01,  step = .1, width ="100px"),
+    checkboxGroupInput("bounded", "Check if Data is Bounded", c("Positive" = "pos_bound", "Negative" = "neg_bound")),
     lapply(1:length(names), function(y, n, i) 
       { sliderInput(paste0("pont.dev", i), paste0(n[i], " : Potential Deviation", " (User Change: ", y[i], "%)"), min =0, max=100, value=0, width="400px") }, y=change, n=names),
     
@@ -506,6 +508,15 @@ dataModal <- function(names, change, failed = FALSE) {
     )
   )
 }
+
+genmc_state_space <- function(n, default_val){ 
+  state_space = list()
+  for(i in 1:n){
+    state_space[[i]] <- default_val
+  }
+  return(state_space)
+} 
+
 
 
 ###############Still Under Development for Future Versions###############

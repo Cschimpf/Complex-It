@@ -1,13 +1,13 @@
 library(shiny)
 suppressMessages(library(SOMbrero))
 library(cluster)
-library(FactoMineR)
-library(plot3D)
+#library(FactoMineR)
+#library(plot3D)
 library(shinyFiles)
-library(plotrix) 
+
 library(rhandsontable)
 library(ggplot2)
-library(MonteCarlo)
+
 
 
 
@@ -91,10 +91,6 @@ server <- function(input, output, session) {
     
     output$kmeans_tab <- renderTable({
       
-     
-      #current_kmeans_solution <<- create_user_saved_kmeans_res("default_name", k$centers, k$cluster, k$size)
-      
-      #current_kmeans_original_solution <<- k
       #this block creates the 'Cluster 1, 2...n' labels for the table display in Shiny
       clus_label = generate_cluster_labels()
       
@@ -102,14 +98,15 @@ server <- function(input, output, session) {
       
     })
     #initializes the directory and save function
-    roots =c(wd='.')
-    shinyFileSave(input, 'save', roots=roots)
+   
     observeEvent(input$save, {
+      roots =c(wd='.')
+      shinyFileSave(input, 'save', roots=roots)
       
       fileinfo <- parseSavePath(roots, input$save)
       k_data <- cbind(current_data_file, "clus_labels" = current_kmeans_solution@uclusters)
-      
-      write.csv(k_data, as.character(fileinfo$datapath))
+      print(fileinfo$datapath)
+      write.csv(k_data, fileinfo$datapath)
       
       #save the cluster summary details
       sumfileinfo <- extend_filename(fileinfo$datapath, "_kstats.")
@@ -188,7 +185,7 @@ server <- function(input, output, session) {
       Cases<- current_som_solution[["data"]]
       Cases_Neurons<-cbind(Cases,Neurons)
       Neuron_Profiles<-current_som_solution[["prototypes"]]
-      write.csv(Neuron_Profiles, file = "./tmp/AgentQuadrantData.csv")
+      #write.csv(Neuron_Profiles, file = "./tmp/AgentQuadrantData.csv") ##CONSIDER
       # now calculate the average overall distance using Euclidean
       #first get the number of variables
       SOMprofilecolumns<-ncol(Cases)
@@ -321,10 +318,11 @@ server <- function(input, output, session) {
       
         BMUS[i,2]<-which(C==2)
       
+      
       }
       
       # Now append the BMUs to the file
-      p.input <- cbind(p.input, 'Matched Neuron' = predicted, '2nd Best Match' = BMUS[,2])
+      p.input <- cbind(p.input, 'Matched Neuron' = predicted, '2nd Best Match' = as.integer(BMUS[,2]))
       
       output$view_predict <- renderTable({
         head(p.input, n=input$nrow.result_pred)
@@ -377,6 +375,7 @@ server <- function(input, output, session) {
                                            print.title = TRUE,the.titles = paste("Quadrant ", 1:prod(temp.dim)))
       })
       output$Agent_Warning <- renderText({})
+      output$sensitivity_barplot <- NULL 
     })
     #still need to update case -> cluster in this function
   observeEvent(input$Agent_Run_Clusters, {
@@ -440,7 +439,8 @@ server <- function(input, output, session) {
     }
     else{
       #need to have this here and for the observe event sa_ok, how to have it in both spaces?
-      agent_cluster_tracker@sensitivity_test = eval_change  
+     
+      agent_cluster_tracker@sensitivity_test <<- eval_change  
       full_var_names = names(current_data_file)
         current_var_names = c()
         change_vector =c()
@@ -455,8 +455,89 @@ server <- function(input, output, session) {
   })
   
   observeEvent(input$sa_ok, {
-    print("Im working I think!")
+    handson_store <<- reactiveValuesToList(agent_cluster_values)
+    baseline <- handson_store[['first']]
+    baseline <- as.numeric(snip_state(baseline, input$cluster_select))
+    change_state <- handson_store[[agent_cluster_tracker@current_state]]
+    change_state <- as.numeric(snip_state(change_state, input$cluster_select))
+    var_names <- names(current_data_file)
+  
+    monte_carlo_grid = list()
+    input_var = 1
+    
+    
+    
+    for(i in 1:length(change_state)){
+      if(agent_cluster_tracker@sensitivity_test[i] != 0){
+        percent = input[[paste0("pont.dev", input_var)]]/100
+        diff = abs(baseline[i] - change_state[i])
+        up = change_state[i] + (diff * percent)
+        down = change_state[i] - (diff * percent)
+        step = abs(up - down)/10
+
+        monte_carlo_grid[[var_names[i]]] = seq(down, up, step)
+        input_var = input_var + 1
+      }
+      else{
+        monte_carlo_grid[[var_names[i]]] = change_state[i]
+      }
+    }
+    #populate the monte carlo state space
+    permutations = c()
+    dev_cols =c()
+    default_vector =c() 
+    
+    for(i in 1:length(monte_carlo_grid)){
+      if(length(monte_carlo_grid[[var_names[i]]]) == 1){
+        default_vector=c(default_vector, monte_carlo_grid[[var_names[i]]])
+      }
+      else{ 
+        default_vector=c(default_vector, NA)
+        permutations =c(permutations, length(monte_carlo_grid[[var_names[i]]]))
+        dev_cols <- c(dev_cols, i)
+        }
+    }
+    rule_list <-c()
+    for(i in 1:length(permutations)){
+      rule_list <- c(rule_list, permutations[i]^(length(permutations)-i))
+    }
+    rule_list_rev <- rev(rule_list)
+    permutation_states = prod(permutations)
+    som_dim <- prod(current_som_solution$parameters$the.grid$dim)
+    
+    permutation_space <- genmc_state_space(permutation_states, default_vector)
+    solution_space <<- genmc_state_space(som_dim, 0)
+    
+    for(r in 1:length(rule_list)){
+      grid_vector <- monte_carlo_grid[[dev_cols[r]]]
+      state_index = 1
+      for(i in 1:rule_list_rev[r]){
+        for(j in 1:length(grid_vector)){
+          for(k in 1:rule_list[r]){ #this should not be the length of rule_list[r] but the element of rule_list[r]
+            permutation_space[[state_index]][dev_cols[r]] <- grid_vector[j]
+            state_index = state_index + 1
+          }
+        }
+      }
+    }
+    state_to_test <- floor(runif((permutation_states*2), min= 1, max = (permutation_states + 1)))
+    for(s in 1:length(state_to_test)){
+      temp_state <- permutation_space[[state_to_test[s]]]
+      quadrant <- predict(current_som_solution, temp_state)
+      solution_space[[quadrant]] <- solution_space[[quadrant]] + 1
+    }
+   sub_sol_space <- c()
+   sub_sol_names <- c()
+   for(i in 1:length(solution_space)) {
+     
+     if(solution_space[[i]]> 0){
+       sub_sol_names <-c(sub_sol_names, i)
+       sub_sol_space <- c(sub_sol_space, solution_space[[i]])
+     }}
     removeModal()
+    output$sensitivity_barplot <- renderPlot({
+      barplot(sub_sol_space, names.arg = sub_sol_names, main = "Senstivity Analysis Results", xlab  = "Quadrant", col = "yellowgreen")
+    })
   })
  
   
@@ -493,160 +574,3 @@ server <- function(input, output, session) {
   
 }  
   
-#   output$somplotagent <- renderPlot({
-#    plot(x=Agent_SOM_loaded, what="obs", type="names",variable=NULL,view=NULL, print.title = TRUE)
-#    tmp.view <- NULL
-#    if (input$somplottypeagent =="boxplot") {
-#      tmp.var <- (1:ncol(Agent_SOM$data))[colnames(Agent_SOM$data) %in% 
-#                                                       input$somplotvar2agent]
-#    }
-#    else {tmp.var <- input$somplotvaragent}
-#    #This if/else set is here to add cluster labels to neurons for observation plots only
-#    if(input$somplotwhatagent =='obs'){plot(x=Agent_SOM, what=input$somplotwhatagent, type=input$somplottypeagent,
-#                                       variable=tmp.var,view=tmp.view, print.title = TRUE)}
-#    else {
-#      plot(x=Agent_SOM, what=input$somplotwhatagent, type=input$somplottypeagent,
-#           variable=tmp.var,view=tmp.view)
-#    }
-#  })
-
-# Run Cases Button Pressed
-# observeEvent(input$Agent_Run_Cases,{
-#   output$view_predict_cases <- renderTable(the.table_agent_cases)
-#   tmp.var <- input$somplotvaragent
-#   output$somplotagent <- renderPlot({
-#     plot(x=Agent_SOM_loaded, what="obs", type="names",variable=NULL,view=NULL, print.title = TRUE)
-#   }) 
-# })
-
-
-
-
-  
-    #  
-  #  output$somplot <- renderPlot({
-#    if(is.null(current_data_file))
-#      return(NULL)
-#    tmp.view <- NULL
-#    tmp.var <- input$somplotvar
-    #This if/else set is here to add cluster labels to neurons for observation plots only
-#    plot(x=current_som_solution, what=input$somplotwhat, type=input$somplottype,
-#                                      variable=tmp.var,view=tmp.view, print.title = TRUE)
-# })
-  
-#  pInput <- reactive({
-#    in.file_pred <- input$file_pred
-#    if (is.null(in.file_pred))
-#      return(NULL)
-#    
-#    the.sep_p <- switch(input$sep_pred, "Comma"=",", "Semicolon"=";", "Tab"="\t",
-#                      "Space"="")
-#    
-#    the.quote_p <- switch(input$quote_pred, "None"="","Double Quote"='"',
-#                        "Single Quote"="'")
-#    
-#    the.table_p <- na.omit(read.csv(in.file_pred$datapath, header=input$header_pred, 
-#                                  sep=the.sep_p, quote=the.quote_p))
-#    
-#    numeric_only_columns <- column_type_identifier(the.table_p) 
-#    the.table_p[numeric_only_columns]
-#  })
-#
-#  
-#  observeEvent(input$classify_prof, {
-#    temp_som <- current_som_solution
-#    warning <- "No new cases uploaded for profile recognition"
-#    p.input <- pInput()
-#    if (input$load_prev_som == TRUE) {
-#      tryCatch(load("./tmp/SavedSOMObject"), error = function(e) NULL)
-#      temp_som <- previous_som #if there is no file to load, previous_som will be NULL from global
-#      warning <- "No previous saved SOM"
-#    }
-#    if (is.null(p.input) | is.null(temp_som)) {
-#      #this is very clunky but should handle the two major kinds of errors for now
-#      if(is.null(p.input)){
-#        warning <- "No new cases uploaded for profile recognition"
-#      }
-#      output$prof_rec_error <- renderUI({
-#        tagList(
-#        strong(paste("Warning!", warning, sep = " ")),
-#        br()
-#        )
-#      })
-#      return(NULL)}
-#    else {
-#      predicted <- predict(temp_som, p.input)
-#      warning <- ""
-#      #so very clunky just repeating the code to get rid of the warning when it goes to print the predict results
-#      output$prof_rec_error <- renderUI({
-#        warning
-#      })
-#      p.input <- cbind(p.input, 'Matched Neuron' = predicted)
-#    #some prediction function goes here
-#      output$view_predict <- renderTable({
-#     
-#        head(p.input, n=input$nrow.result_pred)
-#    })
-#    }
-#  })
-#}
-
-
-########################Discarded Code
-# output$download_clusters <- downloadHandler(
-#   filename = function() {
-#     paste(substr(input$file1$name,1, nchar(input$file1$name)-4), format(Sys.time(),format="_%Y-%m-%d_%H.%M"), ".csv", sep="")
-#   },
-#   content = function(file){
-#     write.csv(cen_tab, file)
-#   }, 
-#   contentType = "text/csv"
-#   
-# )
-#this block of code appends the cluster labels to the data and then writes out to the C:\ directory
-#clus <- k$cluster
-#k_data <- cbind(current_data_file,clus)
-
-### Initialize the predict.kmeans function:
-# predict.kmeans=
-#   function(km, data)
-#   {k <- nrow(km@ucenters)
-#   n <- nrow(data)
-#   d <- as.matrix(dist(rbind(km@ucenters, data)))[-(1:k),1:k]
-#   out <- apply(d, 1, which.min)
-#   return(out)}
-# 
-# 
-# ### see if predicted kmeans is selected
-# if (input$Predicted_Kmeans_solution == TRUE) {
-#   ### Then predict new results assuming it is in the current data file
-#   predicted_cluster_data <<- predict.kmeans(current_kmeans_solution, current_data_file)
-# }
-# 
-# ### see if predicted SOM is selected
-# if (input$Predicted_SOM_solution == TRUE) {
-#   ### Then predict new results assuming it is in the current data file
-#   predicted_cluster_data <<- predict(current_som_solution, current_data_file)
-# }
-
-### if predicted is selected, use the new solutions
-# if (input$Predicted_Kmeans_solution == TRUE) {
-#   ### assign k_data to the new cluster values
-#   current_kmeans_solution_predicted<-current_kmeans_solution
-#   current_kmeans_solution_predicted@uclusters<-as.list(as.numeric(predicted_cluster_data))
-#   k_data <- append_cluster_labels(current_kmeans_solution_predicted, current_data_file)
-# }
-# if (input$Predicted_SOM_solution == TRUE) {
-#   ### assign k_data to the new cluster values
-#   current_kmeans_solution_predicted<-current_kmeans_solution
-#   current_kmeans_solution_predicted@uclusters<-as.list(as.numeric(predicted_cluster_data))
-#   k_data <- append_cluster_labels(current_kmeans_solution_predicted, current_data_file)
-
-#output$cases_editable_table <- renderRHandsontable({
-#if(is.null(current_data_file)){
-#return()
-#}
-#new_data <- hot_to_r(input$cases_editable_table)
-#rhandsontable(new_data)
-# print(new_data)
-#})
