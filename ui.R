@@ -121,6 +121,7 @@ ui <- fluidPage(theme=shinytheme("cosmo"),
                                p(HTML("SOME DEFINITIONS: The Pseudo F provides a measure of how distinct and well defined the clusters are; the larger the number, the better the fit.
                                       <BR> The Silhouette plots display how well each case fits within its respective cluster; where a score of 1 is a perfect fit; and -1 is a 
                                       perfect fit with a different, neighboring cluster.")),
+                               p(HTML("<b>NOTE:</b> Save K-means results is currently disabled as we work on a more general report tab")),
                                
                                    
                                br(),
@@ -129,8 +130,8 @@ ui <- fluidPage(theme=shinytheme("cosmo"),
                                checkboxInput('pseudo_f', 'Pseudo F?'),
                                numericInput(inputId = "clusters", label = "Select the number of clusters", value = 2, min = 2),
                                actionButton(inputId = "init_kmeans", label="Get Clusters"),
-                               conditionalPanel("input.init_kmeans > 0", shinySaveButton("save", "Save results", "Save file as", 
-                                                                                         filetype=list(csv="csv"))),
+                               # conditionalPanel("input.init_kmeans > 0", shinySaveButton("save", "Save results", "Save file as", 
+                               #                                                           filetype=list(csv="csv"))),
                                tableOutput("kmeans_tab"),
                                textOutput("pseudoF"),
                                plotOutput(outputId = "kmeans_silh", inline=TRUE)
