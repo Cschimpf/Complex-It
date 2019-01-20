@@ -15,10 +15,7 @@
     + shinythemes
     + cluster
     + SOMbrero
-    + FactoMineR
-    + plot3D
     + shinyFiles
-    + plotrix
     + rhandsontable
     + ggplot2
 
