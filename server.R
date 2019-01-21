@@ -482,6 +482,7 @@ server <- function(input, output, session) {
         monte_carlo_grid[[var_names[i]]] = change_state[i]
       }
     }
+    removeModal()
     #populate the monte carlo state space
     permutations = c()
     dev_cols =c()
@@ -497,6 +498,7 @@ server <- function(input, output, session) {
         dev_cols <- c(dev_cols, i)
         }
     }
+    
     rule_list <-c()
     for(i in 1:length(permutations)){
       rule_list <- c(rule_list, permutations[i]^(length(permutations)-i))
@@ -504,6 +506,9 @@ server <- function(input, output, session) {
     rule_list_rev <- rev(rule_list)
     permutation_states = prod(permutations)
     som_dim <- prod(current_som_solution$parameters$the.grid$dim)
+    if(permutation_states >= 10000) {
+      output$Agent_Warning <- renderText({"There are many states to sample from. Monte Carlo may take several minutes"})}
+    
     
     permutation_space <- genmc_state_space(permutation_states, default_vector)
     solution_space <<- genmc_state_space(som_dim, 0)
@@ -534,7 +539,7 @@ server <- function(input, output, session) {
        sub_sol_names <-c(sub_sol_names, i)
        sub_sol_space <- c(sub_sol_space, solution_space[[i]])
      }}
-    removeModal()
+    
     output$sensitivity_barplot <- renderPlot({
       barplot(sub_sol_space, names.arg = sub_sol_names, main = "Senstivity Analysis Results", xlab  = "Quadrant", col = "yellowgreen")
     })
