@@ -13,6 +13,7 @@ full_data = NULL
 current_kmeans_solution = NULL
 current_som_solution = NULL
 previous_som = NULL
+monte_carlo = NULL
 
 agent_case_tracker = NULL
 agent_cluster_tracker = NULL
@@ -177,10 +178,10 @@ create_kmeans_SOM_mapping <- function(){
 
 #### Panel 'Agent-Model'
 ####################################
-setClass("track_agent_tab_state", representation(current_state = "character", terminal_state = "character", possible_states = "character", sensitivity_test = "list"))
+setClass("track_agent_tab_state", representation(current_state = "character", terminal_state = "character", possible_states = "character", cluster_tested = "character", checked_data = "data.frame", sensitivity_test = "list"))
 
 create_track_agent_tab_state <- function(start, end){
-  new_class = new("track_agent_tab_state", current_state = start, terminal_state = end, possible_states = c("first", "second", "third", "fourth", "fifth", "sixth"), sensitivity_test = list())
+  new_class = new("track_agent_tab_state", current_state = start, terminal_state = end, possible_states = c("first", "second", "third", "fourth", "fifth", "sixth"), cluster_tested = "None", sensitivity_test = list())
   return(new_class)
 }
 
@@ -430,7 +431,9 @@ grid_color_subset <- function(knum) {
   return(case_colors)
 }
 
-###MONTE CARLO FUNCTIONS###
+###MONTE CARLO FUNCTIONS and CLASS###
+
+
 
 snip_state <- function(state, select_clus){
   state <- state[names(current_data_file)]

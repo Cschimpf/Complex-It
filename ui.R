@@ -18,7 +18,7 @@ ui <- fluidPage(theme=shinytheme("cosmo"),
 # ----------
                 #imageOutput("complexit_logo", inline=TRUE),
 
-                titlePanel("Complex-It 0.2.5 Alpha"),
+                titlePanel("Complex-It 1.0.0 Beta"),
                 
                 #sidebarLayout(
                   
@@ -384,7 +384,11 @@ ui <- fluidPage(theme=shinytheme("cosmo"),
                     "Export Results",                      
                     tabPanel("7. Generate Report", 
                              h3("Generate a report and exportable datasets from your analysis"),
-                             h3("Under Construction")
+                             p("Here you can download a report. The Files will be placed in a zip file
+                               and downloaded to your default download directory. Please note, you will
+                               only receive results from sections you have used in this session. Only your
+                               most recent analysis-kmeans, SOM or policy prediction, will be downloaded."),
+                             downloadButton('downloadReport', 'Download Report')
                     ),
                       tabPanel("Help",
                                h3("Under Construction")

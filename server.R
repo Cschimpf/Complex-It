@@ -1,12 +1,10 @@
 library(shiny)
 suppressMessages(library(SOMbrero))
 library(cluster)
-#library(FactoMineR)
-#library(plot3D)
 library(shinyFiles)
-
 library(rhandsontable)
 library(ggplot2)
+library(zip)
 
 
 
@@ -459,8 +457,12 @@ server <- function(input, output, session) {
     baseline <- handson_store[['first']]
     baseline <- as.numeric(snip_state(baseline, input$cluster_select))
     change_state <- handson_store[[agent_cluster_tracker@current_state]]
+    agent_cluster_tracker@checked_data <<- change_state #for now this has to be here because it gets reassigned below
     change_state <- as.numeric(snip_state(change_state, input$cluster_select))
     var_names <- names(current_data_file)
+    
+    
+    
   
     monte_carlo_grid = list()
     input_var = 1
@@ -511,7 +513,7 @@ server <- function(input, output, session) {
     
     
     permutation_space <- genmc_state_space(permutation_states, default_vector)
-    solution_space <<- genmc_state_space(som_dim, 0)
+    solution_space <- genmc_state_space(som_dim, 0)
     
     for(r in 1:length(rule_list)){
       grid_vector <- monte_carlo_grid[[dev_cols[r]]]
@@ -531,6 +533,8 @@ server <- function(input, output, session) {
       quadrant <- predict(current_som_solution, temp_state)
       solution_space[[quadrant]] <- solution_space[[quadrant]] + 1
     }
+   agent_cluster_tracker@cluster_tested <<- input$cluster_select
+   agent_cluster_tracker@sensitivity_test <<- solution_space
    sub_sol_space <- c()
    sub_sol_names <- c()
    for(i in 1:length(solution_space)) {
@@ -544,6 +548,95 @@ server <- function(input, output, session) {
       barplot(sub_sol_space, names.arg = sub_sol_names, main = "Senstivity Analysis Results", xlab  = "Quadrant", col = "yellowgreen")
     })
   })
+  
+  
+  #########
+  output$downloadReport <- downloadHandler(
+ 
+    
+    filename = 'report_docs.zip',
+    content = function(fname) {
+      tmpdir <- tempdir()
+      setwd(tempdir())
+      file_names <- c("info.txt")
+      info_text = "This directory contains the following files:"
+      kmeans_files <- c("kmeans_profiles.csv", "clustered_data.csv", "silh_plot.pdf")
+      som_files <- c("som_options.csv", "som_profiles.csv", "data_quadrants.csv", "som_barplot.pdf", "som_boxplot.pdf")
+      policy_files <- c("adjust_kmeans.csv", "sensitivity.pdf")
+      
+      if(is.null(current_kmeans_solution) == FALSE) {
+        file_names <- c(file_names, kmeans_files)
+        info_text <- c(info_text, kmeans_files)
+      }
+      if(is.null(current_som_solution) == FALSE){
+        file_names <- c(file_names, som_files)
+        info_text <- c(info_text, som_files)
+      }
+      if(is.null(agent_cluster_tracker) == FALSE && agent_cluster_tracker@cluster_tested != "None"){
+        file_names <- c(file_names, policy_files)
+        info_text <- c(info_text, policy_files)
+      }
+  
+      fs <-file_names 
+      fileConn<-file("info.txt")
+      writeLines(info_text, fileConn)
+      close(fileConn)
+      
+      if(is.null(current_kmeans_solution) == FALSE){
+        kcenters <- cbind(current_kmeans_solution@ucenters, "size" = current_kmeans_solution@usize)
+        write.csv(kcenters, file = "kmeans_profiles.csv")
+        clustered_data <- cbind(current_data_file, "clus" = current_kmeans_solution@uclusters)
+        write.csv(clustered_data, file = "clustered_data.csv")
+        pdf("silh_plot.pdf")
+        plot_silhouette(current_data_file, current_kmeans_solution)
+        dev.off()
+      }
+      if(is.null(current_som_solution) == FALSE){
+        som_options =list("x dim" = current_som_solution$parameters$the.grid$dim[1], "y dim" = current_som_solution$parameters$the.grid$dim[2], 
+                          "proto_init" = current_som_solution$parameters$init.proto, "max_iter" = current_som_solution$parameters$maxit, 
+                          "data_scaling" = current_som_solution$parameters$scaling, "gradient_descent" = current_som_solution$parameters$eps0)
+        som_options_df <- as.data.frame(som_options)
+        write.csv(som_options_df, file = "som_options.csv")
+        som_profiles <- as.data.frame(current_som_solution$prototypes)
+        write.csv(som_profiles, file = "som_profiles.csv")
+        data_quadrants <- cbind(current_data_file, "quadrant" = current_som_solution$clustering)
+        write.csv(data_quadrants, file = "data_quadrants.csv")
+        
+        temp.dim<-current_som_solution[["parameters"]][["the.grid"]][["dim"]] 
+        pdf("som_barplot.pdf")
+        plot(x=current_som_solution, what="obs", type="barplot",
+             print.title = TRUE,the.titles = paste("Quadrant ", 1:prod(temp.dim)))
+        dev.off()
+        pdf("som_boxplot.pdf")
+        plot(x=current_som_solution, what="obs", type="boxplot",
+              print.title = TRUE,the.titles = paste("Quadrant ", 1:prod(temp.dim)))
+        dev.off()
+        
+      }
+      #      policy_files <- c("adjust_kmeans.csv", "sensitivity.pdf")
+      if(is.null(agent_cluster_tracker) == FALSE && agent_cluster_tracker@cluster_tested != "None"){
+        write.csv(agent_cluster_tracker@checked_data, file ="adjust_kmeans.csv")
+        sub_sol_space <- c()
+        sub_sol_names <- c()
+        for(i in 1:length(agent_cluster_tracker@sensitivity_test)) {
+          
+          if(agent_cluster_tracker@sensitivity_test[[i]]> 0){
+            sub_sol_names <-c(sub_sol_names, i)
+            sub_sol_space <- c(sub_sol_space, agent_cluster_tracker@sensitivity_test[[i]])
+          }}
+        
+        pdf("sensitivity.pdf")
+        barplot(sub_sol_space, names.arg = sub_sol_names, main = "Senstivity Analysis Results", xlab  = "Quadrant", col = "yellowgreen")
+        dev.off()
+      }
+      
+      
+
+      zip(zipfile=fname, files=fs)
+    },
+    contentType = "application/zip"
+  )
+  
  
   
     # Run Clusters Button Pressed
