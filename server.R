@@ -170,48 +170,23 @@ server <- function(input, output, session) {
                                      maxit=input$maxit, scaling=input$scaling, init.proto=input$initproto)
    
     updatePlotSomVar() # update variable choice for som plots
-    ########  
-  })  
-  output$trainnotice <- renderUI({
-    if(input$trainbutton == 0){
-      return()
-    }
-    else{
-      ### post the quality control factors as well
-      qc<-quality(current_som_solution)
-      Neurons<-current_som_solution[["clustering"]]
-      Cases<- current_som_solution[["data"]]
-      Cases_Neurons<-cbind(Cases,Neurons)
-      Neuron_Profiles<-current_som_solution[["prototypes"]]
-      #write.csv(Neuron_Profiles, file = "./tmp/AgentQuadrantData.csv") ##CONSIDER
-      # now calculate the average overall distance using Euclidean
-      #first get the number of variables
-      SOMprofilecolumns<-ncol(Cases)
-      Distance_Cases_to_Neurons<-1:length(Cases_Neurons[,1])
-      #for each case, see how far it is away from it's neuron,then take the mean
-      for (i in 1:length(Cases_Neurons[,1])){ 
-        Distance_Cases_to_Neurons[i]<-dist(rbind(Cases_Neurons[i,1:SOMprofilecolumns],Neuron_Profiles[Cases_Neurons[i,SOMprofilecolumns+1],1:SOMprofilecolumns]),method =  "euclidean")
-      }
-      # here is the mean calculation for all cases in the SOM object
-      overallquant<-mean(Distance_Cases_to_Neurons)
-      #now print out the results
-      tagList(
-        p(paste("Trained SOM ", format(Sys.time(),format="%Y-%m-%d-%H:%M:%S"),sep=" ")),
-        p(paste("Topo Error  ", format(qc$topographic,digits=4),sep=" ")),
-        p(paste("Quant Error (Letremy) ", format(qc$quantization,digits=4),sep=" ")),
-        p(paste("Quant Error (Euclidean) ", format(overallquant,digits=4),sep=" "))
-      )}
-    })
-  output$somsummary <- renderUI({
-      if(input$trainbutton == 0){
-        return()
-      }
-      else{
-        ### post the summary data
+    output$trainnotice <- renderUI({
+        ### post the quality control factors as well
+        ###THIS IS WHERE YOU CUT CODE OUT###
+        qual_measures <- quality(current_som_solution)
         somsummarydata<-capture.output(summary(current_som_solution))
-        paste(somsummarydata,collapse="\n\n")
-      }
-  })
+        #now print out the results
+        tagList(
+          p(paste("Trained SOM ", format(Sys.time(),format="%Y-%m-%d-%H:%M:%S"),sep=" ")),
+          p(paste("Topo Error  ", format(qual_measures$topographic,digits=4),sep=" ")),
+          p(paste("Quant Error ", format(qual_measures$quantization,digits=4),sep=" ")),
+          paste(somsummarydata,collapse="\n\n")
+        )
+    })
+    
+  })  
+
+
   #### Panel 'Plot Map'
   #############################################################################
   observe({
@@ -438,7 +413,7 @@ server <- function(input, output, session) {
     else{
       #need to have this here and for the observe event sa_ok, how to have it in both spaces?
      
-      agent_cluster_tracker@sensitivity_test <<- eval_change  
+      agent_cluster_tracker@sensitivity_test <<- eval_change
       full_var_names = names(current_data_file)
         current_var_names = c()
         change_vector =c()
@@ -500,7 +475,7 @@ server <- function(input, output, session) {
         dev_cols <- c(dev_cols, i)
         }
     }
-    
+    showModal(waitModal(input$cluster_select, dev_cols))
     rule_list <-c()
     for(i in 1:length(permutations)){
       rule_list <- c(rule_list, permutations[i]^(length(permutations)-i))
@@ -508,9 +483,6 @@ server <- function(input, output, session) {
     rule_list_rev <- rev(rule_list)
     permutation_states = prod(permutations)
     som_dim <- prod(current_som_solution$parameters$the.grid$dim)
-    if(permutation_states >= 10000) {
-      output$Agent_Warning <- renderText({"There are many states to sample from. Monte Carlo may take several minutes"})}
-    
     
     permutation_space <- genmc_state_space(permutation_states, default_vector)
     solution_space <- genmc_state_space(som_dim, 0)
@@ -534,7 +506,7 @@ server <- function(input, output, session) {
       solution_space[[quadrant]] <- solution_space[[quadrant]] + 1
     }
    agent_cluster_tracker@cluster_tested <<- input$cluster_select
-   agent_cluster_tracker@sensitivity_test <<- solution_space
+   agent_cluster_tracker@sensitivity_result <<- solution_space
    sub_sol_space <- c()
    sub_sol_names <- c()
    for(i in 1:length(solution_space)) {
@@ -543,7 +515,7 @@ server <- function(input, output, session) {
        sub_sol_names <-c(sub_sol_names, i)
        sub_sol_space <- c(sub_sol_space, solution_space[[i]])
      }}
-    
+    removeModal()
     output$sensitivity_barplot <- renderPlot({
       barplot(sub_sol_space, names.arg = sub_sol_names, main = "Senstivity Analysis Results", xlab  = "Quadrant", col = "yellowgreen")
     })
@@ -561,8 +533,8 @@ server <- function(input, output, session) {
       file_names <- c("info.txt")
       info_text = "This directory contains the following files:"
       kmeans_files <- c("kmeans_profiles.csv", "clustered_data.csv", "silh_plot.pdf")
-      som_files <- c("som_options.csv", "som_profiles.csv", "data_quadrants.csv", "som_barplot.pdf", "som_boxplot.pdf")
-      policy_files <- c("adjust_kmeans.csv", "sensitivity.pdf")
+      som_files <- c("som_options.csv", "summary_class.txt", "som_profiles.csv", "data_quadrants.csv", "som_barplot.pdf", "som_boxplot.pdf")
+      policy_files <- c("adjust_kmeans.csv", "tested_intervention.csv", "sensitivity.pdf")
       
       if(is.null(current_kmeans_solution) == FALSE) {
         file_names <- c(file_names, kmeans_files)
@@ -583,7 +555,10 @@ server <- function(input, output, session) {
       close(fileConn)
       
       if(is.null(current_kmeans_solution) == FALSE){
-        kcenters <- cbind(current_kmeans_solution@ucenters, "size" = current_kmeans_solution@usize)
+        fstat <- pseudoF(current_data_file, current_kmeans_solution, nrow(current_kmeans_solution@ucenters))
+        fstat_col <- rep(0, nrow(current_kmeans_solution@ucenters)-1)
+        fstat_col <- c(fstat, fstat_col)
+        kcenters <- cbind(current_kmeans_solution@ucenters, "size" = current_kmeans_solution@usize, "Pseudo_F" = fstat_col)
         write.csv(kcenters, file = "kmeans_profiles.csv")
         clustered_data <- cbind(current_data_file, "clus" = current_kmeans_solution@uclusters)
         write.csv(clustered_data, file = "clustered_data.csv")
@@ -597,6 +572,13 @@ server <- function(input, output, session) {
                           "data_scaling" = current_som_solution$parameters$scaling, "gradient_descent" = current_som_solution$parameters$eps0)
         som_options_df <- as.data.frame(som_options)
         write.csv(som_options_df, file = "som_options.csv")
+        class_summary <- capture.output(summary(current_som_solution))
+        temp_qual <- quality(current_som_solution)
+        class_summary <- class_summary[12:length(class_summary)]
+        class_summary <- append(class_summary, paste("      Quant Error:", format(temp_qual$quantization, digits = 6)), after=2)
+        fileConn<-file("summary_class.txt")
+        writeLines(class_summary, fileConn)
+        close(fileConn)
         som_profiles <- as.data.frame(current_som_solution$prototypes)
         write.csv(som_profiles, file = "som_profiles.csv")
         data_quadrants <- cbind(current_data_file, "quadrant" = current_som_solution$clustering)
@@ -613,16 +595,34 @@ server <- function(input, output, session) {
         dev.off()
         
       }
-      #      policy_files <- c("adjust_kmeans.csv", "sensitivity.pdf")
       if(is.null(agent_cluster_tracker) == FALSE && agent_cluster_tracker@cluster_tested != "None"){
         write.csv(agent_cluster_tracker@checked_data, file ="adjust_kmeans.csv")
+        temp_names <- names(current_data_file)
+        intervention =c()
+        deviation =c()
+        input_var = 1
+        for(i in 1:length(temp_names)){
+          if(agent_cluster_tracker@sensitivity_test[i] != 0){
+            intervention =c(intervention, agent_cluster_tracker@sensitivity_test[i])
+            deviation =c(deviation, input[[paste0("pont.dev", input_var)]])
+            input_var = input_var + 1
+          }
+          else{
+            intervention = c(intervention, 0)
+            deviation =c(deviation, 0)
+          }
+        }
+        tested_changes <- matrix(c(intervention, deviation), nrow = 2, ncol = length(deviation), byrow = TRUE,
+                                 dimnames = list(c("Intervention", "Deviation"), c(temp_names)))
+        write.csv(tested_changes, file ="tested_intervention.csv")
+        
         sub_sol_space <- c()
         sub_sol_names <- c()
-        for(i in 1:length(agent_cluster_tracker@sensitivity_test)) {
+        for(i in 1:length(agent_cluster_tracker@sensitivity_result)) {
           
-          if(agent_cluster_tracker@sensitivity_test[[i]]> 0){
+          if(agent_cluster_tracker@sensitivity_result[[i]]> 0){
             sub_sol_names <-c(sub_sol_names, i)
-            sub_sol_space <- c(sub_sol_space, agent_cluster_tracker@sensitivity_test[[i]])
+            sub_sol_space <- c(sub_sol_space, agent_cluster_tracker@sensitivity_result[[i]])
           }}
         
         pdf("sensitivity.pdf")

@@ -178,10 +178,12 @@ create_kmeans_SOM_mapping <- function(){
 
 #### Panel 'Agent-Model'
 ####################################
-setClass("track_agent_tab_state", representation(current_state = "character", terminal_state = "character", possible_states = "character", cluster_tested = "character", checked_data = "data.frame", sensitivity_test = "list"))
+setClass("track_agent_tab_state", representation(current_state = "character", terminal_state = "character", possible_states = "character", cluster_tested = "character", 
+                                                 checked_data = "data.frame", sensitivity_test = "list", sensitivity_result = "list"))
 
 create_track_agent_tab_state <- function(start, end){
-  new_class = new("track_agent_tab_state", current_state = start, terminal_state = end, possible_states = c("first", "second", "third", "fourth", "fifth", "sixth"), cluster_tested = "None", sensitivity_test = list())
+  new_class = new("track_agent_tab_state", current_state = start, terminal_state = end, possible_states = c("first", "second", "third", "fourth", "fifth", "sixth"), 
+                  cluster_tested = "None", sensitivity_test = list(), sensitivity_result = list())
   return(new_class)
 }
 
@@ -511,6 +513,16 @@ dataModal <- function(names, change, failed = FALSE) {
     )
   )
 }
+
+waitModal <- function(cluster, vars_tested) {
+  modalDialog(
+    p("Sensitivity Analaysis currently running."),
+    p("This may take several minutes depending on how many attributes were tested."),
+    paste("You tested changing ", length(vars_tested), " attributes on ", cluster)
+   
+  )
+}
+
 
 genmc_state_space <- function(n, default_val){ 
   state_space = list()

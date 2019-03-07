@@ -36,28 +36,9 @@ ui <- fluidPage(theme=shinytheme("cosmo"),
                     "Build the Model",
            
                       tabPanel("1. Build Database and Import Cases",
-                               h3("Here we will create your EXCEL database and import it into COMPLEX-IT"),
+                               h3("Here we will create your CSV database and import it into COMPLEX-IT"),
                              
-                               p(HTML("To help with the process, complete the following two steps.")),
-                               
-                               tags$b("BUILDING YOUR DATABASE:",
-                                      tags$ol(tags$li("Step 1: You need to get all of your cases and profile variables into a single database"), 
-                                              tags$li("Step 2: You need to convert this database into an EXCEL comma separated database"))),
-
-
-
-                                              p(HTML('For help on building an EXCEL database, See <a href= 
-                                                     "https://support.office.com/en-us/article/video-get-to-know-excel-2010-create-your-first-spreadsheet-3323c699-ca68-448e-ab44-12b8e348bbf5"
-                                                     target="_blank">CLICK HERE</a>')),
-
-                                              p(HTML('For help on converting a database to EXCEL, See <a href= 
-                                                     "https://support.office.com/en-us/article/export-data-to-excel-64e974e6-ae43-4301-a53e-20463655b1a9"
-                                                      target="_blank">CLICK HERE</a>')),
-                               
-                               
-                                              p(HTML('For help exporting an EXCEL database as CVS comma delimited, See <a href= 
-                                                    "https://support.office.com/en-us/article/import-or-export-text-txt-or-csv-files-5250ac4c-663c-47ce-937b-339e391393ba"
-                                                    target="_blank">CLICK HERE</a>')),
+                               p(HTML("To help with the process, complete the following steps.")),
                                
 
                                tags$b("IMPORT YOUR DATA",
@@ -167,8 +148,6 @@ ui <- fluidPage(theme=shinytheme("cosmo"),
                                br(), br(),
                                verbatimTextOutput("som_dimwarning"),
                                uiOutput("trainnotice"),
-                               br(),
-                               uiOutput("somsummary"),
                                br(), 
                                h4("Options"),
                                
@@ -249,43 +228,19 @@ ui <- fluidPage(theme=shinytheme("cosmo"),
                   
                       
                       "Extend the Model",                      
-                      tabPanel("5. Predict New Cases", 
-                               h3("Use your solution to predict the quadrant membership of new or different cases"),
-                               p(HTML('Predict the classification of a new or different case
-                                  <br><i>Goodness of fit for classification is based on a numeric tolerance defined as
-                                  10^(-10)</i>'
-                                 )),
-                               br(),
-                               fileInput('file_pred', 'Choose CSV File', accept = c(
-                                 "text/csv",
-                                 "text/comma-separated-values,text/plain",
-                                 ".csv")),
-                               checkboxInput('header_pred', ' Header?', TRUE),
-                               checkboxInput('load_prev_som', 'Use Previous SOM Solution? If unchecked it will use SOM solution from this session.'),
-                               selectInput('sep_pred', 'Separator:',
-                                           c("Comma","Semicolon","Tab","Space"), 'Comma'),
-                               selectInput('quote_pred', 'Quote:',
-                                           c("None","Double Quote","Single Quote"), 
-                                           'Double Quote'),
-                               actionButton('classify_prof', 'Classify Profiles'),
-                               conditionalPanel("input.classify_prof > 0",
-                                                numericInput("nrow.result_pred","Number of rows in the results:" ,20, min = 1, max = 100),
-                                                tableOutput("view_predict"))
-                               
-                      ),
-                      tabPanel("6. Simulate Policy Scenarios", 
-                               h3("Case-Based Multi-Agent Modeling:"),
+                      
+                      tabPanel("5. Simulate Interventions", 
+                               h3("Modeling Case-Based Microsimulation Interventions."),
                                   
-                               p(HTML("Use your SOM solution to create a simulated multi-agent environment 
-                                      for evaluating how policies impact the cases in your study. NOTE. This
-                                      is an experimental tab. <br>
-                                      What constitutes the credibility of the results of policy? <br>
+                               p(HTML("Use your SOM solution to create a microsimulation environment 
+                                      for evaluating how interventions impact the cases in your study. <br>
+                                      What constitutes the credibility of the results of intervention? <br>
                                       Are you going to be predicting? If so, consider pulling off a quarter of your data")),
                               tags$b("To Use:",
                               tags$ol(tags$li("Upload data under Import Data"), 
                                                          tags$li("Press Model Setup"),
-                                                         tags$li("Clusters from your analysis will be selected randomly, only 6 can be selected"),
-                                                         tags$li("You can edit the data for the cluster or which clusters are included - MAX of 6 clusters"),
+                                                         tags$li("Clusters from your analysis will be selecte, up to 9 can be selected"),
+                                                         tags$li("You can edit the data for the cluster or which clusters are included"),
                                                          tags$li("Press Run Cases to see where the edited cluster centroids fall on the SOM grid. This is the same grid as Plot Map"))),
                               verbatimTextOutput("Agent_Warning"),
                 
@@ -380,6 +335,30 @@ ui <- fluidPage(theme=shinytheme("cosmo"),
                               #                 tableOutput("view_predict"))
                               # 
                               ),
+                    tabPanel("6. Predict New Cases", 
+                             h3("Use your solution to predict the quadrant membership of new or different cases"),
+                             p(HTML('Predict the classification of a new or different case
+                                    <br><i>Goodness of fit for classification is based on a numeric tolerance defined as
+                                    10^(-10)</i>'
+                             )),
+                             br(),
+                             fileInput('file_pred', 'Choose CSV File', accept = c(
+                               "text/csv",
+                               "text/comma-separated-values,text/plain",
+                               ".csv")),
+                             checkboxInput('header_pred', ' Header?', TRUE),
+                             checkboxInput('load_prev_som', 'Use Previous SOM Solution? If unchecked it will use SOM solution from this session.'),
+                             selectInput('sep_pred', 'Separator:',
+                                         c("Comma","Semicolon","Tab","Space"), 'Comma'),
+                             selectInput('quote_pred', 'Quote:',
+                                         c("None","Double Quote","Single Quote"), 
+                                         'Double Quote'),
+                             actionButton('classify_prof', 'Classify Profiles'),
+                             conditionalPanel("input.classify_prof > 0",
+                                              numericInput("nrow.result_pred","Number of rows in the results:" ,20, min = 1, max = 100),
+                                              tableOutput("view_predict"))
+                             
+                             ),
                               
                     "Export Results",                      
                     tabPanel("7. Generate Report", 
