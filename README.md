@@ -7,8 +7,8 @@
   
   
   ### Requirements 
-    1. Base R, the open source statistical package 
-    2. R Studio, an Integrated Development Environment (IDE) for R 
+      1. Base R, the open source statistical package 
+      2. R Studio, an Integrated Development Environment (IDE) for R 
     3. Complex-It app. Click the *Download or Clone* button above and select *Download as ZIP*
     4. Install R *Packages*:
        + shiny
