@@ -18,6 +18,7 @@
     + shinyFiles
     + rhandsontable
     + ggplot2
+    + zip
 
 
 ### Detailed Installation Steps
