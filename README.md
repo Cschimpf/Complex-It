@@ -7,23 +7,23 @@
   
   
   ### Requirements 
-  1. Base R, the open source statistical package <a href="https://cran.r-project.org/" target="_blank">Get R here!</a>
+    1. Base R, the open source statistical package <a href="https://cran.r-project.org/" target="_blank">Get R here!</a>
     2. R Studio, an Integrated Development Environment (IDE) for R <a href="https://www.rstudio.com/" target="_blank">Get it here!</a>
-      3. Complex-It app. Click the *Download or Clone* button above and select *Download as ZIP*
-      4. Install *R Packages*:
-    + shiny
-    + shinythemes
-    + cluster
-    + SOMbrero
-    + shinyFiles
-    + rhandsontable
-    + ggplot2
-    + zip
+    3. Complex-It app. Click the *Download or Clone* button above and select *Download as ZIP*
+    4. Install *R Packages*:
+       + shiny
+       + shinythemes
+       + cluster
+       + SOMbrero
+       + shinyFiles
+       + rhandsontable
+       + ggplot2
+       + zip
     
     
-    ### Detailed Installation Steps
+   ### Detailed Installation Steps
     
-    #### Install R
+   #### Install R
     1. Go to <a href="https://cran.r-project.org/" target="_blank">https://cran.r-project.org/</a>
       2. Follow the link for version that matches your operating system.
     + For Windows click on the link for 'base.'
