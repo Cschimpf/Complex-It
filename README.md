@@ -1,4 +1,4 @@
-![alt text](https://github.com/Cschimpf/Complex-It/blob/master/logo_header.png "Logo Title Text")
+<!---![alt text](https://github.com/Cschimpf/Complex-It/blob/master/logo_header.png "Logo Title Text")--->
 
 ## COMPLEX-IT BETA VERSION
 *A tool exploring complex data from a case-based perspective.* 
