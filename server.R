@@ -27,12 +27,11 @@ server <- function(input, output, session) {
     the.sep <- switch(input$sep, "Comma"=",", "Semicolon"=";", "Tab"="\t",
                       "Space"="")
     
-    the.quote <- switch(input$quote, "None"="","Double Quote"='"',
-                        "Single Quote"="'")
+
     
     
     the.table <- na.omit(read.csv(in.file$datapath, header=input$header, 
-                                  sep=the.sep, quote=the.quote))
+                                  sep=the.sep))
     
     
     #right now this just deselects not numeric data columns, later should it auto subset these?
@@ -250,11 +249,10 @@ server <- function(input, output, session) {
     the.sep_p <- switch(input$sep_pred, "Comma"=",", "Semicolon"=";", "Tab"="\t",
                         "Space"="")
     
-    the.quote_p <- switch(input$quote_pred, "None"="","Double Quote"='"',
-                          "Single Quote"="'")
+ 
     
     the.table_p <- na.omit(read.csv(in.file_pred$datapath, header=input$header_pred, 
-                                    sep=the.sep_p, quote=the.quote_p))
+                                    sep=the.sep_p))
   
     numeric_only_columns <- column_type_identifier(the.table_p)
 
@@ -295,7 +293,7 @@ server <- function(input, output, session) {
       }
       
       # Now append the BMUs to the file
-      p.input <- cbind(p.input, 'Matched Neuron' = predicted, '2nd Best Match' = as.integer(BMUS[,2]))
+      p.input <- cbind(p.input, 'Best Quadrant' = predicted, '2nd Best Quadrant' = as.integer(BMUS[,2]))
       
       output$view_predict <- renderTable({
         head(p.input, n=input$nrow.result_pred)
