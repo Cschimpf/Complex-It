@@ -8,7 +8,7 @@
   
 
   ### Requirements 
-  
+  1. Base R, the open source statistical package
     
     
   ### Detailed Installation Steps
