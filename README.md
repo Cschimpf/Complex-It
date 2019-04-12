@@ -1,4 +1,4 @@
-<!---![alt text](https://github.com/Cschimpf/Complex-It/blob/master/logo_header.png "Logo Title Text")--->
+
   
   ## COMPLEX-IT BETA VERSION
   *A tool exploring complex data from a case-based perspective.* 
@@ -10,7 +10,7 @@
     1. Base R, the open source statistical package <a href="https://cran.r-project.org/" target="_blank">Get R here!</a>
     2. R Studio, an Integrated Development Environment (IDE) for R <a href="https://www.rstudio.com/" target="_blank">Get it here!</a>
     3. Complex-It app. Click the *Download or Clone* button above and select *Download as ZIP*
-    4. Install *R Packages*:
+    4. Install R *Packages*:
        + shiny
        + shinythemes
        + cluster
@@ -25,7 +25,7 @@
     
    #### Install R
     1. Go to <a href="https://cran.r-project.org/" target="_blank">https://cran.r-project.org/</a>
-      2. Follow the link for version that matches your operating system.
+    2. Follow the link for version that matches your operating system.
     + For Windows click on the link for 'base.'
     + For Mac click on the first '.pkg' link.
     3. Open the *exe (Windows)* or *pkg (Mac)* R installer and follow the defaults in the installation wizard.
