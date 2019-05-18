@@ -203,7 +203,8 @@ ui <- fluidPage(theme=shinytheme("cosmo"),
                                                             choices= "(Not Available)", 
                                                             multiple= TRUE)),
                                conditionalPanel("input.trainbutton > 0", 
-                                                actionButton("save_som", "Save SOM Results")),
+                                                actionButton("save_som", "Save SOM Results"),
+                                                downloadButton("downloadSOM", "Download SOM")),
                                uiOutput("save_som_notice"),
                                plotOutput("somplot")),
                     
@@ -359,20 +360,21 @@ ui <- fluidPage(theme=shinytheme("cosmo"),
                                                  tags$li("For validity purposes, COMPLEX-IT also provides the second best grid quadrant fit"),
                                                  tags$li("NOTE: For advanced users, goodness-of-fit for classification is based on a numeric tolerance defined as
                                   10^(-10)", style = "color:purple"))),
+                                  verbatimTextOutput("Predict_Warning"),
                                   
                              br(),
                              fileInput('file_pred', 'Choose CSV File', accept = c(
                                "text/csv",
                                "text/comma-separated-values,text/plain",
                                ".csv")),
-                             checkboxInput('header_pred', ' Header?', TRUE),
                              checkboxInput('load_prev_som', 'Use Previous SOM Solution? If unchecked it will use SOM solution from this session.'),
                              selectInput('sep_pred', 'Separator:',
                                          c("Comma","Semicolon","Tab","Space"), 'Comma'),
                              actionButton('classify_prof', 'Classify Profiles'),
                              conditionalPanel("input.classify_prof > 0",
                                               numericInput("nrow.result_pred","Number of rows in the results:" ,20, min = 1, max = 100),
-                                              tableOutput("view_predict"))
+                                              tableOutput("view_predict")),
+                             plotOutput("predict_somplot")
                              
                              ),
                               

@@ -231,6 +231,15 @@ server <- function(input, output, session) {
   observeEvent(input$save_som, {
                previous_som <- current_som_solution #need to rename the object or it may overwrite later current_som objects
                save(previous_som, file = "./tmp/SavedSOMObject")})
+  # Downloadable csv of selected dataset ----
+  output$downloadSOM <- downloadHandler(
+    filename = function() {
+      paste0("SavedSOMObject", "_", Sys.Date(), "_", Sys.time())
+    },
+    content = function(file) {
+      current_som_solution
+    }
+  )
   output$save_som_notice <- renderUI({
     if(input$save_som == 0){
       return()
@@ -251,12 +260,18 @@ server <- function(input, output, session) {
     
  
     
-    the.table_p <- na.omit(read.csv(in.file_pred$datapath, header=input$header_pred, 
+    the.table_p <- na.omit(read.csv(in.file_pred$datapath, header=T, 
                                     sep=the.sep_p))
   
     numeric_only_columns <- column_type_identifier(the.table_p)
 
-    the.table_p[numeric_only_columns]
+    the.table_p <- the.table_p[numeric_only_columns]
+    if(check_predict_header(names(current_data_file), names(the.table_p)) ==FALSE){
+      output$Predict_Warning <- renderText({"The variable names for the new cases do not match the original names"})
+      return(NULL)
+    }
+    output$Predict_Warning <- renderText({""})
+    the.table_p
   })
   
   
@@ -293,12 +308,21 @@ server <- function(input, output, session) {
       }
       
       # Now append the BMUs to the file
-      p.input <- cbind(p.input, 'Best Quadrant' = predicted, '2nd Best Quadrant' = as.integer(BMUS[,2]))
-      
+      case_id = seq(from = 1, to = nrow(p.input), by = 1)
+     
+      predicted_cases <<- cbind("Case id" = as.integer(case_id), 'Best Quadrant' = predicted, '2nd Best Quadrant' = as.integer(BMUS[,2]), p.input)
+    
       output$view_predict <- renderTable({
-        head(p.input, n=input$nrow.result_pred)
+        head(predicted_cases, n=input$nrow.result_pred)
       })
     }
+    output$predict_somplot <- renderPlot({
+      
+      #This is here to add cluster labels to neurons for observation plots only
+      temp.dim<-temp_som[["parameters"]][["the.grid"]][["dim"]] #gets the dimension of the grid
+      plot(x=temp_som, what="obs", type="barplot",
+           print.title = TRUE,the.titles = paste("Quadrant ", 1:prod(temp.dim)))
+    })
   })
   
   
@@ -533,6 +557,7 @@ server <- function(input, output, session) {
       kmeans_files <- c("kmeans_profiles.csv", "clustered_data.csv", "silh_plot.pdf")
       som_files <- c("som_options.csv", "summary_class.txt", "som_profiles.csv", "data_quadrants.csv", "som_barplot.pdf", "som_boxplot.pdf")
       policy_files <- c("adjust_kmeans.csv", "tested_intervention.csv", "sensitivity.pdf")
+      predict_files <-c("predicted_quadrants.csv")
       
       if(is.null(current_kmeans_solution) == FALSE) {
         file_names <- c(file_names, kmeans_files)
@@ -545,6 +570,10 @@ server <- function(input, output, session) {
       if(is.null(agent_cluster_tracker) == FALSE && agent_cluster_tracker@cluster_tested != "None"){
         file_names <- c(file_names, policy_files)
         info_text <- c(info_text, policy_files)
+      }
+      if(is.null(predicted_cases)== FALSE){
+        file_names <- c(file_names, predict_files)
+        info_text <-c(info_text,predict_files)
       }
   
       fs <-file_names 
@@ -626,6 +655,10 @@ server <- function(input, output, session) {
         pdf("sensitivity.pdf")
         barplot(sub_sol_space, names.arg = sub_sol_names, main = "Senstivity Analysis Results", xlab  = "Quadrant", col = "yellowgreen")
         dev.off()
+      }
+      if(is.null(predicted_cases) == FALSE){
+        write.csv(predicted_cases, file ="predicted_quadrants.csv")
+        
       }
       
       

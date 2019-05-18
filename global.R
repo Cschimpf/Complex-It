@@ -13,6 +13,7 @@ full_data = NULL
 current_kmeans_solution = NULL
 current_som_solution = NULL
 previous_som = NULL
+predicted_cases = NULL
 monte_carlo = NULL
 
 agent_case_tracker = NULL
@@ -532,28 +533,19 @@ genmc_state_space <- function(n, default_val){
   return(state_space)
 } 
 
+#### Panel 'Predict/Forecast'
+####################################
 
+check_predict_header <- function(train_names, trial_names){
+  match = TRUE
+  for(i in 1:length(train_names)){
+    if(any(trial_names == train_names[i])== FALSE){
+      match = FALSE
+      break
+    }
+  }
+  return(match)
+}
 
 ###############Still Under Development for Future Versions###############
 
-list_cluster_centers <-function(unlist, k_number) {
-  
-}
-#in order to this right it will need to maybe have its own class
-#that starts with the name of the var clustered and then includes
-#the centers below it. Right now can't retrieve var names and
-#wonder if its useful to put the centroids into a list with no var name
-#references 
-create_centers_indexes <-function(unlist, k_number){
-  for (i in 1:(length(unlist)/k_number)){
-    print(5)
-  }
-}
-
-convert_list_to_vector <-function(a_list){
-  new_vec =c()
-  for(i in 1:length(current_kmeans_solution@uclusters)){
-    new_vec = c(new_vec, as.integer(current_kmeans_solution@uclusters[i]))
-  }
-  return(new_vec)
-}
