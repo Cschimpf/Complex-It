@@ -1,4 +1,5 @@
-
+*MIT License
+*Copyright (c) 2019 Corey Schimpf
   
   ## COMPLEX-IT BETA VERSION
   *A tool exploring complex data from a case-based perspective.* 
