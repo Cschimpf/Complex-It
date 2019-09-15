@@ -1,6 +1,5 @@
 library(shiny)
 library(shinythemes)
-library(shinyFiles)
 library(rhandsontable)
 
 
@@ -16,19 +15,11 @@ ui <- fluidPage(theme=shinytheme("cosmo"),
  #tags$style("#nrow.preview {font-size:10px;height:10px;}"),
 # ),
 # ----------
-                #imageOutput("complexit_logo", inline=TRUE),
+               
 
                 titlePanel("COMPLEX-IT 1.0.0 Beta - exploring complex data from a case-based perspective"),
                 
-                #sidebarLayout(
-                  
-
-                 #sidebarPanel(
-                  
-                  #width = 2
-                  #),
-                  
-                  #mainPanel(
+              
                   navlistPanel(
                     selected = "1. Import Your Database",
                     HTML("<img src='Complexit_LOGO4.jpg'>"),
@@ -99,8 +90,7 @@ ui <- fluidPage(theme=shinytheme("cosmo"),
                                checkboxInput('pseudo_f', 'Pseudo F?'),
                                numericInput(inputId = "clusters", label = "Select the number of clusters", value = 2, min = 2),
                                actionButton(inputId = "init_kmeans", label="Get Clusters"),
-                               # conditionalPanel("input.init_kmeans > 0", shinySaveButton("save", "Save results", "Save file as", 
-                               #                                                           filetype=list(csv="csv"))),
+                             
                                tableOutput("kmeans_tab"),
                                textOutput("pseudoF"),
                                plotOutput(outputId = "kmeans_silh", inline=TRUE)
@@ -127,8 +117,7 @@ ui <- fluidPage(theme=shinytheme("cosmo"),
                                       target="_blank">CLICK HERE</a>')),
                                
                                actionButton("trainbutton","Train SOM"),
-                               #verbatimTextOutput("summary") #prints the output of a reactive variable, can show status of uploaded
-                               #data, check the original SOMbrero 
+                            
                                br(), br(),
                                verbatimTextOutput("som_dimwarning"),
                                uiOutput("trainnotice"),
@@ -203,24 +192,23 @@ ui <- fluidPage(theme=shinytheme("cosmo"),
                                                             choices= "(Not Available)", 
                                                             multiple= TRUE)),
                                conditionalPanel("input.trainbutton > 0", 
-                                                actionButton("save_som", "Save SOM Results"),
-                                                downloadButton("downloadSOM", "Download SOM")),
+                                                actionButton("save_som", "Save SOM Results")),
                                uiOutput("save_som_notice"),
                                plotOutput("somplot")),
                     
                   
                       
-                      "Run Micro-simulations",                      
+                      "Run Scenario Simulations",                      
                    
-                      tabPanel("5. Simulate your policies and interventions", 
-                              h3("STEP 5: USING YOUR MODEL TO RUN MICROSIMULATIONS", style = "color:purple"),
-                              h4("Here we will use your model to explore different policies and interventions."),
+                      tabPanel("5. Simulate your scenarios, policies, and interventions", 
+                              h3("STEP 5: USING YOUR MODEL TO RUN SCENARIO SIMULATIONS", style = "color:purple"),
+                              h4("Here we will use your model to explore different scenarios, policies, and interventions."),
                               h4("To do that, we will be using your k-means clusters and your SOM AI solution and grid"),
                               
-                              p(HTML('For TUTORIALS on using your model to run a microsimulation in COMPLEX-IT <a href= 
+                              p(HTML('For TUTORIALS on using your model to run scenario simulations in COMPLEX-IT <a href= 
                                                     "https://www.art-sciencefactory.com/tutorials.html"
                                      target="_blank">CLICK HERE</a>')), 
-                              p(HTML('To learn more about case-based microsimulation <a href="https://www.art-sciencefactory.com/case-based%20microsimulation.pdf" target="_blank">CLICK HERE</a>')),  
+                              p(HTML('To learn more about case-based scenario simulation <a href="https://www.art-sciencefactory.com/case-based%20microsimulation.pdf" target="_blank">CLICK HERE</a>')),  
                               
                               h4("The grid below visually displays the results of your k-means and SOM AI cluster solutions.", style = "color:green"),                              
                               
@@ -237,7 +225,7 @@ ui <- fluidPage(theme=shinytheme("cosmo"),
                               
                               tags$b("To Run Sensitivity Analysis",
                               tags$ol(tags$li("Pick the CLUSTER you are testing from the options"), 
-                                      tags$li ("Decide how much to dither your solution by in order to account for variance and error that go with any real-world solution"),
+                                      tags$li ("Decide how much to dither your solution by in order to account for variance and error that go with any real-world estimation of change"),
                                       tags$li ("Run the sensitivity analysis"),
                                       tags$li ("NOTE: very complex solutions can several minutes or hours to finish", style = "color:purple"))),
                               
@@ -284,17 +272,6 @@ ui <- fluidPage(theme=shinytheme("cosmo"),
                                         uiOutput('cluster_sensitivity'),
                                         
                                         hr()
-                                        # actionButton(inputId = "Agent_Use_Prev_SOM", label="Use Previous SOM",
-                                        #              style = "foreground-color:white; 
-                                        #              background-color:turquoise; 
-                                        #              color:black;
-                                        #              height: 50px;
-                                        #              width: 150px;
-                                        #              text-align:center;
-                                        #              border-color:seagreen;
-                                        #              border-radius: 5px;
-                                        #              border-width: 5px"),
-                                        # br(),
                                         
                                         ),
                                  column(10,
@@ -307,37 +284,14 @@ ui <- fluidPage(theme=shinytheme("cosmo"),
                                        plotOutput("sensitivity_barplot"),
                                        plotOutput("agent_somplot")
                                        
-                                       # rHandsontableOutput("cases_editable_table"),
-                                       # actionButton("back_case", "<<"),
-                                       # actionButton("forward_case", ">>" )
+                                    
                                       )))
-                               
-                               #uiOutput("save_som_notice"),
-                               #plotOutput(outputId = "som_3Dplot", width = "50%", height = "500px"),
-                               #plotOutput("somplot"),
-                              # fileInput('file_pred', 'Choose CSV File', accept = c(
-                              #   "text/csv",
-                              #   "text/comma-separated-values,text/plain",
-                              #   ".csv")),
-                              # checkboxInput('header_pred', ' Header?', TRUE),
-                              # checkboxInput('load_prev_som', 'Use Previous SOM Results?'),
-                              # selectInput('sep_pred', 'Separator:',
-                              #             c("Comma","Semicolon","Tab","Space"), 'Comma'),
-                              # selectInput('quote_pred', 'Quote:',
-                              #             c("None","Double Quote","Single Quote"), 
-                              #             'Double Quote'),
-                              # actionButton('classify_prof', 'Classify Profiles'),
-                              # uiOutput("prof_rec_error"),
-                              # conditionalPanel("input.classify_prof > 0",
-                              #                 br(),
-                              #                 numericInput("nrow.result_pred","Number of rows in the results:" ,20, min = 1, max = 100),
-                              #                 tableOutput("view_predict"))
-                              # 
+                             
                               ),
 
-                    "Run Data-forcasting Model",                      
+                    "Run Data-forecasting/classification",                      
                     
-                            tabPanel("6. Using AI to predict the cluster membership of new cases", 
+                            tabPanel("6. Use AI to predict the cluster membership of new cases", 
                                   h3("STEP 6: USING YOUR SOM AI TO PREDICT THE CLUSTER MEMBERSHIP OF NEW CASES", style = "color:purple"),
                                   h4("Here we will use your trained SOM GRID (TAB 4) to predict the cluster profile(s) that best represent a new set of cases"),
                                   p(HTML('For TUTORIALS on using your SOM GRID for data forcasting in COMPLEX-IT <a href= 
@@ -393,7 +347,10 @@ ui <- fluidPage(theme=shinytheme("cosmo"),
                              downloadButton('downloadReport', 'Download Report')
                     ),
                       tabPanel("Help",
-                               h3("Under Construction")
+                               h3("Help Documentation"),
+                               p(HTML('To view TUTORIALS and USER HELP FILES for COMPLEX-IT report, <a href= 
+                                    "https://www.art-sciencefactory.com/tutorials.html"
+                                  target="_blank">CLICK HERE</a> (Note internet connection required)'))
                                
                       ),
                       widths = c(3,9)
