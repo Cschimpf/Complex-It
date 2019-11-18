@@ -1,7 +1,6 @@
 library(shiny)
 suppressMessages(library(SOMbrero))
 library(cluster)
-library(shinyFiles)
 library(rhandsontable)
 library(ggplot2)
 library(zip)
@@ -34,7 +33,7 @@ server <- function(input, output, session) {
                                   sep=the.sep))
     
     
-    #right now this just deselects not numeric data columns, later should it auto subset these?
+    #right now this just deselects not numeric data columns
     output$varchoice <- renderUI(div(
       checkboxGroupInput(inputId="varchoice", label="Input variables:",
                          choices=as.list(colnames(the.table)[
@@ -45,7 +44,7 @@ server <- function(input, output, session) {
                              c("integer", "numeric")])), 
       actionButton(inputId = "subset_data", label = "Subset Data")))
     numeric_only_columns <- column_type_identifier(the.table) 
-    full_data <<- the.table #check if needed
+    full_data <<- the.table 
     current_data_file <<- the.table[numeric_only_columns]
     the.table#this is set such that the last thing in this method/function is the table and is therefore set to dInput
     
@@ -55,10 +54,6 @@ server <- function(input, output, session) {
     
     subset_list <- input$varchoice
     if(length(ncol(d.input) >= length(subset_list))){
-      #subset_list <- c()
-      #for(i in 1:length(input$varchoice)){
-      #subset_list <-c(subset_list, input$varchoice[i])
-      #}
       current_data_file <<- d.input[subset_list]
     }
     
@@ -80,45 +75,17 @@ server <- function(input, output, session) {
   #this observe event looks for users to press 'get clusters'
   observeEvent(input$init_kmeans, { 
     if(is.null(current_data_file)){return()}  #this function will return nothing if there is no data
-    #print(current_data_file)
     current_kmeans_solution <<- create_user_gen_kmeans_solution("default_name", kmeans(current_data_file, isolate(input$clusters)))
-    
-    
     
     
     output$kmeans_tab <- renderTable({
       
       #this block creates the 'Cluster 1, 2...n' labels for the table display in Shiny
-      clus_label = generate_cluster_labels()
-      
+      clus_label <- generate_cluster_labels()
+      summary_row <- generate_data_summary()
       cen_tab <- cbind("Cluster" = clus_label, current_kmeans_solution@ucenters, "Size" = current_kmeans_solution@usize)
-      
-    })
-    #initializes the directory and save function
-   
-    observeEvent(input$save, {
-      roots =c(wd='.')
-      shinyFileSave(input, 'save', roots=roots)
-      
-      fileinfo <- parseSavePath(roots, input$save)
-      k_data <- cbind(current_data_file, "clus_labels" = current_kmeans_solution@uclusters)
-      print(fileinfo$datapath)
-      write.csv(k_data, fileinfo$datapath)
-      
-      #save the cluster summary details
-      sumfileinfo <- extend_filename(fileinfo$datapath, "_kstats.")
-      summarykstats <- cbind(as.data.frame(current_kmeans_solution@ucenters), "clus_size" = current_kmeans_solution@usize)
-      write.csv(summarykstats, sumfileinfo)
-      
-      #save silhouette if checked
-      if (input$silhouette == TRUE){
-        
-        setwd(".")
-        pdf("temp_silh.pdf")
-        plot_silhouette(current_data_file, current_kmeans_solution) 
-        dev.off()
-      }
-      
+      cen_tab <- rbind(cen_tab, summary_row)
+
     })
     
     #displays the pseudoF
@@ -166,12 +133,11 @@ server <- function(input, output, session) {
     
     set.seed(input$rand.seed)
     current_som_solution<<- trainSOM(tmp_data, dimension=c(input$dimx,input$dimy), 
-                                     maxit=input$maxit, scaling=input$scaling, init.proto=input$initproto)
+                                     maxit=input$maxit, scaling=input$scaling, init.proto=input$initproto, eps0 =input$eps0)
    
     updatePlotSomVar() # update variable choice for som plots
     output$trainnotice <- renderUI({
         ### post the quality control factors as well
-        ###THIS IS WHERE YOU CUT CODE OUT###
         qual_measures <- quality(current_som_solution)
         somsummarydata<-capture.output(summary(current_som_solution))
         #now print out the results
@@ -220,8 +186,7 @@ server <- function(input, output, session) {
     temp.dim<-current_som_solution[["parameters"]][["the.grid"]][["dim"]] #gets the dimension of the grid
     if(input$somplotwhat =='obs'){plot(x=current_som_solution, what=input$somplotwhat, type=input$somplottype,
                                        variable=tmp.var,view=tmp.view, print.title = TRUE,the.titles = paste("Quadrant ", 1:prod(temp.dim)))}
-    #if(input$somplotwhat =='obs'){plot(x=current_som_solution, what=input$somplotwhat, type=input$somplottype,
-    #                                   variable=tmp.var,view=tmp.view, print.title = TRUE)}
+   
     else {
     plot(x=current_som_solution, what=input$somplotwhat, type=input$somplottype,
          variable=tmp.var,view=tmp.view)
@@ -232,14 +197,7 @@ server <- function(input, output, session) {
                previous_som <- current_som_solution #need to rename the object or it may overwrite later current_som objects
                save(previous_som, file = "./tmp/SavedSOMObject")})
   # Downloadable csv of selected dataset ----
-  output$downloadSOM <- downloadHandler(
-    filename = function() {
-      paste0("SavedSOMObject", "_", Sys.Date(), "_", Sys.time())
-    },
-    content = function(file) {
-      current_som_solution
-    }
-  )
+
   output$save_som_notice <- renderUI({
     if(input$save_som == 0){
       return()
@@ -283,7 +241,6 @@ server <- function(input, output, session) {
       temp_som <- previous_som #if there is no file to load, previous_som will be NULL from global
     }
     if (is.null(p.input) | is.null(temp_som)) {
-      print("Nothing here!")
       return(NULL)}
     else {
       # the predictions are made using SOMbrero predict function against the p.input data
@@ -327,7 +284,7 @@ server <- function(input, output, session) {
   
   
   
-  #### Panel 'Agent-Model'
+  #### Panel 'Scenario Simulation'
   #############################################################################
     agent_cluster_values <- reactiveValues(first = NA, second = NA, third = NA, fourth = NA, fifth = NA, sixth = NA)
   
@@ -372,7 +329,7 @@ server <- function(input, output, session) {
       output$Agent_Warning <- renderText({})
       output$sensitivity_barplot <- NULL 
     })
-    #still need to update case -> cluster in this function
+   
   observeEvent(input$Agent_Run_Clusters, {
     if(is.null(agent_cluster_tracker)){
       output$Agent_Warning <- renderText({"You must first Setup the Model"})
@@ -404,7 +361,7 @@ server <- function(input, output, session) {
     #need to add something here so it only plots the lower bound of data points
     output$somplotagent <- renderPlot({
       agent_grid_plot + geom_point(aes(color=agentdf$groupnames), size =4) + scale_color_manual(values = agent_drawtools@plot_colors, name = "Clusters") + theme(legend.key = element_blank())
-      #agent_grid_plot
+      
     })
     
     
@@ -415,7 +372,7 @@ server <- function(input, output, session) {
     output$clusters_editable_table <- renderRHandsontable({
       rhandsontable(agent_cluster_values[[agent_cluster_tracker@current_state]])
       })
-    #values$update_data <- values$update_data + 1
+    
   })
   observeEvent(input$forward_cluster, {
     newstate <- update_tracker_current_state(agent_cluster_tracker, agent_cluster_values, 1)
@@ -433,7 +390,7 @@ server <- function(input, output, session) {
       output$Agent_Warning <- renderText({eval_change})
     }
     else{
-      #need to have this here and for the observe event sa_ok, how to have it in both spaces?
+      
      
       agent_cluster_tracker@sensitivity_test <<- eval_change
       full_var_names = names(current_data_file)
@@ -544,7 +501,8 @@ server <- function(input, output, session) {
   })
   
   
-  #########
+  ##### 'Generate Report'
+  #############################################################################
   output$downloadReport <- downloadHandler(
  
     
@@ -670,31 +628,7 @@ server <- function(input, output, session) {
   
  
   
-    # Run Clusters Button Pressed
-    # observeEvent(input$Agent_Run_Clusters,{
-    # Agent_SOM <- Agent_SOM_loaded
-    # SOMgriddatanew<-SOMgriddata
-    # #Predict the Cluster Neurons from the centroids
-    # Agents_Clusters_predicted <- predict(Agent_SOM, the.table_agent_clusters[,2:(as.numeric(length(the.table_agent_clusters))-1)])
-    # #First, initialize the Agent_SOM to blanks creating an empty array
-    # for (i in 1:length(SOMgriddatanew)){ 
-    # SOMgriddatanew[i]<-NA
-    # }
-    # #Next replace the labels with the cluster neurons
-    # for (i in 1:length(the.table_agent_clusters$clus_size)){
-    #   SOMgriddatanew[Agents_Clusters_predicted[i]]<-i
-    # } 
-    # output$somplotagent <- renderPlot({
-    #   color2D.matplot(SOMgriddatanew, show.values = TRUE, axes = FALSE, xlab = "", ylab = "", vcex = 2, vcol = "black",extremes = c("red", "yellow"),na.color="black")
-    # })
-    # output$view_predict_clusters <- renderTable(the.table_agent_clusters)
-    # })
-    
- 
-  # Use Previous Button Pressed
-  # observeEvent(input$Agent_Use_Prev_SOM,{
-  #   output$view_predict_cases <- renderTable(the.table_agent_cases)
-  # })
+   
   
   
  

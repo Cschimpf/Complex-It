@@ -3,8 +3,7 @@
 
 # Any code in this global.r file will run one time prior to launching
 # the Shiny App.  The code will not continually scan in the background
-# while the App runs, so a good place for intialization of variables using
-# code
+# while the App runs, so a good place for intialization of variables
 
 #Data Variables
 ####
@@ -23,12 +22,7 @@ agent_grid_colors = NULL
 agentdf = NULL
 agent_drawtools = NULL
 displacement = list("1" =c(0, 2), "2" =c(0,-2), "3" =c(2,0), "4" =c(-2,0), "5" =c(-5,0), "6" =c(0,5))
-#grid_colors = c("red", "orange", "pink", "green", "blue", "purple")
-#groupnames = c("Cluster 1", "Cluster 2", "Cluster 3", "Cluster 4", "Cluster 5", "Cluster 6")
 
-####
-#numeric_only_columns = NULL
-#other_columns = NULL
 all.somplot.types <- list("numeric"=
                             list("prototypes"=
                                    list("3d", "barplot",
@@ -50,41 +44,7 @@ create_user_gen_kmeans_solution <- function(objectname, km){
                                             
                     
 
-# setClass("user_saved_kmeans_res", representation(save_name = "character", ucentroids = "list", uclusters = "list", usize = "integer"))
-# 
-# create_user_saved_kmeans_res <- function(objectname, ucenters, cluster_labels, k_size){
-#   new_labels <- list_cluster_labels(cluster_labels)
-#   ucenters <- list(ucenters)
-#   new_class = new("user_saved_kmeans_res", save_name = objectname, ucentroids = ucenters, uclusters = new_labels, usize = k_size)
-#   return(new_class)
-# }
 
-list_cluster_labels <-function(unlist){
-  new_list = list()
-  for(i in 1:length(unlist)){
-    new_list[[i]] = as.numeric(unlist[i])
-  }
-  return(new_list)
-}
-###########Can all of this be removed??
-# setGeneric(name="append_cluster_labels", 
-#            def = function(cluster_obj, data_obj){
-#              
-#              standardGeneric("append_cluster_labels")
-#            })
-# 
-# setMethod(f = "append_cluster_labels", 
-#           signature = "user_saved_kmeans_res",
-#           definition = function(cluster_obj, data_obj){
-#             
-#             clus_labels =c()
-#             for(i in 1: length(cluster_obj@uclusters)){
-#               newnum <- as.numeric(cluster_obj@uclusters[i])
-#               clus_labels = c(clus_labels, newnum)
-#             }
-#             appended_labels <- cbind(data_obj, clus_labels)
-#             return(appended_labels)
-#           })
 
 
 #####General Purpose Functions####
@@ -113,6 +73,15 @@ graph_dimension = function(data, scale = 5){
   return(dimension)
 }
 
+#used by multiple 'tabs' for generating clusters
+generate_cluster_labels <-function(){
+  clus_label =c()
+  for(i in 1: nrow(current_kmeans_solution@ucenters)){
+    clus_label = c(clus_label, paste(c("Cluster"), toString(i), sep = " "))
+  }
+  return(clus_label)
+}
+
 
 ####Panel 'Import Data'
 ##################################
@@ -120,7 +89,7 @@ graph_dimension = function(data, scale = 5){
 column_type_identifier <-function(data){
   numeric_only_columns <-sapply(data, class) %in% c("integer", "numeric")
   return(numeric_only_columns)
-  #other_columns <<- logic_vector_inverter(numeric_only_columns)
+ 
 }
 
 logic_vector_inverter <- function(logic_vec){
@@ -140,17 +109,10 @@ logic_vector_inverter <- function(logic_vec){
 ####Panel 'Cluster Data'
 ##################################
 
-#for now I left your code here so there is a trace of what changes were made
+#calculate PSEUDO F
 
 pseudoF = function(data,sol, k){
-  #nk = length(k)
-  #n = nrow(X)
   T = sum(scale(data, scale=F)^2)
-  #W = rep(T, nk)
-  #for (i in 1:nk){
-  #cli = kmeans(X, k[i], nstart=ns,algorithm="Lloyd")
-  #W[i] = sum(cli$withinss)
-  #}
   W <- sum(sol@uwithinss) #this is using the withinss from 'k' above
   pF = ((T-W)/(k-1))/(W/(nrow(data)-k))
   return(pF)
@@ -160,6 +122,17 @@ plot_silhouette <- function(data, km){
   dissM <- daisy(data)
   sil_plot <- plot(silhouette(km@uclusters, dissM)) 
   return(sil_plot)
+}
+
+generate_data_summary <- function() {
+  summary_row <-c("Variable Avg.")
+  col_names <- names(current_data_file)
+  for(i in 1:ncol(current_data_file)){
+    summary_row <-c(summary_row, mean(current_data_file[[col_names[i]]]))
+  }
+  summary_row <-c(summary_row, nrow(current_data_file))
+  
+  return(summary_row)
 }
 
 ####Panel 'Self Organize'
@@ -177,7 +150,7 @@ create_kmeans_SOM_mapping <- function(){
   
 }
 
-#### Panel 'Agent-Model'
+#### Panel 'Scenario Simulation'
 ####################################
 setClass("track_agent_tab_state", representation(current_state = "character", terminal_state = "character", possible_states = "character", cluster_tested = "character", 
                                                  checked_data = "data.frame", sensitivity_test = "list", sensitivity_result = "list"))
@@ -280,7 +253,7 @@ generate_grid_template <-function(dims, knum){
   if (knum <9) {groupnames <- groupnames[1:knum]}
   agent_drawtools <<- create_SOMdrawtools(current_som_solution$parameters$the.grid$dim, length(current_kmeans_solution@usize))
   
-  #agent_grid_colors <<- grid_color_subset(knum)
+
   
   agentdf <<- cbind(as.data.frame(cbind(x = rep(0, knum), y = rep(0,knum))), groupnames = groupnames)
   grid_template <- ggplot(agentdf, aes(x=agentdf$x, y=agentdf$y)) + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
@@ -327,13 +300,7 @@ generate_logic_column <- function(df){
   return(logic_col)
 }
 
-generate_cluster_labels <-function(){
-  clus_label =c()
-  for(i in 1: nrow(current_kmeans_solution@ucenters)){
-    clus_label = c(clus_label, paste(c("Cluster"), toString(i), sep = " "))
-  }
-  return(clus_label)
-}
+
 
 generate_cluster_table <- function(){
   clus_label = generate_cluster_labels()
@@ -499,11 +466,11 @@ evaluate_state_change <- function(state_vals, select_clus) {
 dataModal <- function(names, change, failed = FALSE) {
   modalDialog(
     p("Select a range in which each projected change may deviate"),
-    checkboxGroupInput("bounded", "Check if Data is Bounded", c("Positive" = "pos_bound", "Negative" = "neg_bound")),
+    
     lapply(1:length(names), function(y, n, i) 
       { sliderInput(paste0("pont.dev", i), paste0(n[i], " : Potential Deviation", " (User Change: ", y[i], "%)"), min =0, max=100, value=0, width="400px") }, y=change, n=names),
     
-    #sliderInput(paste0("pontdev", i), paste0(name[i], " : Potential Deviation", " (User Change: ", change[i], ")"), min = 0, max=100, value=0, width='400px')
+    
     
     if (failed)
       div(tags$b("Invalid name of data object", style = "color: red;")),
