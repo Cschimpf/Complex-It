@@ -74,16 +74,22 @@ server <- function(input, output, session) {
   #############################################################################
   #this observe event looks for users to press 'get clusters'
   observeEvent(input$init_kmeans, { 
-    if(is.null(current_data_file)){return()}  #this function will return nothing if there is no data
+    if(is.null(current_data_file)){output$kmean_warning <- renderText({"Please upload data first."})
+      return()}
+    else {output$kmean_warning <- renderText({""})}
+    if(input$setrandseedkmean == "Yes") {set.seed(input$randseedkmean)}
+    else {set.seed(sample(1:9999, size= 1))}
     current_kmeans_solution <<- create_user_gen_kmeans_solution("default_name", kmeans(current_data_file, isolate(input$clusters)))
     
-    
+    output$kmeans_title <- renderUI({
+      h4("Kmeans Cluster Centroids")
+    })
     output$kmeans_tab <- renderTable({
       
       #this block creates the 'Cluster 1, 2...n' labels for the table display in Shiny
       clus_label <- generate_cluster_labels()
       summary_row <- generate_data_summary()
-      cen_tab <- cbind("Cluster" = clus_label, current_kmeans_solution@ucenters, "Size" = current_kmeans_solution@usize)
+      cen_tab <- cbind("Cluster" = clus_label, "Size" = current_kmeans_solution@usize, round(current_kmeans_solution@ucenters, digits = 3))
       cen_tab <- rbind(cen_tab, summary_row)
 
     })
@@ -117,12 +123,16 @@ server <- function(input, output, session) {
   observeEvent(input$trainbutton, {
     if(input$dimx < 3 | input$dimy < 3 | input$dimx > 15 | input$dimy > 15)
     {
-      output$som_dimwarning <- renderText({"SOM dimensions must be 3 or greater and 15 or lesser."})
+      output$som_warning <- renderText({"SOM dimensions must be 3 or greater and 15 or lesser."})
       return()
     }
+    else if(is.null(current_data_file)){
+      output$som_warning <- renderText({"Please upload data first."})
+      return()
+    }  
     else
     {
-      output$som_dimwarning <- renderText({""})
+      output$som_warning <- renderText({""})
     }
     tmp_data <- current_data_file
     mapped_labels = NULL
@@ -131,7 +141,8 @@ server <- function(input, output, session) {
       rownames(tmp_data) <- mapped_labels
     }
     
-    set.seed(input$rand.seed)
+    if(input$setrandseed == "Yes") {set.seed(input$randseed)}
+    else {set.seed(sample(1:9999, size= 1))}
     current_som_solution<<- trainSOM(tmp_data, dimension=c(input$dimx,input$dimy), 
                                      maxit=input$maxit, scaling=input$scaling, init.proto=input$initproto, eps0 =input$eps0)
    
@@ -139,15 +150,18 @@ server <- function(input, output, session) {
     output$trainnotice <- renderUI({
         ### post the quality control factors as well
         qual_measures <- quality(current_som_solution)
-        somsummarydata<-capture.output(summary(current_som_solution))
+        anova_results <- retrieve_ANOVA_results()
+     
         #now print out the results
         tagList(
           p(paste("Trained SOM ", format(Sys.time(),format="%Y-%m-%d-%H:%M:%S"),sep=" ")),
           p(paste("Topo Error  ", format(qual_measures$topographic,digits=4),sep=" ")),
           p(paste("Quant Error ", format(qual_measures$quantization,digits=4),sep=" ")),
-          paste(somsummarydata,collapse="\n\n")
+          p(paste("ANOVA Results")),
+          lapply(length(anova_results):1, function(i, y) { p(paste(y[i])) }, y=anova_results)
         )
     })
+ 
     
   })  
 
@@ -165,8 +179,9 @@ server <- function(input, output, session) {
     tmp.names <- colnames(current_som_solution$data)
     
     updateSelectInput(session, "somplotvar", choices=tmp.names)
-    updateSelectInput(session, "somplotvar2", choices=tmp.names, 
-                      selected=tmp.names[1:min(5,length(tmp.names))])
+    # updateSelectInput(session, "somplotvar2", choices=tmp.names, 
+    #                   selected=tmp.names[1:length(tmp.names)])
+ 
   })
   # Plot the SOM 
   output$somplot <- renderPlot({
@@ -177,16 +192,20 @@ server <- function(input, output, session) {
     
     tmp.view <- NULL
     if (input$somplottype =="boxplot") {
-      tmp.var <- (1:ncol(current_som_solution$data))[colnames(current_som_solution$data) %in% 
-                                                       input$somplotvar2]
+      # tmp.var <- (1:ncol(current_som_solution$data))[colnames(current_som_solution$data) %in% 
+      #                                                  input$somplotvar2]
+    tmp.var <- seq(from = 1, to = ncol(current_data_file), by = 1)
     }
     else {tmp.var <- input$somplotvar}
 
     #This if/else set is here to add cluster labels to neurons for observation plots only
     temp.dim<-current_som_solution[["parameters"]][["the.grid"]][["dim"]] #gets the dimension of the grid
-    if(input$somplotwhat =='obs'){plot(x=current_som_solution, what=input$somplotwhat, type=input$somplottype,
-                                       variable=tmp.var,view=tmp.view, print.title = TRUE,the.titles = paste("Quadrant ", 1:prod(temp.dim)))}
-   
+    if(input$somplotwhat =='obs'& input$somplottype == 'boxplot' | input$somplottype == 'color'){plot(x=current_som_solution, what=input$somplotwhat, type=input$somplottype,
+                                       variable = tmp.var, show.names = TRUE,names = paste("Quadrant ", 1:prod(temp.dim)))}
+    else if(input$somplotwhat == 'obs'){plot(x=current_som_solution, what=input$somplotwhat, type=input$somplottype,
+                                             show.names = TRUE,names = paste("Quadrant ", 1:prod(temp.dim)))}
+    else if (input$somplotwhat == 'prototypes' & input$somplottype == 'barplot'){plot(x=current_som_solution, what=input$somplotwhat, type=input$somplottype)
+    }
     else {
     plot(x=current_som_solution, what=input$somplotwhat, type=input$somplottype,
          variable=tmp.var,view=tmp.view)
@@ -278,7 +297,7 @@ server <- function(input, output, session) {
       #This is here to add cluster labels to neurons for observation plots only
       temp.dim<-temp_som[["parameters"]][["the.grid"]][["dim"]] #gets the dimension of the grid
       plot(x=temp_som, what="obs", type="barplot",
-           print.title = TRUE,the.titles = paste("Quadrant ", 1:prod(temp.dim)))
+           show.names = TRUE,names = paste("Quadrant ", 1:prod(temp.dim)))
     })
   })
   
@@ -324,7 +343,7 @@ server <- function(input, output, session) {
         #This is here to add cluster labels to neurons for observation plots only
         temp.dim<-current_som_solution[["parameters"]][["the.grid"]][["dim"]] #gets the dimension of the grid
         plot(x=current_som_solution, what="obs", type="barplot",
-                                           print.title = TRUE,the.titles = paste("Quadrant ", 1:prod(temp.dim)))
+                                           show.names = TRUE,names = paste("Quadrant ", 1:prod(temp.dim)))
       })
       output$Agent_Warning <- renderText({})
       output$sensitivity_barplot <- NULL 
@@ -512,8 +531,8 @@ server <- function(input, output, session) {
       setwd(tempdir())
       file_names <- c("info.txt")
       info_text = "This directory contains the following files:"
-      kmeans_files <- c("kmeans_profiles.csv", "clustered_data.csv", "silh_plot.pdf")
-      som_files <- c("som_options.csv", "summary_class.txt", "som_profiles.csv", "data_quadrants.csv", "som_barplot.pdf", "som_boxplot.pdf")
+      kmeans_files <- c("kmeans_profiles.csv", "clustered_data.csv","kmean_seed.txt", "silh_plot.pdf")
+      som_files <- c("som_options.csv", "summary_class.txt","som_seed.txt", "som_profiles.csv", "data_quadrants.csv", "som_barplot.pdf", "som_boxplot.pdf")
       policy_files <- c("adjust_kmeans.csv", "tested_intervention.csv", "sensitivity.pdf")
       predict_files <-c("predicted_quadrants.csv")
       
@@ -547,6 +566,11 @@ server <- function(input, output, session) {
         write.csv(kcenters, file = "kmeans_profiles.csv")
         clustered_data <- cbind(current_data_file, "clus" = current_kmeans_solution@uclusters)
         write.csv(clustered_data, file = "clustered_data.csv")
+        if(input$setrandseedkmean == "Yes"){kseed = as.character(input$randseedkmean)}
+        else{kseed = "NULL"}
+        fileConn<-file("kmean_seed.txt")
+        writeLines(kseed, fileConn)
+        close(fileConn)
         pdf("silh_plot.pdf")
         plot_silhouette(current_data_file, current_kmeans_solution)
         dev.off()
@@ -564,6 +588,11 @@ server <- function(input, output, session) {
         fileConn<-file("summary_class.txt")
         writeLines(class_summary, fileConn)
         close(fileConn)
+        if(input$setrandseed == "Yes"){somseed = as.character(input$randseed)}
+        else{somseed = "NULL"}
+        fileConn<-file("som_seed.txt")
+        writeLines(somseed, fileConn)
+        close(fileConn)
         som_profiles <- as.data.frame(current_som_solution$prototypes)
         write.csv(som_profiles, file = "som_profiles.csv")
         data_quadrants <- cbind(current_data_file, "quadrant" = current_som_solution$clustering)
@@ -572,11 +601,11 @@ server <- function(input, output, session) {
         temp.dim<-current_som_solution[["parameters"]][["the.grid"]][["dim"]] 
         pdf("som_barplot.pdf")
         plot(x=current_som_solution, what="obs", type="barplot",
-             print.title = TRUE,the.titles = paste("Quadrant ", 1:prod(temp.dim)))
+             show.names = TRUE,names = paste("Quadrant ", 1:prod(temp.dim)))
         dev.off()
         pdf("som_boxplot.pdf")
         plot(x=current_som_solution, what="obs", type="boxplot",
-              print.title = TRUE,the.titles = paste("Quadrant ", 1:prod(temp.dim)))
+              show.names = TRUE,names = paste("Quadrant ", 1:prod(temp.dim)))
         dev.off()
         
       }

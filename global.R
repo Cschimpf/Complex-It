@@ -26,8 +26,8 @@ displacement = list("1" =c(0, 2), "2" =c(0,-2), "3" =c(2,0), "4" =c(-2,0), "5" =
 all.somplot.types <- list("numeric"=
                             list("prototypes"=
                                    list("3d", "barplot",
-                                        "smooth distances"="smooth.dist",
-                                        "U matrix distances"="umatrix"),
+                                        "smooth.dist",
+                                        "umatrix"),
                                  "obs"=c("color", "barplot", 
                                          "names", "boxplot")))
 
@@ -125,12 +125,14 @@ plot_silhouette <- function(data, km){
 }
 
 generate_data_summary <- function() {
-  summary_row <-c("Variable Avg.")
+  summary_row <-c("Total Size & Var Avg")
+  summary_row <-c(summary_row, nrow(current_data_file))
   col_names <- names(current_data_file)
   for(i in 1:ncol(current_data_file)){
-    summary_row <-c(summary_row, mean(current_data_file[[col_names[i]]]))
+    var_avg <- round(mean(current_data_file[[col_names[i]]]), digits = 3)
+    summary_row <-c(summary_row, var_avg)
   }
-  summary_row <-c(summary_row, nrow(current_data_file))
+  
   
   return(summary_row)
 }
@@ -148,6 +150,25 @@ create_kmeans_SOM_mapping <- function(){
   }
   return(label_merge)
   
+}
+
+retrieve_ANOVA_results <-function() {
+  full_text <- capture.output(summary(current_som_solution))
+  start_index <- length(full_text)
+  anova_summary <- list()
+  for(i in start_index:1){
+    if(length(full_text[i]) == ""){
+      next
+    }
+    else if(grepl("Degrees of freedom", full_text[i], fixed = TRUE) == TRUE){
+      anova_summary <- c(anova_summary, full_text[i])
+      break
+    }
+    else{
+      anova_summary <- c(anova_summary, full_text[i])
+    }
+  }
+  return(anova_summary)
 }
 
 #### Panel 'Scenario Simulation'
