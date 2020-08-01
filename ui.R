@@ -17,7 +17,7 @@ ui <- fluidPage(theme=shinytheme("cosmo"),
 # ----------
                
 
-                titlePanel("COMPLEX-IT 1.0.0 Beta - exploring complex data from a case-based perspective"),
+                titlePanel("COMPLEX-IT 1.0.1 Beta - exploring complex data from a case-based perspective"),
                 
               
                   navlistPanel(
