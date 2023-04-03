@@ -537,3 +537,13 @@ check_predict_header <- function(train_names, trial_names){
 
 ###############Still Under Development for Future Versions###############
 
+# Systems Mapping Tab #
+flattenCorrMatrix <- function(cormat, pmat) {
+  ut <- upper.tri(cormat)
+  data.frame(
+    row = rownames(cormat)[row(cormat)[ut]],
+    column = rownames(cormat)[col(cormat)[ut]],
+    cor  =(cormat)[ut],
+    p = pmat[ut]
+  )
+}

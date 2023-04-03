@@ -339,10 +339,213 @@ ui <- fluidPage(theme=shinytheme("cosmo"),
                              plotOutput("predict_somplot")
                              
                              ),
+                    
+                    "Systems Mapping Tab", 
+                    tabPanel("8. Using Sytems Mapping To Explore Cluster Variables",
+                      
+                      # App title ----
+                      #titlePanel("STEP 8: USING SYSTEMS MAPPING TO EXPLORE CLUSTER VARIABLES"),
+                      
+                      tags$h3("STEP 8: USING SYSTEMS MAPPING TO EXPLORE CLUSTER VARIABLES", style = "text-align: center;"), 
+                      
+                      tags$h4(HTML("Here we will use Systems Mapping to visually explore the configuration of variables you used to cluster your data. <br>
+    
+                 The map is generated using the <a href='https://dictionary.apa.org/zero-order-correlation'>zero-order correlations</a> amongst your variables."), style = "text-align: center;"),
+                      
+                      # Sidebar layout with input and output definitions ----
+                      sidebarLayout(
+                        
+                        # Sidebar panel for inputs ----
+                        sidebarPanel(
+                          useShinyjs(),
+                          
+                          ######################## MAIN OPTIONS BOX START ########################
+                          box(id = "intro_box", width = "800px", 
+                              
+                              actionButton("infoButton", "Info"), 
+                              
+                              selectInput(inputId = "cluster",
+                                          label = "What Cluster would you like to analyse?",
+                                          choices = NULL, 
+                                          selected = 'All', 
+                                          multiple = FALSE),
+                              
+                              # Adding information panel
+                              helpText("For these two sliders, values below the threshold will be 
+                     excluded when making the network. For example, setting the correlation threshold
+                     to 0.7 excludes correlations below 0.7 from the network."), 
+                              
+                              # Input: Slider for minimum correlation ----
+                              sliderInput(inputId = "neg_corr",
+                                          label = "Threshold for Negative Correlations:",
+                                          min = 0,
+                                          max = 1,
+                                          value = 0.7,
+                                          step = 0.05),
+                              
+                              # Input: Slider for maximum correlation ----
+                              sliderInput(inputId = "pos_corr",
+                                          label = "Threshold for Positive Correlations:",
+                                          min = 0,
+                                          max = 1,
+                                          value = 0.5, 
+                                          step = 0.05),
+                              
+                              # Adding dropdown to change network ----
+                              selectInput("layout", "Choose layout algorithm:",
+                                          c("Circle" = "layout_in_circle",
+                                            "Random" = "layout_randomly",
+                                            "Davidson-Harel" = "layout_with_dh", 
+                                            "Fruchterman-Reingold" = "layout_with_fr", 
+                                            "Sugiyama" = "layout_with_sugiyama"), 
+                                          selected = T)),
+                          
+                          # Adding dropdown to change network ----
+                          radioButtons(inputId = "remove_unconnecteds", 
+                                       label = "Remove Nodes with No Connections?", 
+                                       c("No", "Yes")),
+                          ######################## MAIN OPTIONS BOX START ########################
+                          
+                          ######################## ADVANCED OPTIONS CHECKBOX START ########################
+                          box(id = "advancedOptionsBox", title = "Advanced Options", width = "800px",
+                              
+                              # Choose how to present line thickness
+                              radioButtons(inputId = "LineThickness", 
+                                           label = "How to Determine Line Thickness", 
+                                           c("Threshold"="binary", "Gradation"="bins")),
+                              
+                              # Adding information panel ----
+                              helpText("Note: the threshold for 'minor' correlations determines at what value 
+                     correlations between nodes will have a thinner dashed line or a thicker
+                     solid line. For example, a setting the threshold at 0.5 will designate
+                     correlations below that as 'minor'."), 
+                              
+                              # Adding slider for when dotted line ----
+                              sliderInput(inputId = "minor_threshold",
+                                          label = "Threshold for 'Minor' Correlations:",
+                                          min = 0,
+                                          max = 1,
+                                          value = 0.7, 
+                                          step = 0.05),
+                              
+                              # Adding checkboxes to change network ----
+                              numericInput(inputId = "seed",
+                                           label = "Set Seed (for reproducible results)",
+                                           value = 1, 
+                                           min = 1, 
+                                           max = 10000)),
+                          
+                          actionButton(inputId = "advancedOptions", label = "Show / Hide"),
+                          
+                          
+                          
+                          ######################## ADVANCED OPTIONS CHECKBOX END ########################
+                          
+                          
+                          ######################## EGO NETWORK CHECKBOX START ########################
+                          box(id = "egoNetworkBox", title = "Ego Network", width = "800px",
+                              
+                              # Adding checkbox for egonetwork ----    
+                              checkboxInput(inputId = "ego_network", 
+                                            label = "Make ego-network?", 
+                                            value = FALSE),
+                              
+                              # Adding slider for degrees ----
+                              numericInput(inputId = "degree",
+                                           label = "No. Degrees:",
+                                           min = 1,
+                                           max = 100,
+                                           value = 1, 
+                                           step = 1),
+                              
+                              # Adding target node ----
+                              selectInput("target_node", "Target Node ID:",
+                                          c(NULL), 
+                                          selected = F)),
+                          
+                          
+                          
+                          actionButton(inputId = "egoNetwork", label = "Show / Hide"),
+                          ######################## EGO NETWORK CHECKBOX END ########################
+                          
+                          ######################## EGO NETWORK CHECKBOX START ########################
+                          box(id = "shortestPathsBox", title = "Shortest Paths", width = "800px",
+                              
+                              # Adding checkbox for egonetwork ----    
+                              checkboxInput(inputId = "shortest_paths_toggle", 
+                                            label = "Show Shortest Paths?", 
+                                            value = FALSE),
+                              
+                              # Adding target node ----
+                              selectInput("from_node", "What node to start at?",
+                                          c(NULL), 
+                                          selected = F), 
+                              
+                              # Adding target node ----
+                              selectInput("to_node", "What node to go to?",
+                                          c(NULL), 
+                                          selected = F)), 
+                          
+                          actionButton(inputId = "shortestPaths", label = "Show / Hide"),
+                          ######################## EGO NETWORK CHECKBOX END ########################
+                          
+                          ######################## EGO NETWORK CHECKBOX START ########################
+                          box(id = "weightsBox", title = "Edge Weights Options", width = "800px",
+                              
+                              # Adding information panel ----
+                              helpText("Reminder: These are all the possible edges between every node. Only put
+                         your user defined weights for the edges you are interested in and upload these below. Remember, 
+                         the network map is undirected, to from A to B and from B to A are synonymous."), 
+                              
+                              # Adding checkbox for egonetwork ----    
+                              downloadButton("downloadData", label = "Download"),
+                              
+                              checkboxInput(inputId = "include_weights", 
+                                            label = "Include Edge Weights?", 
+                                            value = FALSE),
+                              
+                              fileInput(inputId = "weights_values", multiple = F, accept = ".csv", label = "Weights Values")),
+                          
+                          actionButton(inputId = "weightsOptions", label = "Show / Hide"),
+                          ######################## EGO NETWORK CHECKBOX END ########################
+                          
+                          ######################## EXPORT OPTIONS CHECKBOX START ########################
+                          box(id = "exportOptionsBox", title = "Export Options", width = "800px",
+                              
+                              # Adding action buttons for various outputs to change network ----
+                              textInput(inputId = "title", label = "title", value = NULL), 
+                              textInput(inputId = "subtitle", label = "subtitle", value = NULL), 
+                              textInput(inputId = "footer", label = "footer", value = NULL),
+                              
+                              downloadButton('htmlSave', 'Download', label = "Download your network as an HTML file"),
+                              downloadButton("nodesDownload", "Download", label = "Download your network's nodes"),
+                              downloadButton("edgesDownload", "Download", label = "Download your network's edges")),
+                          
+                          actionButton(inputId = "exportOptions", label = "Show / Hide"),
+                          
+                          ######################## EXPORT OPTIONS CHECKBOX END ########################
+                          
+                        ),
+                        
+                        # Main panel for displaying outputs ----
+                        mainPanel(
+                          
+                          # Output: Histogram ----
+                          visNetworkOutput("networkPlot"),
+                          
+                          # Input: Node selection
+                          selectInput("chosen_node", "Examine node:",
+                                      c(NULL), 
+                                      selected = F), 
+                          
+                          htmlOutput("text", inline = T),
+                          
+                        )
+                      )),
                               
                     "Export Your Results",                      
-                    tabPanel("7. Generate your report", 
-                              h3("STEP 7: GENERATING A REPORT FROM YOUR VARIOUS ANALYSES", style = "color:purple"),
+                    tabPanel("8. Generate your report", 
+                              h3("STEP 8: GENERATING A REPORT FROM YOUR VARIOUS ANALYSES", style = "color:purple"),
                               h4("Here you be able to create and download a report of all your key statistical and visual information."),
                               p(HTML('For TUTORIALS on what is contained in a COMPLEX-IT report, <a href= 
                                     "https://www.art-sciencefactory.com/tutorials.html"

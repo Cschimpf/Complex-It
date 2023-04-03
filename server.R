@@ -5,8 +5,26 @@ library(rhandsontable)
 library(ggplot2)
 library(zip)
 
+library(Hmisc)
+library(GGally)
+library(network)
+library(sna)
+library(ggplot2)
+library(igraph)
+library(intergraph)
+library(tibble)
+library(tidyr)
+library(tidyverse)
+library(shiny)
+library(shinyjs)
+library(visNetwork)
+library(shinyalert)
+library(htmltools)
+library(crayon)
+library(shinydashboard)
+library(zip)
 
-
+rm(list=ls())
 
 server <- function(input, output, session) {
   
@@ -520,6 +538,587 @@ server <- function(input, output, session) {
   })
   
   
+  #### Systems Mapping Tab ####
+  
+  ##### Setting Up The Initial File, inc. if it has clustering #####
+  
+  kmeans_count <- reactiveValues(value = 0)
+  
+  observeEvent(input$init_kmeans, {
+    kmeans_count$value <- kmeans_count$value + 1
+    
+    print(kmeans_count$value)
+  })
+  
+  rawcases <- reactive({
+    if (!is.null(current_data_file)) {
+      
+      if (kmeans_count$value > 0 && !is.null(current_kmeans_solution)) {
+        rawcases_data <- cbind(current_data_file, "Group" = current_kmeans_solution@uclusters)
+        print("rawcases has been updated with k-means clustering results")
+      } else {
+        rawcases_data <- data.frame(current_data_file, Group = NA)
+        print("raw cases is as user uploaded, with an added null group column")
+      }
+      return(rawcases_data)
+    } #else {
+      #return(NULL) # or an empty data frame, depending on how you want to handle missing data
+      #print("This is being printed. Big issue!")
+    #}
+  })
+  
+  ########## OBSERVE STATEMENTS FOR MODAL BOXES ##########
+  
+  ##### Observe statement for initial start up modal box #####
+  text <- "Purpose of Map:
+             1) The tab is intended to help you visually think about the relationships amongst your variables as a network of connections and pathways of influence. \n
+             2) It shows the correlation of pairs of factor, and encourages you to evaluate them, add new nodes and connections which represent your beliefs about possible <a href='https://www.khanacademy.org/test-prep/praxis-math/praxis-math-lessons/gtp--praxis-math--lessons--statistics-and-probability/a/gtp--praxis-math--article--correlation-and-causation--lesson'>causal connections</a>, or pull out subsection of the map. \n
+             3) THINK, DON’T ACCEPT: Be careful not to interpret the map as causal connections. It is only showing you the correlation between pairs of nodes. \n
+             4) Keep in mind the correlations are not conditioned on other factors (i.e. they do not control for other variables), so we must keep a critical mindset – these maps are intended to prompt thinking and discussion, not offer definitive or ‘correct’ analysis. \n
+                    
+             Using the Map:
+             1) Along the left you will see various toggles to change your network. Changing these makes 'deep' changes to the network, as it influences the final dataframe informing the construction of the network. This means changes here can be combined and carried over between changes to these toggles. \n
+             2) The network itself is rendered using the visNetwork package. Using this you can add and remove nodes and edges, and change the position of nodes. Be aware: these are 'shallow' or aesthetic changes: changing any parameter on the left will erase any changes made. \n
+             3) Along the bottom you can examine node and network statistic information. \n"
+  text <- gsub("\n", "<br>", text) # Convert newline characters to HTML line breaks
+  text <- gsub("Purpose of Map:", "<u><b>Purpose of Map:</b></u>", text) # Bold the "Purpose of Map:" heading
+  text <- gsub("Using the Map:", "<u><b>Using the Map:</b></u>", text) # Bold the "Using the Map:" heading
+  
+  observe({
+    shinyalert(
+      title = "<u><b>Using the Map</b></u>",
+      text = text,
+      size = "m", 
+      closeOnEsc = TRUE,
+      closeOnClickOutside = FALSE,
+      html = TRUE,
+      type = "info",
+      showConfirmButton = TRUE,
+      showCancelButton = FALSE,
+      confirmButtonText = "OK",
+      confirmButtonCol = "#AEDEF4",
+      timer = 0,
+      imageUrl = "",
+      animation = TRUE
+    )
+  })
+  ##### Observe statement for initial start up modal box #####
+  
+  #####  Observe statement for shortest paths first opening #####
+  observe({
+    
+    if (input$weightsOptions == 1) {
+      
+      shinyalert(
+        title = "Remember",
+        text = "[Disclaimer/reminder about weights]",
+        size = "m", 
+        closeOnEsc = TRUE,
+        closeOnClickOutside = FALSE,
+        html = FALSE,
+        type = "warning",
+        showConfirmButton = TRUE,
+        showCancelButton = FALSE,
+        confirmButtonText = "OK",
+        confirmButtonCol = "#AEDEF4",
+        timer = 0,
+        imageUrl = "",
+        animation = TRUE)
+      
+    }
+  })
+  #####  Observe statement for shortest paths first opening #####
+  
+  ##### Observe statements for weights sanity checks #####
+  observe({
+    if (is.null(input$weights_values$datapath) == FALSE) {
+      testing_file <- read.csv(input$weights_values$datapath)
+      
+      if(is.numeric(testing_file$weight) == FALSE){
+        shinyalert(
+          title = "You have a non-numeric character in your weight column",
+          size = "s", 
+          type = "warning"
+        )
+      } else if (ncol(testing_file) != 3 ) {
+        shinyalert(
+          title = "You have the incorrect number of columns for your weights. You should have three: from, to, and weight.",
+          size = "s", 
+          type = "warning"
+        )
+      } else if (names(testing_file)[3] != 'weight' || names(testing_file)[1] != 'from' || names(testing_file)[1] != 'to') {
+        shinyalert(
+          title = "You have an incorrect name in your columns. Ensure they are 'from', 'to', and 'weight' only.",
+          size = "s", 
+          type = "warning"
+        )
+      } else {
+        NULL
+      }
+      
+      
+    } else {
+      NULL
+    }
+  })
+  ##### Observe statements for weights sanity checks #####
+  
+  ########## OBSERVE STATEMENTS FOR MODAL BOXES ##########
+  
+  ########## OBSERVE STATEMENTS FOR INITIALLY CLOSING HIDE/SHOWS ##########
+  
+  # Observe statement for show/hide export options box
+  observe(if (input$exportOptions == 0) {
+    shinyjs::hide(id = "exportOptionsBox")
+  })
+  
+  # Observe statement for show/hide ego network box
+  observe(if (input$egoNetwork == 0) {
+    shinyjs::hide(id = "egoNetworkBox")
+  })
+  
+  # Observe statement for show/hide advanced options box
+  observe(if (input$advancedOptions == 0) {
+    shinyjs::hide(id = "advancedOptionsBox")
+  })
+  
+  # Observe statement for show/hide shortest paths box
+  observe(if (input$shortestPaths == 0) {
+    shinyjs::hide(id = "shortestPathsBox")
+  })
+  
+  # Observe statement for show/hide weights box
+  observe(if (input$weightsOptions == 0) {
+    shinyjs::hide(id = "weightsBox")
+  })
+  
+  ########## OBSERVE STATEMENTS FOR INITIALLY CLOSING HIDE/SHOWS ##########
+  
+  ########## OBSERVE EVENTS FOR OPENING/CLOSING HIDE/SHOWS ##########
+  # Observe statement for show/hide weights options box
+  observeEvent(input$weightsOptions, {
+    
+    if(input$weightsOptions %% 2 == 1){
+      shinyjs::show(id = "weightsBox")
+    }else{
+      shinyjs::hide(id = "weightsBox")
+    }
+  })
+  
+  # Observe statement for show/hide export options box
+  observeEvent(input$exportOptions, {
+    
+    if(input$exportOptions %% 2 == 1){
+      shinyjs::show(id = "exportOptionsBox")
+    }else{
+      shinyjs::hide(id = "exportOptionsBox")
+    }
+  })
+  
+  # Observe statement for show/hide ego network box
+  observeEvent(input$egoNetwork, {
+    
+    if(input$egoNetwork %% 2 == 1){
+      shinyjs::show(id = "egoNetworkBox")
+    }else{
+      shinyjs::hide(id = "egoNetworkBox")
+    }
+  })
+  
+  # Observe statement for show/hide advanced options box
+  observeEvent(input$advancedOptions, {
+    
+    if(input$advancedOptions %% 2 == 1){
+      shinyjs::show(id = "advancedOptionsBox")
+    }else{
+      shinyjs::hide(id = "advancedOptionsBox")
+    }
+  })
+  
+  # Observe statement for show/hide shortest paths box
+  observeEvent(input$shortestPaths, {
+    
+    if(input$shortestPaths %% 2 == 1){
+      shinyjs::show(id = "shortestPathsBox")
+    }else{
+      shinyjs::hide(id = "shortestPathsBox")
+    }
+  })
+  
+  ########## OBSERVE EVENTS FOR OPENING/CLOSING HIDE/SHOWS ##########
+  
+  observeEvent(infoButton(), {
+    shinyalert(
+      title = "<u><b>Using the Map</b></u>",
+      text = text,
+      size = "m", 
+      closeOnEsc = TRUE,
+      closeOnClickOutside = FALSE,
+      html = TRUE,
+      type = "info",
+      showConfirmButton = TRUE,
+      showCancelButton = FALSE,
+      confirmButtonText = "OK",
+      confirmButtonCol = "#AEDEF4",
+      timer = 0,
+      imageUrl = "",
+      animation = TRUE
+    )
+  })
+  
+  
+  ########## SETTING UP INPUTS ##########
+  neg_corr <- reactive({ (input$neg_corr)*-1 })
+  pos_corr <- reactive({ input$pos_corr })
+  minor_threshold <- reactive({ input$minor_threshold })
+  seed <- reactive({ input$seed })
+  layout <- reactive({ input$layout })
+  degree <- reactive({ input$degree })
+  target_node <- reactive({ input$target_node })
+  ego_network <- reactive({ input$ego_network })
+  title <- reactive({ input$title })
+  subtitle <- reactive({ input$subtitle })
+  footer <- reactive({ input$footer })
+  shortest_paths_toggle <- reactive({ input$shortest_paths_toggle })
+  from_node <- reactive({ input$from_node })
+  to_node <- reactive({ input$to_node })
+  include_weights <- reactive({ input$include_weights })
+  remove_unconnecteds <- reactive({ input$remove_unconnecteds })
+  LineThickness <- reactive({ input$LineThickness })
+  htmlSave <- reactive({ input$htmlSave })
+  cluster <- reactive({ input$cluster })
+  chosen_node <- reactive({  input$chosen_node  })
+  infoButton <- reactive({  input$infoButton  })
+  ########## SETTING UP INPUTS ##########
+  
+  rawcases_filtered <- reactive({
+    if (cluster() == 'All') {
+      rawcases_filt <- rawcases() %>% select(-Group)
+      rawcases_filt
+    } else {
+      rawcases_filt <- rawcases() %>% filter(Group == cluster()) %>% select(-Group)
+      rawcases_filt
+    }
+  })
+  
+  #rawcases_filtered <-  reactive({ current_data_file }) 
+  
+  corrs_matrix <- reactive({  rcorr(as.matrix(rawcases_filtered()[,2:ncol(rawcases_filtered())]))  })
+  
+  corrs <- reactive({  flattenCorrMatrix(corrs_matrix()$r, corrs_matrix()$P)  })
+  
+  corrs_filtered_neg <- reactive({  corrs() %>% filter(cor < neg_corr())  })
+  
+  corrs_filtered_pos <- reactive({  corrs() %>% filter(cor > pos_corr())  })
+  
+  corrs_filtered <- reactive({
+    corrs() %>% 
+      subset(select = c("row", "column", "color", "width")) %>% 
+      filter(cor < neg_corr() | cor > pos_corr())
+  })
+  
+  links <- reactive({
+    data.frame(
+      from = corrs_filtered()$row,
+      to = corrs_filtered()$column
+    ) %>%
+      setNames(c("from", "to"))
+  })
+  
+  pre_nodes_1 <- reactive({ data.frame(name = colnames(rawcases_filtered()[, 2:ncol(rawcases_filtered())])) })
+  
+  pre_nodes_2 <- reactive({  pre_nodes_2 <- pre_nodes_1() %>% rename("label" = "name")  }) 
+  
+  nodes <- reactive({  rowid_to_column(pre_nodes_2(), "id")  }) # keep this one named as nodes
+  
+  corrs_filtered <- reactive({
+    corrs() %>% 
+      subset(select = c("row", "column", "cor")) %>% 
+      filter(cor < neg_corr() | cor > pos_corr()) %>% 
+      mutate(
+        color = ifelse(cor >= 0, "green", "red"),
+        width = if(input$LineThickness == "bins") {
+          case_when(
+            abs(cor) <= 0.1 ~ 0.2,
+            abs(cor) <= 0.2 ~ 0.4,
+            abs(cor) <= 0.3 ~ 0.6,
+            abs(cor) <= 0.4 ~ 0.8,
+            abs(cor) <= 0.5 ~ 1,
+            abs(cor) <= 0.6 ~ 2,
+            abs(cor) <= 0.7 ~ 3,
+            abs(cor) <= 0.8 ~ 4,
+            abs(cor) <= 0.9 ~ 5,
+            TRUE ~ 5
+          )
+        } else if(input$LineThickness == "binary") {
+          ifelse(abs(cor) >= minor_threshold(), 4.5, 1)
+        } else {
+          2
+        }
+      )
+  })
+  
+  corrs_filtered2 <- reactive({  subset(corrs_filtered(), select = c("row", "column", "color", "width"))  })
+  
+  links2 <- reactive({  left_join(links(), corrs_filtered2(), by = c("from" = "row", "to" = "column"))  })
+  
+  links3 <- reactive({
+    links2() %>%
+      mutate(from = nodes()$id[match(from, nodes()$label)],
+             to = nodes()$id[match(to, nodes()$label)])
+  })
+  
+  weights_values <- reactive({
+    if (include_weights() == TRUE) {
+      read.csv(input$weights_values$datapath)
+    } else {
+      NULL
+    }
+  })
+  
+  links4 <- reactive({
+    if (include_weights() == TRUE) {
+      links4 <- left_join(links3(), weights_values(), by = c("to", "from"))
+      links4
+    } else {
+      links3()
+    }
+  })
+  
+  igraph <- reactive({  graph_from_data_frame(links4(), vertices = nodes(), directed = F)  })
+  
+  nodes2 <- reactive({
+    if (ego_network() == TRUE) {
+      distances <- distances(igraph())
+      distances <- as.data.frame(distances[target_node(), ] )
+      distances <- rownames_to_column(distances)
+      distances <- rename(distances, Node = 1, Separation = 2)
+      distances <- subset(distances, Separation > degree())
+      removes <- as.vector(distances$Node)
+      
+      nodes_ego <- nodes()[!nodes()$id %in% removes, ]
+      
+      nodes_ego
+    } else {
+      nodes()
+    }
+  })
+  
+  edges_to_keep <- reactive({
+    if (shortest_paths_toggle() == TRUE) {
+      
+      edges_to_keep <- lapply(all_shortest_paths(igraph(), from = from_node(), to = to_node())$res, function(x) E(igraph(), path=x))
+      edges_to_keep <- as_ids(unique(do.call(c, edges_to_keep)))
+      edges_to_keep <- edges_to_keep %>% as.data.frame() %>% rename(joined = 1)
+      edges_to_keep <- separate(data = edges_to_keep, col = joined, into = c("from", "to"))
+      
+      edges_to_keep$from <- as.numeric(edges_to_keep$from)
+      edges_to_keep$to <- as.numeric(edges_to_keep$to)
+      
+      edges_to_keep
+    } else {
+      'NULL'
+    }
+  })
+  
+  nodes_to_keep <- reactive({
+    if (shortest_paths_toggle() == TRUE) {
+      
+      nodes_to_keep <- unique(do.call(c, all_shortest_paths(igraph(), from = from_node(), to = to_node())$res))
+      nodes_to_keep <- as.data.frame(as.vector(nodes_to_keep)) %>% rename(id = 1)
+      
+      nodes_to_keep
+    } else {
+      'NULL'
+    }
+  })
+  
+  nodes3 <- reactive({
+    if (shortest_paths_toggle() == TRUE) {
+      
+      nodes_to_remove <- anti_join(nodes2(), nodes_to_keep(), by = "id")
+      
+      new_nodes <- anti_join(nodes2(), nodes_to_remove, by = "id")
+      
+      new_nodes
+      
+    } else {
+      nodes2()
+    }
+  })
+  
+  links5 <- reactive({
+    if (shortest_paths_toggle() == TRUE) {
+      
+      edges_to_remove <- anti_join(links4(), edges_to_keep(), by = c("from", "to"))
+      
+      new_links <- anti_join(links4(), edges_to_remove, by = c("from", "to"))
+      
+      new_links
+    } else {
+      links4()
+    }
+  })
+  
+  nodes4 <- reactive({
+    if (remove_unconnecteds() == "Yes"){
+      
+      igraph <- graph_from_data_frame(links5(), vertices = nodes3(), directed = F)
+      
+      distances <- as.data.frame(distances(igraph))
+      distances[sapply(distances, is.infinite)] <- 0
+      
+      distances <- distances %>% select_if(~sum(.) == 0)
+      
+      removes <- as.vector(colnames(distances))
+      
+      new_nodes <- nodes3()[!nodes3()$id %in% removes, ]
+      
+      new_nodes
+    } else {
+      nodes3()
+    }
+  })
+  
+  final_network <- reactive({
+    
+    set.seed(seed())
+    
+    visNetwork(nodes4(), links5(), width = "100%", 
+               main = title(),
+               submain = subtitle(),
+               footer = footer()) %>%
+      visPhysics(enabled = F) %>%
+      visOptions(manipulation = T, highlightNearest = T)  %>%
+      visIgraphLayout(layout = layout())
+  }) 
+  
+  nodes_to_dl <- reactive(nodes4())
+  links_to_dl <- reactive(links5())
+  
+  output$nodesDownload <- downloadHandler(
+    filename = function() {
+      paste("data-", Sys.Date(), ".csv", sep="")
+    },
+    content = function(file) {
+      write.csv(nodes_to_dl(), file, row.names = FALSE)
+    }
+  )
+  
+  output$edgesDownload <- downloadHandler(
+    filename = function() {
+      paste("data-", Sys.Date(), ".csv", sep="")
+    },
+    content = function(file) {
+      write.csv(links_to_dl(), file, row.names = FALSE)
+    }
+  )
+  
+  igraph_for_stats <- reactive({  graph_from_data_frame(links5(), vertices = nodes4(), directed = F)  })
+  
+  igraph_for_stats2 <- reactive({          
+    
+    if(include_weights() == TRUE){
+      igraph <- delete_edge_attr(igraph_for_stats(), "weight")
+    } else {
+      igraph_for_stats()
+    }
+  })
+  
+  network_mean_distance <- reactive({  mean_distance(igraph_for_stats2())  })
+  network_diameter <- reactive({  diameter(igraph_for_stats2())  })
+  
+  closeness <- reactive({
+    closeness <- distances(igraph_for_stats2())
+    closeness <- as.data.frame(closeness[chosen_node(), ] )
+    closeness[sapply(closeness, is.infinite)] <- NA
+    closeness <- rename(closeness, chosen_node = 1)
+    closeness
+  })
+  
+  direct_connections <- reactive({ sum(closeness()$chosen_node == 1, na.rm = T) })
+  standardised_score <- reactive({ round(direct_connections()/(nrow(nodes4())-1), 2) })
+  valid_nodes <- reactive ({ (nrow(nodes4())) - 1 - (sum(is.na(closeness()$chosen_node))) })
+  node_average_distance <- reactive ({ round(sum(closeness()$chosen_node, na.rm = T)/valid_nodes(), 2) })
+  
+  str1 <- reactive({
+    
+    if(direct_connections() != 0){
+      str1 <- paste("Number of direct links:", direct_connections())
+      str1
+    } else {
+      str1 <- paste("This node is unconnected")
+      str1
+    }
+    
+  })
+  
+  str2 <- reactive({
+    
+    if(standardised_score() != 0){
+      str2 <- paste("Standardised connection score:", standardised_score())
+      str2
+    } else {
+      str2 <- paste("This node is unconnected")
+      str2
+    }
+    
+  })
+  
+  str3 <- reactive({
+    
+    if(is.nan(node_average_distance()) == FALSE){
+      str3 <- paste("Average node distance:", node_average_distance())
+      str3
+    } else {
+      str3 <- paste("This node is unconnected")
+      str3
+    }
+    
+  })
+  
+  str4 <- reactive({  
+    
+    if(is.nan(node_average_distance()) == FALSE){
+      str4 <- paste("The average degree of seperation in your network is:", round(network_mean_distance(), 2))  
+      str4
+    } else {
+      str4 <- paste("This network has no connections between nodes")
+      str4
+    }  
+    
+  })
+  
+  str5 <- reactive({  paste("The maximum distance (diameter) of your network is:", network_diameter())  })
+  
+  output$htmlSave <- downloadHandler(
+    filename = function() {
+      paste('network-', Sys.Date(), '.html', sep='')
+    },
+    content = function(con) {
+      final_network() %>% visSave(con)
+    }
+  )
+  
+  output$networkPlot <- renderVisNetwork({final_network()})
+  
+  #output$text <- renderText({  HTML(paste(str1(), str2(), str3(), str4(), str5(), sep = '<br/>'))  })
+  
+  output$text <- renderText({  rawcases()  })
+  
+  ########## MAKING THE NETWORK DIAGRAM ITSELF ##########
+  output$downloadData <- downloadHandler(
+    
+    filename = function() {
+      paste("data-", Sys.Date(), ".csv", sep="")
+    },
+    content = function(file) {
+      write.csv(nodes_to_download, file, row.names = FALSE)
+    }
+  )
+  ########## MAKING THE NETWORK DIAGRAM ITSELF ##########
+  
+  
   ##### 'Generate Report'
   #############################################################################
   output$downloadReport <- downloadHandler(
@@ -656,13 +1255,47 @@ server <- function(input, output, session) {
   )
   
  
-  
-   
-  
-  
- 
-  
+  #clusters_list <- reactive({ 
 
+  # })
   
-}  
+  observe({
+    updateSelectInput(session = session, inputId = "cluster", choices = c("All", unique(rawcases()$Group)))
+  })
+  
+  
+  dynamic_nodes <- reactive({
+    if(is.null(current_data_file)) {
+      return(NULL)
+    } else {
+      data.frame(id = seq_along(current_data_file[,2:ncol(current_data_file)]), 
+                 label = colnames(current_data_file[,2:ncol(current_data_file)]))
+    }
+  })
+  
+  dynamic_nodes_ids <- reactive({
+    if(is.null(dynamic_nodes())) {
+      return(NULL)
+    } else {
+      setNames(dynamic_nodes()$id, dynamic_nodes()$label)
+    }
+  })
+  
+  observe({
+    updateSelectInput(session = session, inputId = "target_node", choices = dynamic_nodes_ids())
+  })
+  
+  observe({
+    updateSelectInput(session = session, inputId = "from_node", choices = dynamic_nodes_ids())
+  })
+  
+  observe({
+    updateSelectInput(session = session, inputId = "to_node", choices = dynamic_nodes_ids())
+  })
+  
+  observe({
+    updateSelectInput(session = session, inputId = "chosen_node", choices = dynamic_nodes_ids())
+  })
+  
+  }  
   
