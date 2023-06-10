@@ -14,6 +14,10 @@ current_som_solution = NULL
 previous_som = NULL
 predicted_cases = NULL
 monte_carlo = NULL
+rawcases = NULL
+dynamic_nodes_ids = NULL
+choices = "All"
+network_initialised = NULL
 
 agent_case_tracker = NULL
 agent_cluster_tracker = NULL

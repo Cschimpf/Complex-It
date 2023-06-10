@@ -21,6 +21,7 @@ ui <- fluidPage(theme=shinytheme("cosmo"),
                 
               
                   navlistPanel(
+                    id = "my_navlist",
                     selected = "1. Import Your Database",
                     HTML("<img src='Complexit_LOGO4.jpg'>"),
                     HTML("<br><br><br><br>"), HTML("<br><br><br><br>"), HTML("<br><br><br><br>"), HTML("<br>"),
@@ -341,7 +342,7 @@ ui <- fluidPage(theme=shinytheme("cosmo"),
                              ),
                     
                     "Systems Mapping Tab", 
-                    tabPanel("8. Using Sytems Mapping To Explore Cluster Variables",
+                    tabPanel("7. Using Sytems Mapping To Explore Cluster Variables",
                       
                       # App title ----
                       #titlePanel("STEP 8: USING SYSTEMS MAPPING TO EXPLORE CLUSTER VARIABLES"),
@@ -357,12 +358,14 @@ ui <- fluidPage(theme=shinytheme("cosmo"),
                         
                         # Sidebar panel for inputs ----
                         sidebarPanel(
-                          useShinyjs(),
+                          shinyjs::useShinyjs(),
                           
                           ######################## MAIN OPTIONS BOX START ########################
                           box(id = "intro_box", width = "800px", 
                               
-                              actionButton("infoButton", "Info"), 
+                              actionButton("infoButton", "Info"),
+                              
+                              actionButton("initialise_button", "Initialise"),
                               
                               selectInput(inputId = "cluster",
                                           label = "What Cluster would you like to analyse?",
