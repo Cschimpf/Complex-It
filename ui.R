@@ -2,6 +2,29 @@ library(shiny)
 library(shinythemes)
 library(rhandsontable)
 
+suppressMessages(library(SOMbrero))
+library(cluster)
+library(rhandsontable)
+
+library(Hmisc)
+library(GGally)
+library(network)
+library(sna)
+library(ggplot2)
+library(igraph)
+library(intergraph)
+library(tibble)
+library(tidyr)
+library(tidyverse)
+library(shiny)
+library(shinyjs)
+library(visNetwork)
+library(shinyalert)
+library(htmltools)
+library(crayon)
+library(shinydashboard)
+library(zip)
+
 
 
 # here is the first option using shiny themes:  
@@ -521,6 +544,7 @@ ui <- fluidPage(theme=shinytheme("cosmo"),
                               textInput(inputId = "footer", label = "footer", value = NULL),
                               
                               downloadButton('htmlSave', 'Download', label = "Download your network as an HTML file"),
+                              # downloadButton('pngSave', 'Download', label = "Download your network as an PNG file"),
                               downloadButton("nodesDownload", "Download", label = "Download your network's nodes"),
                               downloadButton("edgesDownload", "Download", label = "Download your network's edges")),
                           

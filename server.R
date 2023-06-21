@@ -1,10 +1,7 @@
 
-library(shiny)
 suppressMessages(library(SOMbrero))
 library(cluster)
 library(rhandsontable)
-library(ggplot2)
-library(zip)
 
 library(Hmisc)
 library(GGally)
@@ -24,9 +21,6 @@ library(htmltools)
 library(crayon)
 library(shinydashboard)
 library(zip)
-#library(shinyjs)
-
-rm(list=ls())
 
 server <- function(input, output, session) {
   
@@ -661,7 +655,7 @@ server <- function(input, output, session) {
       #  )
       #})
       
-      pop_up <- FALSE
+      #pop_up <- FALSE
       
       observe({
         # Check if the tab "Using Sytems Mapping To Explore Cluster Variables" is selected
@@ -694,8 +688,12 @@ server <- function(input, output, session) {
         if (input$weightsOptions == 1) {
           
           shinyalert(
-            title = "Remember",
-            text = "[Disclaimer/reminder about weights]",
+            title = "Caution when using weights",
+            text = "To work with weights, download your network's edges using the download button below. In your 
+            spreadsheet editor you will have three columns: the edges (to and from) and a 'weight' column, which
+            is by default a value of one. Change the weights as desired, but do not leave values blank or type
+            in non-numeric values, and please do not change the name of the columns. Please upload the weights first, and then tick the box to include them. Also note, weights are ignored
+            when calculating the 'examine node' statistics below the network.",
             size = "m",
             closeOnEsc = TRUE,
             closeOnClickOutside = FALSE,
@@ -730,7 +728,7 @@ server <- function(input, output, session) {
               size = "s",
               type = "warning"
             )
-          } else if (names(testing_file)[3] != 'weight' || names(testing_file)[1] != 'from' || names(testing_file)[1] != 'to') {
+          } else if (names(testing_file)[3] != 'weight' || names(testing_file)[1] != 'from' || names(testing_file)[2] != 'to') {
             shinyalert(
               title = "You have an incorrect name in your columns. Ensure they are 'from', 'to', and 'weight' only.",
               size = "s",
@@ -952,12 +950,23 @@ server <- function(input, output, session) {
                  to = nodes()$id[match(to, nodes()$label)])
       })
       
-      weights_values <- reactive({
+      weights_values_initial <- reactive({
         if (include_weights() == TRUE) {
           read.csv(input$weights_values$datapath)
         } else {
           NULL
         }
+      })
+      
+      weights_values <- reactive({
+        # Get the links5() dataframe
+        weights <- weights_values_initial()
+
+        weights$to <- unname(dynamic_nodes_ids[weights$to])
+        weights$from <- unname(dynamic_nodes_ids[weights$from])
+        
+        # Return the modified dataframe
+        weights
       })
       
       links4 <- reactive({
@@ -1080,7 +1089,20 @@ server <- function(input, output, session) {
       final_network_download <- reactive(final_network())
       
       nodes_to_dl <- reactive(nodes4())
-      links_to_dl <- reactive(links5())
+      
+      links_to_dl <- reactive({
+        # Get the links5() dataframe
+        links_df <- links5()
+        
+        # Remove the "color" and "width" columns
+        subset_df <- links_df[, !(names(links_df) %in% c("color", "width"))]
+        
+        subset_df$to <- names(dynamic_nodes_ids)[match(subset_df$to, dynamic_nodes_ids)]
+        subset_df$from <- names(dynamic_nodes_ids)[match(subset_df$from, dynamic_nodes_ids)]
+        
+        # Return the modified dataframe
+        subset_df
+      })
       
       output$nodesDownload <- downloadHandler(
         filename = function() {
@@ -1096,11 +1118,13 @@ server <- function(input, output, session) {
           paste("data-", Sys.Date(), ".csv", sep="")
         },
         content = function(file) {
-          write.csv(links_to_dl(), file, row.names = FALSE)
+          write.csv(filtered_links_for_igraph(), file, row.names = FALSE)
         }
       )
       
-      igraph_for_stats <- reactive({  graph_from_data_frame(links5(), vertices = nodes4(), directed = F)  })
+      filtered_links_for_igraph <- reactive({ links5()[links5()$to %in% nodes4()$id & links5()$from %in% nodes4()$id, ] })
+      
+      igraph_for_stats <- reactive({  graph_from_data_frame(filtered_links_for_igraph(), vertices = nodes4(), directed = F)  })
       
       igraph_for_stats2 <- reactive({          
         
@@ -1186,6 +1210,15 @@ server <- function(input, output, session) {
         }
       )
       
+      # output$pngSave <- downloadHandler(
+      #   filename = function() {
+      #     paste('network-', Sys.Date(), '.png', sep='')
+      #   },
+      #   content = function(PNGfile) {
+      #     final_network() %>% visExport()
+      #   }
+      # )
+      
       output$networkPlot <- renderVisNetwork({final_network()})
       
       #html_object <<- final_network() 
@@ -1194,17 +1227,35 @@ server <- function(input, output, session) {
       
       output$text <- renderText({  HTML(paste(str1(), str2(), str3(), str4(), str5(), sep = '<br/>'))  })
       
-      ########## MAKING THE NETWORK DIAGRAM ITSELF ##########
+      ########## MAKING THE WEIGHTS DOWNLOAD ##########
+      
+      weights_links <- reactive({
+        # Get the links5() dataframe
+        links_df <- links5()
+        
+        # Remove the "color" and "width" columns
+        subset_df <- links_df[, !(names(links_df) %in% c("color", "width"))]
+        
+        subset_df$to <- names(dynamic_nodes_ids)[match(subset_df$to, dynamic_nodes_ids)]
+        subset_df$from <- names(dynamic_nodes_ids)[match(subset_df$from, dynamic_nodes_ids)]
+        
+        subset_df$weight <- 1
+        
+        # Return the modified dataframe
+        subset_df
+      })
+      
+      
       output$downloadData <- downloadHandler(
         
         filename = function() {
           paste("data-", Sys.Date(), ".csv", sep="")
         },
         content = function(file) {
-          write.csv(nodes_to_download, file, row.names = FALSE)
+          write.csv(weights_links(), file, row.names = FALSE)
         }
       )
-      ########## MAKING THE NETWORK DIAGRAM ITSELF ##########
+      ########## MAKING THE WEIGHTS DOWNLOAD ##########
       
       #button_pressed(TRUE)
       
@@ -1349,9 +1400,14 @@ server <- function(input, output, session) {
       }
       
        if(is.null(network_initialised) == FALSE){
-         full_systems_map_data <- data.frame(id = c(1,4,3,1,5),
-                                             label = c(1,4,3,2,5))
-         write.csv(full_systems_map_data, file ="full_systems_map_data.csv")
+         
+         
+         write.csv(links5_global, file = 'full_systems_map_data.csv')
+         
+         # content = function(con) {
+         #   final_network() %>% visSave() 
+         #   }
+         
        }
       
       zip(zipfile=fname, files=fs)

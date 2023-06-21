@@ -18,6 +18,7 @@ rawcases = NULL
 dynamic_nodes_ids = NULL
 choices = "All"
 network_initialised = NULL
+pop_up = FALSE
 
 agent_case_tracker = NULL
 agent_cluster_tracker = NULL
