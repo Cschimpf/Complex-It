@@ -19,6 +19,8 @@ dynamic_nodes_ids = NULL
 choices = "All"
 network_initialised = NULL
 pop_up = FALSE
+final_network_download = NULL
+nodes4_download = NULL
 
 agent_case_tracker = NULL
 agent_cluster_tracker = NULL

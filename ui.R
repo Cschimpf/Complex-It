@@ -376,6 +376,8 @@ ui <- fluidPage(theme=shinytheme("cosmo"),
     
                  The map is generated using the <a href='https://dictionary.apa.org/zero-order-correlation'>zero-order correlations</a> amongst your variables."), style = "text-align: center;"),
                       
+                      verbatimTextOutput("network_warning"),
+                      
                       # Sidebar layout with input and output definitions ----
                       sidebarLayout(
                         

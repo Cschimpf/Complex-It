@@ -24,7 +24,6 @@ library(zip)
 
 server <- function(input, output, session) {
   
-  
   output$complexit_logo <- renderImage({list(src="Complexit_LOGO3.png")}, deleteFile = FALSE)
   
   
@@ -87,8 +86,12 @@ server <- function(input, output, session) {
   
   observeEvent(input$initialise_button, { 
     
+    if(is.null(current_data_file)){output$network_warning <- renderText({"Please upload data first."})
+    print("this is running renderText")
+    return()}
+    
 #    if (!button_pressed()){
-      
+    
       observe({
         if (!is.null(reactive_current_data_file)) {
           
@@ -97,12 +100,30 @@ server <- function(input, output, session) {
           
           dynamic_nodes_ids <<- setNames(dynamic_nodes$id, dynamic_nodes$label)
           
+          #examine_nodes_dropdown_ids <<- setNames(nodes4_download$id, nodes4_download$label)
+          
           print("dynamic nodes ids updated")
         } else {
           dynamic_nodes_ids <<- NULL
           print("dynamic nodes NULL")
         }
       })  
+      
+      # observe({
+      # 
+      #   if ( !is.null(reactive_current_data_file) & !is.null(examine_nodes_dropdown_ids) ){
+      # 
+      #     if(nrow(nodes4_download) < length(dynamic_nodes_ids)){
+      # 
+      #       examine_nodes_dropdown_ids <<- setNames(nodes4_download$id, nodes4_download$label)
+      # 
+      #       print("detected divergence")
+      # 
+      #     }
+      # 
+      #     }
+      # 
+      #   })
       
 #    }
     
@@ -569,7 +590,71 @@ server <- function(input, output, session) {
     print(kmeans_count$value)
   })
   
+  infoButton <- reactive({  input$infoButton  })
+  
+  text <- "Purpose of Map:
+             1) The tab is intended to help you visually think about the relationships amongst your variables as a network of connections and pathways of influence. \n
+             2) It shows the correlation of pairs of factor, and encourages you to evaluate them, add new nodes and connections which represent your beliefs about possible <a href='https://www.khanacademy.org/test-prep/praxis-math/praxis-math-lessons/gtp--praxis-math--lessons--statistics-and-probability/a/gtp--praxis-math--article--correlation-and-causation--lesson'>causal connections</a>, or pull out subsection of the map. \n
+             3) THINK, DON’T ACCEPT: Be careful not to interpret the map as causal connections. It is only showing you the correlation between pairs of nodes. \n
+             4) Keep in mind the correlations are not conditioned on other factors (i.e. they do not control for other variables), so we must keep a critical mindset – these maps are intended to prompt thinking and discussion, not offer definitive or ‘correct’ analysis. \n
+                   
+             Using the Map:
+             1) Along the left you will see various toggles to change your network. Changing these makes 'deep' changes to the network, as it influences the final dataframe informing the construction of the network. This means changes here can be combined and carried over between changes to these toggles. \n
+             2) The network itself is rendered using the visNetwork package. Using this you can add and remove nodes and edges, and change the position of nodes. Be aware: these are 'shallow' or aesthetic changes: changing any parameter on the left will erase any changes made. \n
+             3) Along the bottom you can examine node and network statistic information. \n"
+  text <- gsub("\n", "<br>", text) # Convert newline characters to HTML line breaks
+  text <- gsub("Purpose of Map:", "<u><b>Purpose of Map:</b></u>", text) # Bold the "Purpose of Map:" heading
+  text <- gsub("Using the Map:", "<u><b>Using the Map:</b></u>", text) # Bold the "Using the Map:" heading
+  
+  observe({
+    # Check if the tab "Using Sytems Mapping To Explore Cluster Variables" is selected
+    if (!is.null(input$my_navlist) && input$my_navlist == "7. Using Sytems Mapping To Explore Cluster Variables" && !pop_up ) {
+      shinyalert(
+        title = "<u><b>Using the Map</b></u>",
+        text = text,
+        size = "m",
+        closeOnEsc = TRUE,
+        closeOnClickOutside = FALSE,
+        html = TRUE,
+        type = "info",
+        showConfirmButton = TRUE,
+        showCancelButton = FALSE,
+        confirmButtonText = "OK",
+        confirmButtonCol = "#AEDEF4",
+        timer = 0,
+        imageUrl = "",
+        animation = TRUE
+      )
+      pop_up <<- TRUE
+    }
+  })
+  
+  observeEvent(infoButton(), {
+    shinyalert(
+      title = "<u><b>Using the Map</b></u>",
+      text = text,
+      size = "m",
+      closeOnEsc = TRUE,
+      closeOnClickOutside = FALSE,
+      html = TRUE,
+      type = "info",
+      showConfirmButton = TRUE,
+      showCancelButton = FALSE,
+      confirmButtonText = "OK",
+      confirmButtonCol = "#AEDEF4",
+      timer = 0,
+      imageUrl = "",
+      animation = TRUE
+    )
+  })
+  
   observeEvent(input$initialise_button, { 
+    
+    if(is.null(current_data_file)){output$network_warning <- renderText({"Please upload data first."})
+    print("this is running renderText")
+    return()}
+    
+    print("this is running")  
     
     network_initialised <<- TRUE
     
@@ -622,20 +707,6 @@ server <- function(input, output, session) {
       ########## OBSERVE STATEMENTS FOR MODAL BOXES ##########
       
       ##### Observe statement for initial start up modal box #####
-      text <- "Purpose of Map:
-             1) The tab is intended to help you visually think about the relationships amongst your variables as a network of connections and pathways of influence. \n
-             2) It shows the correlation of pairs of factor, and encourages you to evaluate them, add new nodes and connections which represent your beliefs about possible <a href='https://www.khanacademy.org/test-prep/praxis-math/praxis-math-lessons/gtp--praxis-math--lessons--statistics-and-probability/a/gtp--praxis-math--article--correlation-and-causation--lesson'>causal connections</a>, or pull out subsection of the map. \n
-             3) THINK, DON’T ACCEPT: Be careful not to interpret the map as causal connections. It is only showing you the correlation between pairs of nodes. \n
-             4) Keep in mind the correlations are not conditioned on other factors (i.e. they do not control for other variables), so we must keep a critical mindset – these maps are intended to prompt thinking and discussion, not offer definitive or ‘correct’ analysis. \n
-                   
-             Using the Map:
-             1) Along the left you will see various toggles to change your network. Changing these makes 'deep' changes to the network, as it influences the final dataframe informing the construction of the network. This means changes here can be combined and carried over between changes to these toggles. \n
-             2) The network itself is rendered using the visNetwork package. Using this you can add and remove nodes and edges, and change the position of nodes. Be aware: these are 'shallow' or aesthetic changes: changing any parameter on the left will erase any changes made. \n
-             3) Along the bottom you can examine node and network statistic information. \n"
-      text <- gsub("\n", "<br>", text) # Convert newline characters to HTML line breaks
-      text <- gsub("Purpose of Map:", "<u><b>Purpose of Map:</b></u>", text) # Bold the "Purpose of Map:" heading
-      text <- gsub("Using the Map:", "<u><b>Using the Map:</b></u>", text) # Bold the "Using the Map:" heading
-      
       #observe({
       #  shinyalert(
       #    title = "<u><b>Using the Map</b></u>",
@@ -656,29 +727,6 @@ server <- function(input, output, session) {
       #})
       
       #pop_up <- FALSE
-      
-      observe({
-        # Check if the tab "Using Sytems Mapping To Explore Cluster Variables" is selected
-        if (!is.null(input$my_navlist) && input$my_navlist == "7. Using Sytems Mapping To Explore Cluster Variables" && !pop_up ) {
-          shinyalert(
-            title = "<u><b>Using the Map</b></u>",
-            text = text,
-            size = "m",
-            closeOnEsc = TRUE,
-            closeOnClickOutside = FALSE,
-            html = TRUE,
-            type = "info",
-            showConfirmButton = TRUE,
-            showCancelButton = FALSE,
-            confirmButtonText = "OK",
-            confirmButtonCol = "#AEDEF4",
-            timer = 0,
-            imageUrl = "",
-            animation = TRUE
-          )
-          pop_up <<- TRUE
-        }
-      })
       
       ##### Observe statement for initial start up modal box #####
       
@@ -829,25 +877,6 @@ server <- function(input, output, session) {
       
       ########## OBSERVE EVENTS FOR OPENING/CLOSING HIDE/SHOWS ##########
       
-      observeEvent(infoButton(), {
-        shinyalert(
-          title = "<u><b>Using the Map</b></u>",
-          text = text,
-          size = "m",
-          closeOnEsc = TRUE,
-          closeOnClickOutside = FALSE,
-          html = TRUE,
-          type = "info",
-          showConfirmButton = TRUE,
-          showCancelButton = FALSE,
-          confirmButtonText = "OK",
-          confirmButtonCol = "#AEDEF4",
-          timer = 0,
-          imageUrl = "",
-          animation = TRUE
-        )
-      })
-      
       
       ########## SETTING UP INPUTS ##########
       neg_corr <- reactive({ (input$neg_corr)*-1 })
@@ -870,10 +899,9 @@ server <- function(input, output, session) {
       htmlSave <- reactive({ input$htmlSave })
       cluster <- reactive({ input$cluster })
       chosen_node <- reactive({  input$chosen_node  })
-      infoButton <- reactive({  input$infoButton  })
       ########## SETTING UP INPUTS ##########
       
-      rawcases_filtered <- reactive({
+        rawcases_filtered <- reactive({
         if (cluster() == 'All') {
           rawcases_filt <- rawcases %>% select(-Group)
           rawcases_filt
@@ -883,11 +911,26 @@ server <- function(input, output, session) {
         }
       })
       
+      
       #rawcases_filtered <-  reactive({ current_data_file })
+      
+      # corrs_matrix <- tryCatch({
+      #   
+      #   result = reactive({  rcorr(as.matrix(rawcases_filtered()[,1:ncol(rawcases_filtered())]))  })
+      #   return(result)
+      #   },
+      #   error=function(e) {
+      #     message('Loading Network')
+      #     print(e)
+      #   }
+      #   )
       
       corrs_matrix <- reactive({  rcorr(as.matrix(rawcases_filtered()[,1:ncol(rawcases_filtered())]))  })
       
-      corrs <- reactive({  flattenCorrMatrix(corrs_matrix()$r, corrs_matrix()$P)  })
+      
+      
+      
+      corrs <- reactive({  flattenCorrMatrix(corrs_matrix()$r, corrs_matrix()$P)  }) 
       
       corrs_filtered_neg <- reactive({  corrs() %>% filter(cor < neg_corr())  })
       
@@ -898,6 +941,7 @@ server <- function(input, output, session) {
           subset(select = c("row", "column", "color", "width")) %>%
           filter(cor < neg_corr() | cor > pos_corr())
       })
+      
       
       links <- reactive({
         data.frame(
@@ -1067,11 +1111,19 @@ server <- function(input, output, session) {
           
           new_nodes <- nodes3()[!nodes3()$id %in% removes, ]
           
+          nodes4_download <<- new_nodes
+          #examine_nodes_dropdown_ids <<- new_nodes
+          examine_nodes_dropdown_ids <<- setNames(new_nodes$id, new_nodes$label)
+          
           new_nodes
         } else {
+          nodes4_download <<-  nodes3()
+          #examine_nodes_dropdown_ids <<- nodes3()
+          examine_nodes_dropdown_ids <<- setNames(nodes3()$id, nodes3()$label)
           nodes3()
         }
       })
+      
       
       final_network <- reactive({
         
@@ -1086,7 +1138,9 @@ server <- function(input, output, session) {
           visIgraphLayout(layout = layout())
       })
       
-      final_network_download <- reactive(final_network())
+      
+      
+      final_network_download <<- reactive(final_network())
       
       nodes_to_dl <- reactive(nodes4())
       
@@ -1123,6 +1177,8 @@ server <- function(input, output, session) {
       )
       
       filtered_links_for_igraph <- reactive({ links5()[links5()$to %in% nodes4()$id & links5()$from %in% nodes4()$id, ] })
+      
+      #filtered_nodes_for_igraph <- unique(c(filtered_links_for_igraph()$from, filtered_links_for_igraph()$to))
       
       igraph_for_stats <- reactive({  graph_from_data_frame(filtered_links_for_igraph(), vertices = nodes4(), directed = F)  })
       
@@ -1210,6 +1266,19 @@ server <- function(input, output, session) {
         }
       )
       
+      html_dl_reactive <- reactive({
+        
+        downloadHandler(
+          filename = function() {
+            paste('network-', Sys.Date(), '.html', sep='')
+          },
+          content = function(con) {
+            final_network() %>% visSave(con)
+          }
+        )
+        
+      }) 
+      
       # output$pngSave <- downloadHandler(
       #   filename = function() {
       #     paste('network-', Sys.Date(), '.png', sep='')
@@ -1259,7 +1328,9 @@ server <- function(input, output, session) {
       
       #button_pressed(TRUE)
       
-    }
+    
+    
+  }
     
 #    }
 )
@@ -1280,7 +1351,7 @@ server <- function(input, output, session) {
       som_files <- c("som_options.csv", "summary_class.txt","som_seed.txt", "som_profiles.csv", "data_quadrants.csv", "som_barplot.pdf", "som_boxplot.pdf")
       policy_files <- c("adjust_kmeans.csv", "tested_intervention.csv", "sensitivity.pdf")
       predict_files <-c("predicted_quadrants.csv")
-      systems_mapping_files <- c("full_systems_map_data.csv")
+      systems_mapping_files <- c("dInput.csv")
       
       if(is.null(current_kmeans_solution) == FALSE) {
         file_names <- c(file_names, kmeans_files)
@@ -1401,12 +1472,8 @@ server <- function(input, output, session) {
       
        if(is.null(network_initialised) == FALSE){
          
-         
-         write.csv(links5_global, file = 'full_systems_map_data.csv')
-         
-         # content = function(con) {
-         #   final_network() %>% visSave() 
-         #   }
+         write.csv(nodes4_download, file ="dInput.csv")
+
          
        }
       
@@ -1486,6 +1553,38 @@ server <- function(input, output, session) {
     }
   })
   
+  ##############################################
+  
+  examine_nodes_dropdown <- reactive({
+    if(is.null(current_data_file)) {
+      return(NULL)
+    } else {
+      
+      data.frame(id = seq_along(current_data_file[,1:ncol(current_data_file)]),
+                 label = colnames(current_data_file[,1:ncol(current_data_file)]))
+    
+      #unique(c(filtered_links_for_igraph()$from, filtered_links_for_igraph()$to))
+      
+      }
+  })
+  
+  examine_nodes_dropdown_ids <<- reactive({
+    if(is.null(dynamic_nodes())) {
+      print('examine_nodes_dropdown_ids RUNNING!!')
+      return(NULL)
+    } else if(nrow(nodes4()) < length(dynamic_nodes())) {
+      setNames(nodes4()$id, nodes4()$label)
+      print('examine_nodes_dropdown_ids RUNNING!!')
+    } else {
+      setNames(dynamic_nodes()$id, dynamic_nodes()$label)
+      print('examine_nodes_dropdown_ids RUNNING!!')
+    }
+  })
+  
+   # output$troubleshooting_text <- renderPrint({
+   #  filtered_nodes_for_igraph()
+   # })
+   
   
   
   observeEvent(input$file1, {
@@ -1584,8 +1683,19 @@ server <- function(input, output, session) {
   # })
   # 
   
+  reactive_examine_nodes_dropdown_ids <- reactiveVal(examine_nodes_dropdown_ids)
+  
+  # Update the reactive value when the global variable changes
+  observe({
+    reactive_current_data_file(examine_nodes_dropdown_ids)
+  })
+  
   observeEvent(input$initialise_button, {   
   
+    if(is.null(current_data_file)){output$network_warning <- renderText({"Please upload data first."})
+    print("this is running renderText")
+    return()}
+    
   observe({
     updateSelectInput(session = session, inputId = "target_node", choices = dynamic_nodes_ids)
   })
@@ -1599,7 +1709,17 @@ server <- function(input, output, session) {
   })
 
   observe({
-    updateSelectInput(session = session, inputId = "chosen_node", choices = dynamic_nodes_ids)
+    
+    #if ( nrow(nodes4_download) < length(dynamic_nodes_ids) ){
+    
+    updateSelectInput(session = session, inputId = "chosen_node", choices = examine_nodes_dropdown_ids)
+    
+    #} else {
+      
+    #updateSelectInput(session = session, inputId = "chosen_node", choices = dynamic_nodes_ids)
+      
+    #}
+    
   })
   
   observe({
