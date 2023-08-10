@@ -100,6 +100,8 @@ server <- function(input, output, session) {
           
           dynamic_nodes_ids <<- setNames(dynamic_nodes$id, dynamic_nodes$label)
           
+          examine_nodes_dropdown_ids <<- dynamic_nodes_ids
+          
           #examine_nodes_dropdown_ids <<- setNames(nodes4_download$id, nodes4_download$label)
           
           print("dynamic nodes ids updated")
@@ -1568,18 +1570,18 @@ server <- function(input, output, session) {
       }
   })
   
-  examine_nodes_dropdown_ids <<- reactive({
-    if(is.null(dynamic_nodes())) {
-      print('examine_nodes_dropdown_ids RUNNING!!')
-      return(NULL)
-    } else if(nrow(nodes4()) < length(dynamic_nodes())) {
-      setNames(nodes4()$id, nodes4()$label)
-      print('examine_nodes_dropdown_ids RUNNING!!')
-    } else {
-      setNames(dynamic_nodes()$id, dynamic_nodes()$label)
-      print('examine_nodes_dropdown_ids RUNNING!!')
-    }
-  })
+  # examine_nodes_dropdown_ids <<- reactive({
+  #   if(is.null(dynamic_nodes())) {
+  #     print('examine_nodes_dropdown_ids RUNNING!!')
+  #     return(NULL)
+  #   } else if(nrow(nodes4()) < length(dynamic_nodes())) {
+  #     setNames(nodes4()$id, nodes4()$label)
+  #     print('examine_nodes_dropdown_ids RUNNING!!')
+  #   } else {
+  #     setNames(dynamic_nodes()$id, dynamic_nodes()$label)
+  #     print('examine_nodes_dropdown_ids RUNNING!!')
+  #   }
+  # })
   
    # output$troubleshooting_text <- renderPrint({
    #  filtered_nodes_for_igraph()
@@ -1683,12 +1685,12 @@ server <- function(input, output, session) {
   # })
   # 
   
-  reactive_examine_nodes_dropdown_ids <- reactiveVal(examine_nodes_dropdown_ids)
+  #reactive_examine_nodes_dropdown_ids <- reactiveVal(examine_nodes_dropdown_ids)
   
   # Update the reactive value when the global variable changes
-  observe({
-    reactive_current_data_file(examine_nodes_dropdown_ids)
-  })
+  # observe({
+  #   reactive_current_data_file(examine_nodes_dropdown_ids)
+  # })
   
   observeEvent(input$initialise_button, {   
   
@@ -1727,6 +1729,44 @@ server <- function(input, output, session) {
   })
     
   })
+  
+  observeEvent(c(input$neg_corr, input$pos_corr, input$minor_threshold,
+                 input$seed, input$layout, input$degree, input$target_node,
+                 input$ego_network, input$ego_network, input$title,
+                 input$subtitle, input$footer, input$shortest_paths_toggle,
+                 input$from_node, input$to_node, input$include_weights,
+                 input$remove_unconnecteds, input$LineThickness,
+                 input$htmlSave, input$cluster),
+
+               {
+
+                 observe({
+
+                   updateSelectInput(session = session, inputId = "chosen_node", choices = examine_nodes_dropdown_ids)
+
+                 })
+
+
+               })
+  
+  observeEvent(input$init_kmeans,
+               
+               {
+                 
+                 observe({
+                   
+                   if (kmeans_count$value > 0 && !is.null(current_kmeans_solution)) {
+                     choices <<- c("All", sort(unique(na.omit(current_kmeans_solution@uclusters))))
+                     print("This has run!!!")
+                     
+                   }})
+                 
+                 observe({
+                   updateSelectInput(session = session, inputId = "cluster", choices = choices)
+                 })
+                 
+                 
+               })
   
   
   
