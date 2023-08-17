@@ -1093,8 +1093,12 @@ server <- function(input, output, session) {
           
           new_links <- anti_join(links4(), edges_to_remove, by = c("from", "to"))
           
+          links5_download <<- new_links
+          
           new_links
+      
         } else {
+          links5_download <<- links4()
           links4()
         }
       })
@@ -1117,15 +1121,21 @@ server <- function(input, output, session) {
           #examine_nodes_dropdown_ids <<- new_nodes
           examine_nodes_dropdown_ids <<- setNames(new_nodes$id, new_nodes$label)
           
+          user_set_seed <<- seed()
+          
           new_nodes
         } else {
           nodes4_download <<-  nodes3()
           #examine_nodes_dropdown_ids <<- nodes3()
           examine_nodes_dropdown_ids <<- setNames(nodes3()$id, nodes3()$label)
+          user_set_seed <<- seed()
           nodes3()
         }
       })
       
+      # if(!(input$to_node %in% nodes4())){output$network_warning <- renderText({"Please make a valid selection!"})
+      # print("this is running renderText")
+      # return()}
       
       final_network <- reactive({
         
@@ -1309,7 +1319,7 @@ server <- function(input, output, session) {
         
         subset_df$to <- names(dynamic_nodes_ids)[match(subset_df$to, dynamic_nodes_ids)]
         subset_df$from <- names(dynamic_nodes_ids)[match(subset_df$from, dynamic_nodes_ids)]
-        
+
         subset_df$weight <- 1
         
         # Return the modified dataframe
@@ -1353,7 +1363,7 @@ server <- function(input, output, session) {
       som_files <- c("som_options.csv", "summary_class.txt","som_seed.txt", "som_profiles.csv", "data_quadrants.csv", "som_barplot.pdf", "som_boxplot.pdf")
       policy_files <- c("adjust_kmeans.csv", "tested_intervention.csv", "sensitivity.pdf")
       predict_files <-c("predicted_quadrants.csv")
-      systems_mapping_files <- c("dInput.csv")
+      systems_mapping_files <- c("nodes_list.csv", 'edges_list.csv', 'set_network_seed.txt')
       
       if(is.null(current_kmeans_solution) == FALSE) {
         file_names <- c(file_names, kmeans_files)
@@ -1474,8 +1484,19 @@ server <- function(input, output, session) {
       
        if(is.null(network_initialised) == FALSE){
          
-         write.csv(nodes4_download, file ="dInput.csv")
+         write.csv(nodes4_download, file ="nodes_list.csv")
+         
+         links5_download <- links5_download[, !(names(links5_download) %in% c("color", "width"))]
+         
+         links5_download$to <- names(dynamic_nodes_ids)[match(links5_download$to, dynamic_nodes_ids)]
+         links5_download$from <- names(dynamic_nodes_ids)[match(links5_download$from, dynamic_nodes_ids)]
 
+         write.csv(links5_download, file ="edges_list.csv")
+         
+         fileConn<-file("set_network_seed.txt")
+         set_seed_info <- paste('Seed set for network visualisation is: ', user_set_seed, sep = '')
+         writeLines(set_seed_info, fileConn)
+         close(fileConn)
          
        }
       

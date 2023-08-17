@@ -29,6 +29,58 @@ library(zip)
 
 # here is the first option using shiny themes:  
 ui <- fluidPage(theme=shinytheme("cosmo"),
+                
+                #SILENCES ALL ERRORS
+                # tags$style(type="text/css",
+                #            ".shiny-output-error { visibility: hidden; }",
+                #            ".shiny-output-error:before { visibility: hidden; }"
+                # ),
+                
+                #SILENCES ALL ERRORS in the relevant locations -- is this what we want?
+                # tags$style(type="text/css",
+                #            ".shiny-output-error.htmlwidgets-error { visibility: hidden; }",
+                #            ".shiny-output-error.htmlwidgets-error:before { visibility: hidden; }", 
+                #            conditionalPanel(
+                #              condition = "output.errorText.includes('must have >4 observations')",
+                #              span(id = "errorText", class = "shiny-html-output shiny-bound-output specific-error", "must have >4 observations")
+                #            )
+                # ),
+                # 
+                #  tags$style(type="text/css",
+                #             ".shiny-html-output.shiny-bound-output.shiny-output-error { display: none !important; }", 
+                # conditionalPanel(
+                #   condition = "output.errorText.includes('must have >4 observations')",
+                #   span(id = "errorText", class = "shiny-html-output shiny-bound-output specific-error", "must have >4 observations")
+                # )
+                #  ),
+                
+                
+                
+                # tags$style(type="text/css",
+                #            ".shiny-output-error.htmlwidgets-error:contains('must have >4 observations') { display: none !important; }",
+                #            ".shiny-output-error.htmlwidgets-error:before:contains('must have >4 observations') { display: none !important; }"
+                # ),
+                # 
+                tags$style(type="text/css",
+                           ".shiny-html-output.shiny-bound-output.shiny-output-error { display: none !important; }"
+                ),
+                
+                tags$style(type="text/css",
+                           ".shiny-output-error.htmlwidgets-error { display: none !important; }",
+                           ".shiny-output-error.htmlwidgets-error:contains('must have >4 observations') { display: block !important; }"
+                ),
+                
+                
+#                 tags$style(type="text/css",
+#                            ".shiny-html-output.shiny-bound-output.specific-error { display: none !important; }"
+#                 ),
+#                 conditionalPanel(
+#                   condition = "output.errorText.includes('Specific Error')",
+#                   span(id = "errorText", class = "shiny-html-output shiny-bound-output specific-error", "Specific Error")
+#                 )
+# )
+
+                
 
 
 # here is the next option embedding the tag in native html,
