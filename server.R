@@ -1873,7 +1873,7 @@ server <- function(input, output, session) {
     if (!(input$target_node %in% examine_nodes_dropdown_ids) & !is.null(network_initialised)) {
       shinyalert(
         title = "<u><b>Warning!</b></u>",
-        text = 'Sample Text',
+        text = "The node you have selected is not in your current network, and thus can't make a valid ego-network. If this is unexpected, perhaps try changing your variables such that this node appears in your network?",
         size = "m",
         closeOnEsc = TRUE,
         closeOnClickOutside = FALSE,
@@ -1894,7 +1894,7 @@ server <- function(input, output, session) {
     if (!(input$from_node %in% examine_nodes_dropdown_ids) & !is.null(network_initialised)) {
       shinyalert(
         title = "<u><b>Warning!</b></u>",
-        text = 'Sample Text',
+        text = "The node you have selected is not in your current network, and thus can't make a valid shortest path with it. If this is unexpected, perhaps try changing your variables such that this node appears in your network?",
         size = "m",
         closeOnEsc = TRUE,
         closeOnClickOutside = FALSE,
@@ -1914,8 +1914,8 @@ server <- function(input, output, session) {
   observeEvent(input$to_node, {
     if (!(input$to_node %in% examine_nodes_dropdown_ids) & !is.null(network_initialised)) {
       shinyalert(
-        title = "<u><b>Warning!</b></u>",
-        text = 'Sample Text',
+        title = "<u><b>Invalid Node Selection!</b></u>",
+        text = "The node you have selected is not in your current network, and thus can't make a valid shortest path with it. If this is unexpected, perhaps try changing your variables such that this node appears in your network?",
         size = "m",
         closeOnEsc = TRUE,
         closeOnClickOutside = FALSE,
