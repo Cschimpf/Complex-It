@@ -731,6 +731,56 @@ server <- function(input, output, session) {
       #pop_up <- FALSE
       
       ##### Observe statement for initial start up modal box #####
+    
+    #####  Observe statement for shortest paths first opening #####
+    observe({
+      
+      if (input$egoNetwork == 1) {
+        
+        shinyalert(
+          title = "Caution when using ego network",
+          text = "When working with ego networks, please only tick the 'Make ego-network' box when you are ready to visualise your ego network and have selected your nodes. This includes both the first ego network you make, and any subsequent ego networks you make. Failing to do this will not break your app or the visualisation, but you may get erroneous pop-up warnings of an invalid node due subsetting moving from one subsetted network to another.",
+          size = "m",
+          closeOnEsc = TRUE,
+          closeOnClickOutside = FALSE,
+          html = FALSE,
+          type = "warning",
+          showConfirmButton = TRUE,
+          showCancelButton = FALSE,
+          confirmButtonText = "OK",
+          confirmButtonCol = "#AEDEF4",
+          timer = 0,
+          imageUrl = "",
+          animation = TRUE)
+        
+      }
+    })
+    #####  Observe statement for shortest paths first opening #####
+    
+    #####  Observe statement for shortest paths first opening #####
+    observe({
+      
+      if (input$shortestPaths == 1) {
+        
+        shinyalert(
+          title = "Caution when using shortest paths",
+          text = "When working with shortest paths, please only tick the 'Show shortest paths' box when you are ready to visualise your shortest paths and have selected your nodes. This includes both the first shortest paths you show, and any subsequent paths you show. Failing to do this will not break your app or the visualisation, but you may get erroneous pop-up warnings of an invalid node due subsetting  moving from one subsetted network to another.",
+          size = "m",
+          closeOnEsc = TRUE,
+          closeOnClickOutside = FALSE,
+          html = FALSE,
+          type = "warning",
+          showConfirmButton = TRUE,
+          showCancelButton = FALSE,
+          confirmButtonText = "OK",
+          confirmButtonCol = "#AEDEF4",
+          timer = 0,
+          imageUrl = "",
+          animation = TRUE)
+        
+      }
+    })
+    #####  Observe statement for shortest paths first opening #####
       
       #####  Observe statement for shortest paths first opening #####
       observe({
@@ -906,9 +956,11 @@ server <- function(input, output, session) {
         rawcases_filtered <- reactive({
         if (cluster() == 'All') {
           rawcases_filt <- rawcases %>% select(-Group)
+          rawcases_filt_super <<- nrow(rawcases_filt)
           rawcases_filt
         } else {
           rawcases_filt <- rawcases %>% filter(Group == cluster()) %>% select(-Group)
+          rawcases_filt_super <<- nrow(rawcases_filt)
           rawcases_filt
         }
       })
@@ -927,7 +979,15 @@ server <- function(input, output, session) {
       #   }
       #   )
       
-      corrs_matrix <- reactive({  rcorr(as.matrix(rawcases_filtered()[,1:ncol(rawcases_filtered())]))  })
+      corrs_matrix <- reactive({  
+        
+        validate(
+          need(!nrow(rawcases_filtered()) < 4, "Have you made a valid selection? (If first initalisation, please wait)")
+        )
+        
+        rcorr(as.matrix(rawcases_filtered()[,1:ncol(rawcases_filtered())]))  
+        
+        })
       
       
       
@@ -1104,7 +1164,7 @@ server <- function(input, output, session) {
       })
       
       nodes4 <- reactive({
-        if (remove_unconnecteds() == "Yes"){
+        if (remove_unconnecteds() == "Yes" & ego_network() == FALSE & shortest_paths_toggle() == FALSE){
           
           igraph <- graph_from_data_frame(links5(), vertices = nodes3(), directed = F)
           
@@ -1138,6 +1198,10 @@ server <- function(input, output, session) {
       # return()}
       
       final_network <- reactive({
+
+        # validate(
+        #   need(is.null(links5()), "Have you made a valid selection?")
+        # )
         
         set.seed(seed())
         
@@ -1339,8 +1403,7 @@ server <- function(input, output, session) {
       ########## MAKING THE WEIGHTS DOWNLOAD ##########
       
       #button_pressed(TRUE)
-      
-    
+
     
   }
     
@@ -1770,6 +1833,136 @@ server <- function(input, output, session) {
 
                })
   
+  
+  
+  
+  # triggered <<- FALSE
+  # 
+  # observeEvent(input$target_node,
+  #              {
+  #                observe({
+  #                  if( !(input$target_node %in% examine_nodes_dropdown_ids)){# | !(input$from_node %in% examine_nodes_dropdown_ids) | !(input$to_node %in% examine_nodes_dropdown_ids) ){
+  #                    triggered <<- TRUE
+  #                    cat('Triggered is ', triggered, sep='')
+  #                  
+  #                    if (triggered == TRUE) {
+  #                      shinyalert(
+  #                        title = "<u><b>Warning!</b></u>",
+  #                        text = 'Sample Text',
+  #                        size = "m",
+  #                        closeOnEsc = TRUE,
+  #                        closeOnClickOutside = FALSE,
+  #                        html = TRUE,
+  #                        type = "info",
+  #                        showConfirmButton = TRUE,
+  #                        showCancelButton = FALSE,
+  #                        confirmButtonText = "OK",
+  #                        confirmButtonCol = "#AEDEF4",
+  #                        timer = 0,
+  #                        imageUrl = "",
+  #                        animation = TRUE
+  #                      )
+  #                    }
+  #                    triggered <<- FALSE
+  #                    }
+  #                })
+  #              })
+  
+  
+  observeEvent(input$target_node, {
+    if (!(input$target_node %in% examine_nodes_dropdown_ids) & !is.null(network_initialised)) {
+      shinyalert(
+        title = "<u><b>Warning!</b></u>",
+        text = 'Sample Text',
+        size = "m",
+        closeOnEsc = TRUE,
+        closeOnClickOutside = FALSE,
+        html = TRUE,
+        type = "info",
+        showConfirmButton = TRUE,
+        showCancelButton = FALSE,
+        confirmButtonText = "OK",
+        confirmButtonCol = "#AEDEF4",
+        timer = 0,
+        imageUrl = "",
+        animation = TRUE
+      )
+    }
+  })
+  
+  observeEvent(input$from_node, {
+    if (!(input$from_node %in% examine_nodes_dropdown_ids) & !is.null(network_initialised)) {
+      shinyalert(
+        title = "<u><b>Warning!</b></u>",
+        text = 'Sample Text',
+        size = "m",
+        closeOnEsc = TRUE,
+        closeOnClickOutside = FALSE,
+        html = TRUE,
+        type = "info",
+        showConfirmButton = TRUE,
+        showCancelButton = FALSE,
+        confirmButtonText = "OK",
+        confirmButtonCol = "#AEDEF4",
+        timer = 0,
+        imageUrl = "",
+        animation = TRUE
+      )
+    }
+  })
+  
+  observeEvent(input$to_node, {
+    if (!(input$to_node %in% examine_nodes_dropdown_ids) & !is.null(network_initialised)) {
+      shinyalert(
+        title = "<u><b>Warning!</b></u>",
+        text = 'Sample Text',
+        size = "m",
+        closeOnEsc = TRUE,
+        closeOnClickOutside = FALSE,
+        html = TRUE,
+        type = "info",
+        showConfirmButton = TRUE,
+        showCancelButton = FALSE,
+        confirmButtonText = "OK",
+        confirmButtonCol = "#AEDEF4",
+        timer = 0,
+        imageUrl = "",
+        animation = TRUE
+      )
+    }
+  })
+  
+  
+  #
+  
+  # observeEvent(c(input$neg_corr, input$pos_corr, input$minor_threshold,
+  #                input$seed, input$layout, input$degree, input$target_node,
+  #                input$ego_network, input$ego_network, input$title,
+  #                input$subtitle, input$footer, input$shortest_paths_toggle,
+  #                input$from_node, input$to_node, input$include_weights,
+  #                input$remove_unconnecteds, input$LineThickness,
+  #                input$htmlSave),
+  # 
+  #              {
+  # 
+  #                observe({
+  # 
+  #                  if(is.null(run_through)){
+  #                    NULL
+  #                  } else if(run_through == TRUE){
+  #                    NULL
+  #                  } else if(run_through == FALSE){
+  #                    output$network_warning <- renderText({"You've made an invalid network selection."})
+  #                  } else {
+  #                    NULL
+  #                  }
+  #                  
+  #                })
+  # 
+  # 
+  #              })
+  
+  
   observeEvent(input$init_kmeans,
                
                {
@@ -1777,7 +1970,12 @@ server <- function(input, output, session) {
                  observe({
                    
                    if (kmeans_count$value > 0 && !is.null(current_kmeans_solution)) {
-                     choices <<- c("All", sort(unique(na.omit(current_kmeans_solution@uclusters))))
+                     
+                     choices_df <- data.frame(clusters = current_kmeans_solution@uclusters)
+                     choices_value_counts <- table(choices_df$clusters)
+                     choices_filtered_values <- as.numeric(names(choices_value_counts[choices_value_counts > 4]))
+                     choices <<- c("All", sort(choices_filtered_values))
+                     
                      print("This has run!!!")
                      
                    }})

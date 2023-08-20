@@ -61,14 +61,17 @@ ui <- fluidPage(theme=shinytheme("cosmo"),
                 #            ".shiny-output-error.htmlwidgets-error:before:contains('must have >4 observations') { display: none !important; }"
                 # ),
                 # 
+                
+                ##### THIS ONE IS THE WORKING ONE #####
                 tags$style(type="text/css",
                            ".shiny-html-output.shiny-bound-output.shiny-output-error { display: none !important; }"
                 ),
-                
+
                 tags$style(type="text/css",
                            ".shiny-output-error.htmlwidgets-error { display: none !important; }",
                            ".shiny-output-error.htmlwidgets-error:contains('must have >4 observations') { display: block !important; }"
                 ),
+                ##### THIS ONE IS THE WORKING ONE #####
                 
                 
 #                 tags$style(type="text/css",

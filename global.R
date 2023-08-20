@@ -21,6 +21,7 @@ pop_up = FALSE
 final_network_download = NULL
 nodes4_download = NULL
 examine_nodes_dropdown_ids = NULL
+rawcases_filt_super = 0
 
 agent_case_tracker = NULL
 agent_cluster_tracker = NULL
