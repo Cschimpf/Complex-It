@@ -24,11 +24,18 @@ library(htmltools)
 library(crayon)
 library(shinydashboard)
 library(zip)
+library(plotly)
 
 
 
 # here is the first option using shiny themes:  
 ui <- fluidPage(theme=shinytheme("cosmo"),
+                
+                #Jumbotrons are pretty, they make nice headers
+                # tags$div(class = "jumbotron text-center", style = "margin-bottom:0px;margin-top:0px",
+                #          tags$h2(class = 'jumbotron-heading', stye = 'margin-bottom:0px;margin-top:0px', 'COMPLEX-IT 1.0.1 Beta'),
+                #          p('Exploring complex data from a case-based perspective')
+                # ),
                 
                 #SILENCES ALL ERRORS
                 # tags$style(type="text/css",
@@ -278,7 +285,38 @@ ui <- fluidPage(theme=shinytheme("cosmo"),
                                conditionalPanel("input.trainbutton > 0", 
                                                 actionButton("save_som", "Save SOM Results")),
                                uiOutput("save_som_notice"),
-                               plotOutput("somplot")),
+                              conditionalPanel(
+                                condition = "input.somplottype == 'boxplot'",
+                                plotlyOutput("somplot_box", height = "800px", width = "1200px")
+                              ),
+                              conditionalPanel(
+                                condition = "input.somplottype == 'names'",
+                                plotOutput("somplot_names")
+                              ),
+                              conditionalPanel(
+                                condition = "input.somplottype == 'color'",
+                                plotOutput("somplot_color")
+                              ),
+                              conditionalPanel(
+                                condition = "input.somplotwhat == 'obs' && input.somplottype == 'barplot'",
+                                plotlyOutput("somplot_obs_bar")
+                              ),
+                              conditionalPanel(
+                                condition = "input.somplotwhat == 'prototypes' && input.somplottype == '3d'",
+                                plotlyOutput("somplot_3d", height = "800px", width = "1200px")
+                              ),
+                              conditionalPanel(
+                                condition = "input.somplotwhat == 'prototypes' && input.somplottype == 'smooth.dist'",
+                                plotlyOutput("somplot_smooth_dist", height = "800px", width = "1200px")
+                              ),
+                              conditionalPanel(
+                                condition = "input.somplotwhat == 'prototypes' && input.somplottype == 'barplot'",
+                                plotlyOutput("somplot_prototypes_bar")
+                              ),
+                              conditionalPanel(
+                                condition = "input.somplotwhat == 'prototypes' && input.somplottype == 'umatrix'",
+                                plotOutput("somplot_umatrix")
+                              )),
                     
                   
                       
@@ -612,7 +650,7 @@ ui <- fluidPage(theme=shinytheme("cosmo"),
                         mainPanel(
                           
                           # Output: Histogram ----
-                          visNetworkOutput("networkPlot"),
+                          visNetworkOutput("networkPlot", height = "600px", width = "900px"), #Add a toggle in maybe for larger networks to have a bigger plotting area?
                           
                           # Input: Node selection
                           selectInput("chosen_node", "Examine node:",
