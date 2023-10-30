@@ -1,6 +1,5 @@
 ####Global Variables#####
 
-
 # Any code in this global.r file will run one time prior to launching
 # the Shiny App.  The code will not continually scan in the background
 # while the App runs, so a good place for intialization of variables
@@ -14,6 +13,21 @@ current_som_solution = NULL
 previous_som = NULL
 predicted_cases = NULL
 monte_carlo = NULL
+rawcases = NULL
+dynamic_nodes_ids = NULL
+choices = "All"
+network_initialised = NULL
+pop_up_intro = FALSE
+pop_up_clusters = FALSE
+pop_up_systems = FALSE
+pop_up_SOM = FALSE
+pop_up_plot_map = FALSE
+pop_up_new_prediction = FALSE
+pop_up_scenarios = FALSE
+final_network_download = NULL
+nodes4_download = NULL
+examine_nodes_dropdown_ids = NULL
+rawcases_filt_super = 0
 
 agent_case_tracker = NULL
 agent_cluster_tracker = NULL
@@ -537,3 +551,13 @@ check_predict_header <- function(train_names, trial_names){
 
 ###############Still Under Development for Future Versions###############
 
+# Systems Mapping Tab #
+flattenCorrMatrix <- function(cormat, pmat) {
+  ut <- upper.tri(cormat)
+  data.frame(
+    row = rownames(cormat)[row(cormat)[ut]],
+    column = rownames(cormat)[col(cormat)[ut]],
+    cor  =(cormat)[ut],
+    p = pmat[ut]
+  )
+}
