@@ -495,11 +495,7 @@ server <- function(input, output, session) {
   
   
   # Plot the SOM
-  output$somplot <- renderPlot({
-    if(is.null(current_data_file))
-      return(NULL)
-    if(input$trainbutton ==0)
-      return(NULL)
+  somplot_output_plot <- reactive({
     
     tmp.view <- NULL
     if (input$somplottype =="boxplot") {
@@ -511,17 +507,162 @@ server <- function(input, output, session) {
     
     #This if/else set is here to add cluster labels to neurons for observation plots only
     temp.dim<-current_som_solution[["parameters"]][["the.grid"]][["dim"]] #gets the dimension of the grid
-    if(input$somplotwhat =='obs'& input$somplottype == 'boxplot' | input$somplottype == 'color'){plot(x=current_som_solution, what=input$somplotwhat, type=input$somplottype,
-                                                                                                      variable = tmp.var, show.names = TRUE,names = paste("Quadrant ", 1:prod(temp.dim)))}
-    else if(input$somplotwhat == 'obs'){plot(x=current_som_solution, what=input$somplotwhat, type=input$somplottype,
-                                             show.names = TRUE,names = paste("Quadrant ", 1:prod(temp.dim)))}
-    else if (input$somplotwhat == 'prototypes' & input$somplottype == 'barplot'){plot(x=current_som_solution, what=input$somplotwhat, type=input$somplottype)
-    }
-    else {
-      plot(x=current_som_solution, what=input$somplotwhat, type=input$somplottype,
-           variable=tmp.var,view=tmp.view)
-    }
     
+    if(input$somplotwhat =='obs' & input$somplottype == 'boxplot'){ ggplotly(plot(x=current_som_solution, what=input$somplotwhat, type=input$somplottype, variable = tmp.var, show.names = TRUE,names = paste("Quadrant ", 1:prod(temp.dim)))) }
+    else if(input$somplotwhat =='obs' & input$somplottype == 'color'){plot(x=current_som_solution, what=input$somplotwhat, type=input$somplottype, variable = tmp.var, show.names = TRUE,names = paste("Quadrant ", 1:prod(temp.dim))) }
+    else if(input$somplotwhat == 'obs' & input$somplottype == 'names'){plot(x=current_som_solution, what=input$somplotwhat, type=input$somplottype, show.names = TRUE,names = paste("Quadrant ", 1:prod(temp.dim)))}
+    else if(input$somplotwhat =='obs' & input$somplottype == 'barplot'){ggplotly(plot(x=current_som_solution, what=input$somplotwhat, type=input$somplottype, show.names = TRUE,names = paste("Quadrant ", 1:prod(temp.dim))))}
+    
+    else if (input$somplotwhat == 'prototypes' & input$somplottype == 'barplot'){ggplotly(plot(x=current_som_solution, what=input$somplotwhat, type=input$somplottype))}
+    else if (input$somplotwhat == 'prototypes' & input$somplottype == '3d'){
+      # Make the data
+      data_3d <- as.data.frame(current_som_solution[["prototypes"]])[tmp.var]
+      data_3d <- rename(data_3d, z = 1)
+      data_3d$x <- as.data.frame(current_som_solution[["parameters"]][["the.grid"]][["coord"]])$x
+      data_3d$y <- as.data.frame(current_som_solution[["parameters"]][["the.grid"]][["coord"]])$y
+      
+      # Define the dimensions of the matrix based on the range of x and y values
+      num_rows <- max(data_3d$x)
+      num_cols <- max(data_3d$y)
+      
+      # Create an empty matrix to hold the z-values
+      z_matrix <- matrix(0, nrow = num_rows, ncol = num_cols)
+      
+      # Fill in the matrix with the z-values from the dataframe
+      for (i in 1:nrow(data_3d)) {
+        row_idx <- data_3d$x[i]
+        col_idx <- data_3d$y[i]
+        z_matrix[row_idx, col_idx] <- data_3d$z[i]
+      }
+      
+      # Create the 3D surface plot
+      plot_ly(x = ~1:num_cols, y = ~1:num_rows, z = ~z_matrix) %>% 
+        add_surface()
+    }
+    else if (input$somplotwhat == 'prototypes' & input$somplottype == 'smooth.dist'){
+      # Make the data
+      smooth_dist_data <- plot(x=current_som_solution, what='prototypes', type='smooth.dist')[["data"]]
+      
+      # Define the dimensions of the matrix based on the range of x and y values
+      num_rows <- max(smooth_dist_data$x)
+      num_cols <- max(smooth_dist_data$y)
+      
+      # Create an empty matrix to hold the z-values
+      z_matrix <- matrix(0, nrow = num_rows, ncol = num_cols)
+      
+      # Fill in the matrix with the z-values from the dataframe
+      for (i in 1:nrow(smooth_dist_data)) {
+        row_idx <- smooth_dist_data$x[i]
+        col_idx <- smooth_dist_data$y[i]
+        z_matrix[row_idx, col_idx] <- smooth_dist_data$z[i]
+      }
+      
+      # Create the 3D surface plot
+      plot_ly(x = ~1:num_cols, y = ~1:num_rows, z = ~z_matrix) %>% 
+        add_surface() %>%
+        layout(
+          scene = list(
+            xaxis = list(title = "Insert Title",
+                         tickmode = "linear",  # Use linear tick mode
+                         dtick = 1             # Set tick interval to 1 (whole numbers)
+            ),
+            yaxis = list(title = "Insert Title",
+                         tickmode = "linear",  # Use linear tick mode
+                         dtick = 1             # Set tick interval to 1 (whole numbers)
+            ),
+            zaxis = list(title = "Insert Title")
+          )
+        )
+    }
+    else if (input$somplotwhat == 'prototypes' & input$somplottype == 'umatrix'){plot(x=current_som_solution, what=input$somplotwhat, type=input$somplottype, variable=tmp.var,view=tmp.view)}
+    #else {plot(x=current_som_solution, what=input$somplotwhat, type=input$somplottype, variable=tmp.var,view=tmp.view)}
+    
+    
+  })
+  
+  
+  
+  output$somplot <- renderPlot({
+    if(is.null(current_data_file))
+      return(NULL)
+    if(input$trainbutton ==0)
+      return(NULL)
+    
+    somplot_output_plot()
+    
+    
+  })
+  
+  output$somplot_box <- renderPlotly({
+    if(is.null(current_data_file))
+      return(NULL)
+    if(input$trainbutton ==0)
+      return(NULL)
+    
+    somplot_output_plot()
+  })
+  
+  output$somplot_names <- renderPlot({
+    if(is.null(current_data_file))
+      return(NULL)
+    if(input$trainbutton ==0)
+      return(NULL)
+    
+    somplot_output_plot()
+  })
+  
+  output$somplot_color <- renderPlot({
+    if(is.null(current_data_file))
+      return(NULL)
+    if(input$trainbutton ==0)
+      return(NULL)
+    
+    somplot_output_plot()
+  })
+  
+  output$somplot_obs_bar <- renderPlotly({
+    if(is.null(current_data_file))
+      return(NULL)
+    if(input$trainbutton ==0)
+      return(NULL)
+    
+    somplot_output_plot()
+  })
+  
+  output$somplot_prototypes_bar <- renderPlotly({
+    if(is.null(current_data_file))
+      return(NULL)
+    if(input$trainbutton ==0)
+      return(NULL)
+    
+    somplot_output_plot()
+  })
+  
+  output$somplot_3d <- renderPlotly({
+    if(is.null(current_data_file))
+      return(NULL)
+    if(input$trainbutton ==0)
+      return(NULL)
+    
+    somplot_output_plot()
+  })
+  
+  output$somplot_smooth_dist <- renderPlotly({
+    if(is.null(current_data_file))
+      return(NULL)
+    if(input$trainbutton ==0)
+      return(NULL)
+    
+    somplot_output_plot()
+  })
+  
+  output$somplot_umatrix <- renderPlot({
+    if(is.null(current_data_file))
+      return(NULL)
+    if(input$trainbutton ==0)
+      return(NULL)
+    
+    somplot_output_plot()
   })
   
   

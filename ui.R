@@ -346,8 +346,39 @@ ui <- dashboardPage(
               #                              multiple variables)", 
               #                              choices= "(Not Available)", 
               #                              multiple= TRUE)),
-              
-              plotOutput("somplot")
+             
+              conditionalPanel(
+                condition = "input.somplottype == 'boxplot'",
+                plotlyOutput("somplot_box", height = "800px", width = "1200px")
+              ),
+              conditionalPanel(
+                condition = "input.somplottype == 'names'",
+                plotOutput("somplot_names")
+              ),
+              conditionalPanel(
+                condition = "input.somplottype == 'color'",
+                plotOutput("somplot_color")
+              ),
+              conditionalPanel(
+                condition = "input.somplotwhat == 'obs' && input.somplottype == 'barplot'",
+                plotlyOutput("somplot_obs_bar")
+              ),
+              conditionalPanel(
+                condition = "input.somplotwhat == 'prototypes' && input.somplottype == '3d'",
+                plotlyOutput("somplot_3d", height = "800px", width = "1200px")
+              ),
+              conditionalPanel(
+                condition = "input.somplotwhat == 'prototypes' && input.somplottype == 'smooth.dist'",
+                plotlyOutput("somplot_smooth_dist", height = "800px", width = "1200px")
+              ),
+              conditionalPanel(
+                condition = "input.somplotwhat == 'prototypes' && input.somplottype == 'barplot'",
+                plotlyOutput("somplot_prototypes_bar")
+              ),
+              conditionalPanel(
+                condition = "input.somplotwhat == 'prototypes' && input.somplottype == 'umatrix'",
+                plotOutput("somplot_umatrix")
+              )
               
       ),
       
