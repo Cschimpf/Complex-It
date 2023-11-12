@@ -37,6 +37,12 @@ agentdf = NULL
 agent_drawtools = NULL
 displacement = list("1" =c(0, 2), "2" =c(0,-2), "3" =c(2,0), "4" =c(-2,0), "5" =c(-5,0), "6" =c(0,5))
 
+egoNetworkToggle = 0
+exportOptionsToggle = 0
+advancedOptionsToggle = 0
+shortestPathsToggle = 0
+weightsOptionsToggle = 0
+
 all.somplot.types <- list("numeric"=
                             list("prototypes"=
                                    list("3d", "barplot",

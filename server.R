@@ -22,6 +22,11 @@ library(crayon)
 library(shinydashboard)
 library(zip)
 library(rintrojs)
+library(plotly)
+library(DT)
+library(fresh)
+library(plotly)
+library(shinycssloaders)
 
 
 server <- function(input, output, session) {
@@ -39,19 +44,19 @@ server <- function(input, output, session) {
     if (!is.null(input$tabs) && input$tabs == "importing" && !pop_up_intro ) {
       shinyalert(
         title = "<u><b>Welcome to COMPLEX-IT</b></u>",
-        text = 'Welcome and all jazz :)',
         size = "m",
         closeOnEsc = TRUE,
         closeOnClickOutside = FALSE,
         html = TRUE,
-        type = "info",
         showConfirmButton = TRUE,
         showCancelButton = FALSE,
-        confirmButtonText = "OK",
-        confirmButtonCol = "#AEDEF4",
+        confirmButtonText = "Let's Go!",
+        confirmButtonCol = "#bce7fa",
         timer = 0,
-        imageUrl = "",
-        animation = TRUE
+        animation = TRUE, 
+        imageUrl = "https://static.wixstatic.com/media/d66b8f_9f553b735eec47df906350831599a8ef~mv2.jpg/v1/fill/w_460,h_236,al_c,q_80,usm_0.66_1.00_0.01,enc_auto/Logo2.jpg", 
+        imageWidth = 460,
+        imageHeight = 236
       )
       pop_up_intro <<- TRUE
     }
@@ -87,6 +92,7 @@ server <- function(input, output, session) {
     the.table#this is set such that the last thing in this method/function is the table and is therefore set to dInput
     
   })
+  
   observeEvent(input$subset_data,{
     d.input <- dInput()
     
@@ -99,16 +105,27 @@ server <- function(input, output, session) {
   })
   # data preview table
   # once data is populated, with the dInput call here, it will automatically be populated
-  output$view <- renderTable({
+  d.input <- reactive({
     d.input <- dInput()
-    if (is.null(d.input))
-      return(NULL)
-    if (ncol(full_data)>input$ncol.preview)
-      full_data <- full_data[,1:input$ncol.preview]
-    head(full_data, n=input$nrow.preview)
+    if (is.null(d.input)){
+      return(NULL)}
+    # if (ncol(full_data)>input$ncol.preview)
+    #   full_data <- full_data[,1:input$ncol.preview]
+    # head(full_data, n=input$nrow.preview)
+    else{ 
+      return(d.input)}
   })
   
+  output$view <- renderDT(
+    
+    d.input(),
+    options = list(scrollX = TRUE, searching = FALSE),
+    rownames = FALSE
+    
+  )
   
+  
+  #Not related to data input
   observeEvent(input$initialise_button, { 
     
     if(is.null(current_data_file)){output$network_warning <- renderText({"Please upload data first."})
@@ -202,7 +219,7 @@ server <- function(input, output, session) {
         showConfirmButton = TRUE,
         showCancelButton = FALSE,
         confirmButtonText = "OK",
-        confirmButtonCol = "#AEDEF4",
+        confirmButtonCol = "#bce7fa",
         timer = 0,
         imageUrl = "",
         animation = TRUE
@@ -225,7 +242,7 @@ server <- function(input, output, session) {
       showConfirmButton = TRUE,
       showCancelButton = FALSE,
       confirmButtonText = "OK",
-      confirmButtonCol = "#AEDEF4",
+      confirmButtonCol = "#bce7fa",
       timer = 0,
       imageUrl = "",
       animation = TRUE
@@ -235,7 +252,23 @@ server <- function(input, output, session) {
   
   #this observe event looks for users to press 'get clusters'
   observeEvent(input$init_kmeans, {
-    if(is.null(current_data_file)){output$kmean_warning <- renderText({"Please upload data first."})
+    if(is.null(current_data_file)){    
+      shinyalert(
+      title = "Please Upload Data First",
+      text = '',
+      size = "s",
+      closeOnEsc = TRUE,
+      closeOnClickOutside = FALSE,
+      html = TRUE,
+      type = "error",
+      showConfirmButton = TRUE,
+      showCancelButton = FALSE,
+      confirmButtonText = "OK",
+      confirmButtonCol = "#bce7fa",
+      timer = 0,
+      imageUrl = "",
+      animation = TRUE
+    )
     return()}
     else {output$kmean_warning <- renderText({""})}
     if(input$setrandseedkmean == "Yes") {set.seed(input$randseedkmean)}
@@ -245,7 +278,7 @@ server <- function(input, output, session) {
     output$kmeans_title <- renderUI({
       h4("Kmeans Cluster Centroids")
     })
-    output$kmeans_tab <- renderTable({
+    kmeans_table <- reactive({
       
       #this block creates the 'Cluster 1, 2...n' labels for the table display in Shiny
       clus_label <- generate_cluster_labels()
@@ -255,17 +288,37 @@ server <- function(input, output, session) {
       
     })
     
+    output$kmeans_tab <- renderDT(
+      
+      kmeans_table(),
+      options = list(scrollX = TRUE, searching = FALSE),
+      rownames = FALSE
+      
+    )
+    
     #displays the pseudoF
-    if (input$pseudo_f == TRUE) {
-      FSTAT <- pseudoF(current_data_file, current_kmeans_solution,input$clusters)
-      output$pseudoF <- renderText({
-        paste("Pseudo F: ", FSTAT)
-      })}
-    if (input$silhouette == TRUE){
-      output$kmeans_silh <- renderPlot({
-        plot_silhouette(current_data_file, current_kmeans_solution)
-      }, width = 500, height = graph_dimension(current_data_file))
-    }
+    FSTAT <- pseudoF(current_data_file, current_kmeans_solution,input$clusters)
+    output$pseudoF <- renderText({ paste("Pseudo F: ", FSTAT) })
+
+
+    output$kmeans_silh <- renderPlot({
+        
+      plot_silhouette(current_data_file, current_kmeans_solution)
+      
+      }, width = 500, height = graph_dimension(current_data_file)) 
+
+    
+    # #displays the pseudoF
+    # if (input$pseudo_f == TRUE) {
+    #   FSTAT <- pseudoF(current_data_file, current_kmeans_solution,input$clusters)
+    #   output$pseudoF <- renderText({
+    #     paste("Pseudo F: ", FSTAT)
+    #   })}
+    # if (input$silhouette == TRUE){
+    #   output$kmeans_silh <- renderPlot({
+    #     plot_silhouette(current_data_file, current_kmeans_solution)
+    #   }, width = 500, height = graph_dimension(current_data_file))
+    # }
   })
   #### Panel 'Train the SOM'
   #############################################################################
@@ -296,7 +349,7 @@ server <- function(input, output, session) {
         showConfirmButton = TRUE,
         showCancelButton = FALSE,
         confirmButtonText = "OK",
-        confirmButtonCol = "#AEDEF4",
+        confirmButtonCol = "#bce7fa",
         timer = 0,
         imageUrl = "",
         animation = TRUE
@@ -319,7 +372,7 @@ server <- function(input, output, session) {
       showConfirmButton = TRUE,
       showCancelButton = FALSE,
       confirmButtonText = "OK",
-      confirmButtonCol = "#AEDEF4",
+      confirmButtonCol = "#bce7fa",
       timer = 0,
       imageUrl = "",
       animation = TRUE
@@ -340,13 +393,29 @@ server <- function(input, output, session) {
   })
   
   observeEvent(input$trainbutton, {
+    
     if(input$dimx < 3 | input$dimy < 3 | input$dimx > 15 | input$dimy > 15)
     {
       output$som_warning <- renderText({"SOM dimensions must be 3 or greater and 15 or lesser."})
       return()
     }
     else if(is.null(current_data_file)){
-      output$som_warning <- renderText({"Please upload data first."})
+      shinyalert(
+        title = "Please Upload Data First",
+        text = '',
+        size = "s",
+        closeOnEsc = TRUE,
+        closeOnClickOutside = FALSE,
+        html = TRUE,
+        type = "error",
+        showConfirmButton = TRUE,
+        showCancelButton = FALSE,
+        confirmButtonText = "OK",
+        confirmButtonCol = "#bce7fa",
+        timer = 0,
+        imageUrl = "",
+        animation = TRUE
+      )
       return()
     }  
     else
@@ -366,23 +435,99 @@ server <- function(input, output, session) {
                                      maxit=input$maxit, scaling=input$scaling, init.proto=input$initproto, eps0 =input$eps0)
     
     updatePlotSomVar() # update variable choice for som plots
-    output$trainnotice <- renderUI({
+    
+    shinyjs::onclick("toggleAdvanced", shinyjs::toggle(id = "advanced_info", anim = TRUE))
+    # shinyjs::onclick("toggleAdvanced", shinyjs::toggle(id = "advanced_info_table", anim = TRUE))
+    
+    output$trainnotice_header <- renderUI({
+      
+      tagList(h3(paste("SOM trained at:", format(Sys.time(),format="%Y-%m-%d-%H:%M:%S"),sep=" "), style = "text-align: center;"), 
+              h4("Progress to the next tab to compare your clusters to the SOM AI", style = "text-align: center;"), 
+              h4("If you like your SOM AI solution, you can save it in the next tab", style = "text-align: center;"), 
+              br(),
+              h4("Users confident with the SOM AI may wish to examine the advanced statistics below", style = "text-align: center;"))
+      
+    })
+
+    output$trainnotice_advanced_trigger <- renderUI({
+      
+      useShinyjs()
+
+      a(id = "toggleAdvanced", "Show/hide advanced statistics")
+    
+  })
+    
+    # Create a reactive value to store the parsed dataframe
+    parsed_anova_results <- reactive({
+      anova_results <<- retrieve_ANOVA_results()
+
+      # Function to process the list and create a dataframe
+      parse_list_to_dataframe <- function(my_list) {
+        # Use lapply to apply the regular expression split to each element in the list
+        split_list <- lapply(my_list, function(x) {
+          parts <- unlist(strsplit(x, "\\s+"))
+          if (length(parts) < 4) {
+            parts <- c(parts, "")
+          }
+          return(parts)
+        })
+        
+        # Create a dataframe from the split list
+        df <- as.data.frame(do.call(rbind, split_list))
+        
+        # Rename the columns
+        colnames(df) <- c("Variable", "F Value", "p Value", "Significance")
+        
+        return(df)
+      }
+      
+      # Call the function with your list
+      my_list <- anova_results[(length(anova_results)-3):2]
+
+      anova_results_df <<- parse_list_to_dataframe( my_list )
+    })
+    
+    output$trainnotice_advanced_info <- renderUI({
+      
+      useShinyjs()
+      
       ### post the quality control factors as well
       qual_measures <- quality(current_som_solution)
       anova_results <- retrieve_ANOVA_results()
       
-      #now print out the results
-      tagList(
-        p(paste("Trained SOM ", format(Sys.time(),format="%Y-%m-%d-%H:%M:%S"),sep=" ")),
-        p(paste("Topo Error  ", format(qual_measures$topographic,digits=4),sep=" ")),
-        p(paste("Quant Error ", format(qual_measures$quantization,digits=4),sep=" ")),
-        p(paste("ANOVA Results")),
-        lapply(length(anova_results):1, function(i, y) { p(paste(y[i])) }, y=anova_results)
+      shinyjs::hidden(
+        div(id = "advanced_info",
+            #now print out the results
+            tagList(
+              #p(paste("Trained SOM ", format(Sys.time(),format="%Y-%m-%d-%H:%M:%S"),sep=" ")),
+              p(paste("Topo Error  ", format(qual_measures$topographic,digits=4),sep=" ")),
+              p(paste("Quant Error ", format(qual_measures$quantization,digits=4),sep=" ")),
+              br(),
+              p(paste("ANOVA Results")),
+              #lapply(length(anova_results):1, function(i, y) { p(paste(y[i])) }, y=anova_results)
+              
+              p(paste(anova_results[length(anova_results)])),
+              # paste(anova_results_df)
+              #lapply(length(anova_results):1, function(i, y) { p(paste(y[i])) }, y=anova_results)
+            ), 
+            renderDT(parsed_anova_results())
+        )
       )
+      
     })
     
-    
-  })  
+  #   output$trainnotice_advanced_table <- renderUI({
+  #     
+  #     shinyjs::hidden(
+  #       div(id = "advanced_info_table", 
+  #           renderTable("parsed_anova_results")
+  #       )
+  #     )
+  #     
+  #   })
+  #   
+  })
+
   
   
   #### Panel 'Plot Map'
@@ -439,7 +584,7 @@ server <- function(input, output, session) {
         showConfirmButton = TRUE,
         showCancelButton = FALSE,
         confirmButtonText = "OK",
-        confirmButtonCol = "#AEDEF4",
+        confirmButtonCol = "#bce7fa",
         timer = 0,
         imageUrl = "",
         animation = TRUE
@@ -466,7 +611,7 @@ server <- function(input, output, session) {
       showConfirmButton = TRUE,
       showCancelButton = FALSE,
       confirmButtonText = "OK",
-      confirmButtonCol = "#AEDEF4",
+      confirmButtonCol = "#bce7fa",
       timer = 0,
       imageUrl = "",
       animation = TRUE
@@ -512,7 +657,6 @@ server <- function(input, output, session) {
     else if(input$somplotwhat =='obs' & input$somplottype == 'color'){plot(x=current_som_solution, what=input$somplotwhat, type=input$somplottype, variable = tmp.var, show.names = TRUE,names = paste("Quadrant ", 1:prod(temp.dim))) }
     else if(input$somplotwhat == 'obs' & input$somplottype == 'names'){plot(x=current_som_solution, what=input$somplotwhat, type=input$somplottype, show.names = TRUE,names = paste("Quadrant ", 1:prod(temp.dim)))}
     else if(input$somplotwhat =='obs' & input$somplottype == 'barplot'){ggplotly(plot(x=current_som_solution, what=input$somplotwhat, type=input$somplottype, show.names = TRUE,names = paste("Quadrant ", 1:prod(temp.dim))))}
-    
     else if (input$somplotwhat == 'prototypes' & input$somplottype == 'barplot'){ggplotly(plot(x=current_som_solution, what=input$somplotwhat, type=input$somplottype))}
     else if (input$somplotwhat == 'prototypes' & input$somplottype == '3d'){
       # Make the data
@@ -720,7 +864,7 @@ server <- function(input, output, session) {
         showConfirmButton = TRUE,
         showCancelButton = FALSE,
         confirmButtonText = "OK",
-        confirmButtonCol = "#AEDEF4",
+        confirmButtonCol = "#bce7fa",
         timer = 0,
         imageUrl = "",
         animation = TRUE
@@ -743,7 +887,7 @@ server <- function(input, output, session) {
       showConfirmButton = TRUE,
       showCancelButton = FALSE,
       confirmButtonText = "OK",
-      confirmButtonCol = "#AEDEF4",
+      confirmButtonCol = "#bce7fa",
       timer = 0,
       imageUrl = "",
       animation = TRUE
@@ -773,7 +917,23 @@ server <- function(input, output, session) {
     
     the.table_p <- the.table_p[numeric_only_columns]
     if(check_predict_header(names(current_data_file), names(the.table_p)) ==FALSE){
-      output$Predict_Warning <- renderText({"The variable names for the new cases do not match the original names"})
+      #output$Predict_Warning <- renderText({"The variable names for the new cases do not match the original names"})
+      shinyalert(
+        title = "The variable names for the new cases do not match the original names",
+        text = '',
+        size = "s",
+        closeOnEsc = TRUE,
+        closeOnClickOutside = FALSE,
+        html = TRUE,
+        type = "error",
+        showConfirmButton = TRUE,
+        showCancelButton = FALSE,
+        confirmButtonText = "OK",
+        confirmButtonCol = "#bce7fa",
+        timer = 0,
+        imageUrl = "",
+        animation = TRUE
+      )
       return(NULL)
     }
     output$Predict_Warning <- renderText({""})
@@ -817,9 +977,18 @@ server <- function(input, output, session) {
       
       predicted_cases <<- cbind("Case id" = as.integer(case_id), 'Best Quadrant' = predicted, '2nd Best Quadrant' = as.integer(BMUS[,2]), p.input)
       
-      output$view_predict <- renderTable({
-        head(predicted_cases, n=input$nrow.result_pred)
-      })
+      # output$view_predict <- renderTable({
+      #   head(predicted_cases, n=input$nrow.result_pred)
+      # })
+      
+      output$view_predict <- renderDT(
+        
+        predicted_cases,
+        options = list(scrollX = TRUE, searching = FALSE),
+        rownames = FALSE
+        
+      )
+      
     }
     output$predict_somplot <- renderPlot({
       
@@ -876,7 +1045,7 @@ server <- function(input, output, session) {
         showConfirmButton = TRUE,
         showCancelButton = FALSE,
         confirmButtonText = "OK",
-        confirmButtonCol = "#AEDEF4",
+        confirmButtonCol = "#bce7fa",
         timer = 0,
         imageUrl = "",
         animation = TRUE
@@ -901,7 +1070,7 @@ server <- function(input, output, session) {
       showConfirmButton = TRUE,
       showCancelButton = FALSE,
       confirmButtonText = "OK",
-      confirmButtonCol = "#AEDEF4",
+      confirmButtonCol = "#bce7fa",
       timer = 0,
       imageUrl = "",
       animation = TRUE
@@ -918,11 +1087,41 @@ server <- function(input, output, session) {
   # Setup Button Pressed
   observeEvent(input$Agent_Setup,{
     if(is.null(current_kmeans_solution) | is.null(current_som_solution)){
-      output$Agent_Warning <- renderText({"You must first run your own clusters and train the SOM"})
+      shinyalert(
+        title = "You must first run your own clusters and train the SOM",
+        text = '',
+        size = "s",
+        closeOnEsc = TRUE,
+        closeOnClickOutside = FALSE,
+        html = TRUE,
+        type = "error",
+        showConfirmButton = TRUE,
+        showCancelButton = FALSE,
+        confirmButtonText = "OK",
+        confirmButtonCol = "#bce7fa",
+        timer = 0,
+        imageUrl = "",
+        animation = TRUE
+      )
       return()
     }
     if(length(current_kmeans_solution@usize) > 9){
-      output$Agent_Warning <- renderText({"You must use 9 or fewer clusters"})
+      shinyalert(
+        title = "You must use 9 or fewer clusters",
+        text = '',
+        size = "s",
+        closeOnEsc = TRUE,
+        closeOnClickOutside = FALSE,
+        html = TRUE,
+        type = "error",
+        showConfirmButton = TRUE,
+        showCancelButton = FALSE,
+        confirmButtonText = "OK",
+        confirmButtonCol = "#bce7fa",
+        timer = 0,
+        imageUrl = "",
+        animation = TRUE
+      )
       return()
     }
     
@@ -1167,7 +1366,7 @@ server <- function(input, output, session) {
         showConfirmButton = TRUE,
         showCancelButton = FALSE,
         confirmButtonText = "OK",
-        confirmButtonCol = "#AEDEF4",
+        confirmButtonCol = "#bce7fa",
         timer = 0,
         imageUrl = "",
         animation = TRUE
@@ -1188,7 +1387,7 @@ server <- function(input, output, session) {
       showConfirmButton = TRUE,
       showCancelButton = FALSE,
       confirmButtonText = "OK",
-      confirmButtonCol = "#AEDEF4",
+      confirmButtonCol = "#bce7fa",
       timer = 0,
       imageUrl = "",
       animation = TRUE
@@ -1211,7 +1410,7 @@ server <- function(input, output, session) {
         showConfirmButton = TRUE,
         showCancelButton = FALSE,
         confirmButtonText = "OK",
-        confirmButtonCol = "#AEDEF4",
+        confirmButtonCol = "#bce7fa",
         timer = 0,
         imageUrl = "",
         animation = TRUE)
@@ -1236,7 +1435,7 @@ server <- function(input, output, session) {
         showConfirmButton = TRUE,
         showCancelButton = FALSE,
         confirmButtonText = "OK",
-        confirmButtonCol = "#AEDEF4",
+        confirmButtonCol = "#bce7fa",
         timer = 0,
         imageUrl = "",
         animation = TRUE)
@@ -1265,7 +1464,7 @@ server <- function(input, output, session) {
         showConfirmButton = TRUE,
         showCancelButton = FALSE,
         confirmButtonText = "OK",
-        confirmButtonCol = "#AEDEF4",
+        confirmButtonCol = "#bce7fa",
         timer = 0,
         imageUrl = "",
         animation = TRUE)
@@ -1308,32 +1507,73 @@ server <- function(input, output, session) {
   })
   ##### Observe statements for weights sanity checks #####
   
+  observeEvent(input$exportOptions, {
+    if(input$exportOptions == 0){
+      exportOptionsToggle <<- 0
+    } else {
+      exportOptionsToggle <<- exportOptionsToggle + 1
+    }
+  })
+  
+  observeEvent(input$egoNetwork, {
+    if(input$egoNetwork == 0){
+      egoNetworkToggle <<- 0
+    } else {
+      egoNetworkToggle <<- egoNetworkToggle + 1
+    }
+  })
+  
+  observeEvent(input$advancedOptions, {
+    if(input$advancedOptions == 0){
+      advancedOptionsToggle <<- 0
+    } else {
+      advancedOptionsToggle <<- advancedOptionsToggle + 1
+    }
+  })
+  
+  observeEvent(input$shortestPaths, {
+    if(input$shortestPaths == 0){
+      shortestPathsToggle <<- 0
+    } else {
+      shortestPathsToggle <<- shortestPathsToggle + 1
+    }
+  })
+  
+  observeEvent(input$weightsOptions, {
+    if(input$weightsOptions == 0){
+      weightsOptionsToggle <<- 0
+    } else {
+      weightsOptionsToggle <<- weightsOptionsToggle + 1
+    }
+  })
+  
+  
   ########## OBSERVE STATEMENTS FOR MODAL BOXES ##########
   
   ########## OBSERVE STATEMENTS FOR INITIALLY CLOSING HIDE/SHOWS ##########
   
   # Observe statement for show/hide export options box
-  observe(if (input$exportOptions == 0) {
+  observe(if (exportOptionsToggle == 0) {
     shinyjs::hide(id = "exportOptionsBox")
   })
   
   # Observe statement for show/hide ego network box
-  observe(if (input$egoNetwork == 0) {
+  observe(if (egoNetworkToggle == 0) {
     shinyjs::hide(id = "egoNetworkBox")
   })
   
   # Observe statement for show/hide advanced options box
-  observe(if (input$advancedOptions == 0) {
+  observe(if (advancedOptionsToggle == 0) {
     shinyjs::hide(id = "advancedOptionsBox")
   })
   
   # Observe statement for show/hide shortest paths box
-  observe(if (input$shortestPaths == 0) {
+  observe(if (shortestPathsToggle == 0) {
     shinyjs::hide(id = "shortestPathsBox")
   })
   
   # Observe statement for show/hide weights box
-  observe(if (input$weightsOptions == 0) {
+  observe(if (weightsOptionsToggle == 0) {
     shinyjs::hide(id = "weightsBox")
   })
   
@@ -1343,7 +1583,7 @@ server <- function(input, output, session) {
   # Observe statement for show/hide weights options box
   observeEvent(input$weightsOptions, {
     
-    if(input$weightsOptions %% 2 == 1){
+    if(weightsOptionsToggle %% 2 == 1){
       shinyjs::show(id = "weightsBox")
     }else{
       shinyjs::hide(id = "weightsBox")
@@ -1353,7 +1593,7 @@ server <- function(input, output, session) {
   # Observe statement for show/hide export options box
   observeEvent(input$exportOptions, {
     
-    if(input$exportOptions %% 2 == 1){
+    if(exportOptionsToggle %% 2 == 1){
       shinyjs::show(id = "exportOptionsBox")
     }else{
       shinyjs::hide(id = "exportOptionsBox")
@@ -1363,7 +1603,7 @@ server <- function(input, output, session) {
   # Observe statement for show/hide ego network box
   observeEvent(input$egoNetwork, {
     
-    if(input$egoNetwork %% 2 == 1){
+    if(egoNetworkToggle %% 2 == 1){
       shinyjs::show(id = "egoNetworkBox")
     }else{
       shinyjs::hide(id = "egoNetworkBox")
@@ -1373,7 +1613,7 @@ server <- function(input, output, session) {
   # Observe statement for show/hide advanced options box
   observeEvent(input$advancedOptions, {
     
-    if(input$advancedOptions %% 2 == 1){
+    if(advancedOptionsToggle %% 2 == 1){
       shinyjs::show(id = "advancedOptionsBox")
     }else{
       shinyjs::hide(id = "advancedOptionsBox")
@@ -1383,7 +1623,7 @@ server <- function(input, output, session) {
   # Observe statement for show/hide shortest paths box
   observeEvent(input$shortestPaths, {
     
-    if(input$shortestPaths %% 2 == 1){
+    if(shortestPathsToggle %% 2 == 1){
       shinyjs::show(id = "shortestPathsBox")
     }else{
       shinyjs::hide(id = "shortestPathsBox")
@@ -1403,14 +1643,45 @@ server <- function(input, output, session) {
     
     # Start the tour if it's not active
 
-    introjs(session, options = list("nextLabel" = "Next", "prevLabel" = "Previous", "skipLabel" = "Quit"))
+    introjs(session, options = list("nextLabel" = "Next", "prevLabel" = "Previous", "skipLabel" = "Quit"),
+            
+            events = list(
+              
+              oncomplete=I('Shiny.setInputValue("weightsOptions", 0, {priority: "event"});
+                            Shiny.setInputValue("exportOptions", 0, {priority: "event"});
+                            Shiny.setInputValue("egoNetwork", 0, {priority: "event"});
+                            Shiny.setInputValue("advancedOptions", 0, {priority: "event"});
+                            Shiny.setInputValue("shortestPaths", 0, {priority: "event"});'), #, {priority: "event"}
+              
+              onexit=I('Shiny.setInputValue("weightsOptions", 0, {priority: "event"});
+                            Shiny.setInputValue("exportOptions", 0, {priority: "event"});
+                            Shiny.setInputValue("egoNetwork", 0, {priority: "event"});
+                            Shiny.setInputValue("advancedOptions", 0, {priority: "event"});
+                            Shiny.setInputValue("shortestPaths", 0, {priority: "event"});') 
+              
+            ))
     
   })
   
   observeEvent(input$initialise_button, { 
     
-    if(is.null(current_data_file)){output$network_warning <- renderText({"Please upload data first."})
-    print("this is running renderText")
+    if(is.null(current_data_file)){      
+      shinyalert(
+      title = "Please Upload Data First",
+      text = '',
+      size = "s",
+      closeOnEsc = TRUE,
+      closeOnClickOutside = FALSE,
+      html = TRUE,
+      type = "error",
+      showConfirmButton = TRUE,
+      showCancelButton = FALSE,
+      confirmButtonText = "OK",
+      confirmButtonCol = "#bce7fa",
+      timer = 0,
+      imageUrl = "",
+      animation = TRUE
+    )
     return()}
     
     print("this is running")  
@@ -1478,7 +1749,7 @@ server <- function(input, output, session) {
       #    showConfirmButton = TRUE,
       #    showCancelButton = FALSE,
       #    confirmButtonText = "OK",
-      #    confirmButtonCol = "#AEDEF4",
+      #    confirmButtonCol = "#bce7fa",
       #    timer = 0,
       #    imageUrl = "",
       #    animation = TRUE
@@ -1844,55 +2115,126 @@ server <- function(input, output, session) {
       valid_nodes <- reactive ({ (nrow(nodes4())) - 1 - (sum(is.na(closeness()$chosen_node))) })
       node_average_distance <- reactive ({ round(sum(closeness()$chosen_node, na.rm = T)/valid_nodes(), 2) })
       
+      # str1 <- reactive({
+      #   
+      #   if(direct_connections() != 0){
+      #     str1 <- paste("Number of direct links:", direct_connections())
+      #     str1
+      #   } else {
+      #     str1 <- paste("This node is unconnected")
+      #     str1
+      #   }
+      #   
+      # })
+      
+      
       str1 <- reactive({
+        result <- tryCatch({
+          if (direct_connections() != 0) {
+            str1 <- paste("Number of direct links:", direct_connections())
+            str1
+          } else {
+            str1 <- paste("This node is unconnected")
+            str1
+          }
+        }, error = function(e) {
+          message <- "Couldn't produce node or network statistics. Did you make invalid selections in choosing your network, such as choosing a 'shortest path' with an unconnected node?"
+          return(message)
+        })
         
-        if(direct_connections() != 0){
-          str1 <- paste("Number of direct links:", direct_connections())
-          str1
+        if (inherits(result, "character")) {
+          return(result)
         } else {
-          str1 <- paste("This node is unconnected")
-          str1
+          return("An unexpected error occurred.")
         }
-        
       })
+      
+      
       
       str2 <- reactive({
+        result <- tryCatch({
+          if(standardised_score() != 0){
+            str2 <- paste("Standardised connection score:", standardised_score())
+            str2
+          } else {
+            str2 <- paste("This node is unconnected")
+            str2
+          }
+        }, error = function(e) {
+          message <- ""
+          return(message)
+        })
         
-        if(standardised_score() != 0){
-          str2 <- paste("Standardised connection score:", standardised_score())
-          str2
+        if (inherits(result, "character")) {
+          return(result)
         } else {
-          str2 <- paste("This node is unconnected")
-          str2
+          return("")
         }
-        
       })
+      
+      
+      
       
       str3 <- reactive({
+        result <- tryCatch({
+          if(is.nan(node_average_distance()) == FALSE){
+            str3 <- paste("Average node distance:", node_average_distance())
+            str3
+          } else {
+            str3 <- paste("This node is unconnected")
+            str3
+          }
+        }, error = function(e) {
+          message <- ""
+          return(message)
+        })
         
-        if(is.nan(node_average_distance()) == FALSE){
-          str3 <- paste("Average node distance:", node_average_distance())
-          str3
+        if (inherits(result, "character")) {
+          return(result)
         } else {
-          str3 <- paste("This node is unconnected")
-          str3
+          return("")
         }
-        
       })
       
-      str4 <- reactive({  
+      
+      str4 <- reactive({
+        result <- tryCatch({
+          if(is.nan(node_average_distance()) == FALSE){
+            str4 <- paste("The average degree of seperation in your network is:", round(network_mean_distance(), 2))
+            str4
+          } else {
+            str4 <- paste("This network has no connections between nodes")
+            str4
+          }
+        }, error = function(e) {
+          message <- ""
+          return(message)
+        })
         
-        if(is.nan(node_average_distance()) == FALSE){
-          str4 <- paste("The average degree of seperation in your network is:", round(network_mean_distance(), 2))  
-          str4
+        if (inherits(result, "character")) {
+          return(result)
         } else {
-          str4 <- paste("This network has no connections between nodes")
-          str4
-        }  
-        
+          return("")
+        }
       })
       
-      str5 <- reactive({  paste("The maximum distance (diameter) of your network is:", network_diameter())  })
+      
+      
+      str5 <- reactive({
+        result <- tryCatch({
+          paste("The maximum distance (diameter) of your network is:", network_diameter())
+        }, error = function(e) {
+          message <- ""
+          return(message)
+        })
+        
+        if (inherits(result, "character")) {
+          return(result)
+        } else {
+          return("")
+        }
+      })
+      
       
       output$htmlSave <- downloadHandler(
         filename = function() {
@@ -1927,11 +2269,32 @@ server <- function(input, output, session) {
       
       output$networkPlot <- renderVisNetwork({final_network()})
       
+      # output$networkPlot <- renderVisNetwork({
+      #   result <- tryCatch({
+      #     final_network()
+      #   }, error = function(e) {
+      #     # Print a general error message to the console for the developer
+      #     cat("Some error occurred, this is printing\n")
+      #     return(NULL)  # Return NULL to indicate an empty plot or do nothing
+      #   })
+      #   
+      #   if (inherits(result, "visNetwork")) {
+      #     # If no error occurred, return the result
+      #     return(result)
+      #   } else {
+      #     # Handle the case when an error occurred
+      #     # You can return an empty plot, do nothing, or take other actions here
+      #     return(NULL)
+      #   }
+      # })
+      
+      
+      
       #html_object <<- final_network() 
       
       #output$text <- renderText({  HTML(paste(str1(), str2(), str3(), str4(), str5(), sep = '<br/>'))  })
       
-      output$text <- renderText({  HTML(paste(str1(), str2(), str3(), str4(), str5(), sep = '<br/>'))  })
+      output$text <- renderText({  HTML(paste(str1(), str2(), str3(), str4(), str5(), sep = '<br/>'))  }) #
       
       ########## MAKING THE WEIGHTS DOWNLOAD ##########
       
@@ -2418,7 +2781,7 @@ server <- function(input, output, session) {
   #                        showConfirmButton = TRUE,
   #                        showCancelButton = FALSE,
   #                        confirmButtonText = "OK",
-  #                        confirmButtonCol = "#AEDEF4",
+  #                        confirmButtonCol = "#bce7fa",
   #                        timer = 0,
   #                        imageUrl = "",
   #                        animation = TRUE
@@ -2443,7 +2806,7 @@ server <- function(input, output, session) {
         showConfirmButton = TRUE,
         showCancelButton = FALSE,
         confirmButtonText = "OK",
-        confirmButtonCol = "#AEDEF4",
+        confirmButtonCol = "#bce7fa",
         timer = 0,
         imageUrl = "",
         animation = TRUE
@@ -2464,7 +2827,7 @@ server <- function(input, output, session) {
         showConfirmButton = TRUE,
         showCancelButton = FALSE,
         confirmButtonText = "OK",
-        confirmButtonCol = "#AEDEF4",
+        confirmButtonCol = "#bce7fa",
         timer = 0,
         imageUrl = "",
         animation = TRUE
@@ -2485,7 +2848,7 @@ server <- function(input, output, session) {
         showConfirmButton = TRUE,
         showCancelButton = FALSE,
         confirmButtonText = "OK",
-        confirmButtonCol = "#AEDEF4",
+        confirmButtonCol = "#bce7fa",
         timer = 0,
         imageUrl = "",
         animation = TRUE
@@ -2555,5 +2918,9 @@ server <- function(input, output, session) {
   # 
   # })
   
+  
+  observeEvent(input$egoNetwork, {
+    print(paste0("EgoNetwork Value: ", input$egoNetwork))
+  })
 }  
 

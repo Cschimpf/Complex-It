@@ -25,8 +25,32 @@ library(crayon)
 library(shinydashboard)
 library(zip)
 library(rintrojs)
+library(fresh)
+library(plotly)
+library(DT)
+library(shinycssloaders)
 
+mytheme <- create_theme(
+  adminlte_color(
+    light_blue = "#bce7fa"
+  ),
+  adminlte_sidebar(
+    width = "400px",
+    dark_bg = "#FFFFFF",
+    dark_hover_bg = "#EEEEEE",
+    dark_color = "#000000", 
+    dark_hover_color = "#000000", 
+    dark_submenu_color = "#000000", 
+    dark_submenu_hover_color = "#000000"
+  ),
+  adminlte_global(
+    content_bg = "#FAFAFA",
+    box_bg = "#FFFFFF", 
+    info_box_bg = "#FFFFFF"
+  )
+)
 
+options(spinner.type = 1, spinner.color = "#bce7fa", size = 2)
 
 # here is the first option using shiny themes:  
 ui <- dashboardPage(
@@ -37,18 +61,23 @@ ui <- dashboardPage(
   
   dashboardSidebar(
     
+    tags$style(HTML(".main-sidebar .sidebar .sidebar-menu .treeview-menu li.active a {background-color: #FFFFFF !important;}")),
+    tags$style(HTML(".main-sidebar .sidebar .sidebar-menu .treeview-menu li:hover a {background-color: #EEEEEE !important;}")),
+    
     width = 375,
     
     sidebarMenu(
+
+      HTML('<img src="Complexit_LOGO4.png" style="margin-bottom: 20px;margin-top: 10px; display: block; margin-left: auto; margin-right: auto;">'),
       
       id = 'tabs',
       
-      menuItem("Build Your Model",
-               menuSubItem("Import Cases", tabName = "importing"),
-               menuSubItem("Cluster Your Cases", tabName = "cluster_cases")
+      menuItem("Import Your Cases",
+               menuSubItem("Import Cases", tabName = "importing")
       ), 
       
-      menuItem("Confirm and Explore Your Model",
+      menuItem("Build, Confirm and Explore Your Model",
+               menuSubItem("Cluster Your Cases", tabName = "cluster_cases"),
                menuSubItem("Use AI to Confirm Clusters", tabName = "AI_clusters"),
                menuSubItem("Compare and Visualise Your Results", tabName = "compare_and_visualise")
       ), 
@@ -76,11 +105,49 @@ ui <- dashboardPage(
   ),
   dashboardBody(
     
+    useShinyjs(),
+    
+    use_theme(mytheme),
+    
     tags$head(tags$style(HTML('
 .box {margin-top: 2px;margin-left: 0px; margin-right: 0px; margin-bottom:2px;padding:-10px}'
     ))),
     
+    tags$head(tags$style(HTML('
+        .skin-blue .main-header .navbar .sidebar-toggle {
+          color: #000000;
+        }
+      '))),
+    
+    tags$head(tags$style(HTML('
+        .skin-blue .main-header .logo {
+          color: #000000;
+        }
+      '))),
+    
+    
+    # tags$style("#varchoice ~ .selectize-control .select-input {
+    # max-height: 150px;
+    # overflow-y: auto;
+    #                 }"),
+    
+    # tags$head(
+    #   tags$style(HTML("#trainnotice_advanced_trigger {text-align: center;}"))),
+    # 
+    # tags$head(
+    #   tags$style(HTML("#trainnotice_advanced_info {text-align: center;}"))),
+    
+    # tags$head(
+    #   tags$style(HTML("#kmeans_title {text-align: center;}"))),
+    
     tags$style(HTML(".full-width-button { width: 100%; }")),
+    
+    tags$style("
+#varchoice ~ .selectize-control .selectize-input {
+  max-height: 100px;
+  overflow-y: auto;
+}
+"),
 
     introjsUI(),
 
@@ -121,9 +188,9 @@ ui <- dashboardPage(
                                        c("Comma","Semicolon","Tab","Space"), 'Comma'),
                            
                            uiOutput("varchoice"),
-                           numericInput('nrow.preview','Number of rows in the preview:',20, min = 1, max = 100),
-                           numericInput('ncol.preview', 'Number of columns in the preview:',
-                                        10,min = 1, max = 100),
+                           # numericInput('nrow.preview','Number of rows in the preview:',20, min = 1, max = 100),
+                           # numericInput('ncol.preview', 'Number of columns in the preview:',
+                           #              10,min = 1, max = 100),
                            helpText("Note: Even if the preview only shows a restricted
                                         number of observations, the map will be based on the full dataset.")
                            
@@ -135,7 +202,7 @@ ui <- dashboardPage(
                 
                 column(9, 
                        
-                       tableOutput("view")
+                       DTOutput("view")
                        
                 )
               )
@@ -150,7 +217,7 @@ ui <- dashboardPage(
               
               br(),
               
-              verbatimTextOutput("kmean_warning"),
+              #verbatimTextOutput("kmean_warning"),
               
               fluidRow(
                 
@@ -177,10 +244,10 @@ ui <- dashboardPage(
                                     style = "margin-bottom: 5px;
                                                      margin-top: 5px;"),
                          
-                         helpText("Select display options."),
+                         #helpText("Select display options."),
                          
-                         checkboxInput('silhouette', 'Silhouette?'),
-                         checkboxInput('pseudo_f', 'Pseudo F?'),
+                         #checkboxInput('silhouette', 'Silhouette?'),
+                         #checkboxInput('pseudo_f', 'Pseudo F?'),
                          
                          numericInput(inputId = "clusters", label = "Select the number of clusters", value = 2, min = 2),
                          
@@ -196,14 +263,27 @@ ui <- dashboardPage(
                        ), 
                 
                 
-                column(9, 
+                column(9, align="center",
                        
-                       uiOutput("kmeans_title"), #title for the table
-                       tableOutput("kmeans_tab"),
-                       br(),
-                       textOutput("pseudoF"),
-                       br(),
-                       plotOutput(outputId = "kmeans_silh", inline=TRUE)
+                       
+                       tabsetPanel(type = 'tabs', 
+                                   
+                                   tabPanel('K-Means Clusters', 
+                                            uiOutput("kmeans_title"), #title for the table
+                                           DTOutput("kmeans_tab")), 
+                                   
+                                   tabPanel('Additional Statistics', 
+                                            textOutput("pseudoF"),
+                                            br(),
+                                            plotOutput(outputId = "kmeans_silh", inline=TRUE))
+                                   )
+                       
+                       # uiOutput("kmeans_title"), #title for the table
+                       # tableOutput("kmeans_tab"),
+                       # br(),
+                       # textOutput("pseudoF"),
+                       # br(),
+                       # plotOutput(outputId = "kmeans_silh", inline=TRUE)
                        
                        )
                        
@@ -219,7 +299,7 @@ ui <- dashboardPage(
               
               tags$h4(HTML("Here we will use the Self-Organising Map AI to explore further your k-means cluster solution"), style = "text-align: center;"),
               
-              verbatimTextOutput("som_warning"),
+              #verbatimTextOutput("som_warning"),
               
               br(),
               
@@ -268,11 +348,17 @@ ui <- dashboardPage(
                        
                        ),
                 
-                column(9,
+                column(9, align="center", 
                        
-                       uiOutput("trainnotice"),
+                       uiOutput("trainnotice_header"),
                        
-                       plotOutput(outputId = "som_3Dplot", width = "50%", height = "500px")
+                       br(),
+                       
+                       uiOutput("trainnotice_advanced_trigger"),
+                       
+                       uiOutput("trainnotice_advanced_info")
+                       
+                       #plotOutput(outputId = "som_3Dplot", width = "50%", height = "500px")
                        
                        )
                 
@@ -337,7 +423,7 @@ ui <- dashboardPage(
                               actionButton("infoButton_plot_map", "Info", class = "full-width-button")
                               
                               )
-                )
+                       )
                 
               ),
               # conditionalPanel("input.somplottype == 'boxplot'",
@@ -347,40 +433,43 @@ ui <- dashboardPage(
               #                              choices= "(Not Available)", 
               #                              multiple= TRUE)),
              
-              conditionalPanel(
-                condition = "input.somplottype == 'boxplot'",
-                plotlyOutput("somplot_box", height = "800px", width = "1200px")
+              column(12, align="center",
+                     
+                     
+                     conditionalPanel(
+                       condition = "input.somplottype == 'boxplot'",
+                       withSpinner(plotlyOutput("somplot_box", height = "600px"))  #, width = "1000px"
+                     ),
+                     conditionalPanel(
+                       condition = "input.somplottype == 'names'",
+                       withSpinner(plotOutput("somplot_names", height = "600px"))
+                     ),
+                     conditionalPanel(
+                       condition = "input.somplottype == 'color'",
+                       withSpinner(plotOutput("somplot_color", height = "600px"))
+                     ),
+                     conditionalPanel(
+                       condition = "input.somplotwhat == 'obs' && input.somplottype == 'barplot'",
+                       withSpinner(plotlyOutput("somplot_obs_bar", height = "600px"))
+                     ),
+                     conditionalPanel(
+                       condition = "input.somplotwhat == 'prototypes' && input.somplottype == '3d'",
+                       withSpinner(plotlyOutput("somplot_3d", height = "600px"))
+                     ),
+                     conditionalPanel(
+                       condition = "input.somplotwhat == 'prototypes' && input.somplottype == 'smooth.dist'",
+                       withSpinner(plotlyOutput("somplot_smooth_dist", height = "600px"))
+                     ),
+                     conditionalPanel(
+                       condition = "input.somplotwhat == 'prototypes' && input.somplottype == 'barplot'",
+                       withSpinner(plotlyOutput("somplot_prototypes_bar", height = "600px"))
+                     ),
+                     conditionalPanel(
+                       condition = "input.somplotwhat == 'prototypes' && input.somplottype == 'umatrix'",
+                       withSpinner(plotOutput("somplot_umatrix", height = "600px"))
+                     )
+                   )
               ),
-              conditionalPanel(
-                condition = "input.somplottype == 'names'",
-                plotOutput("somplot_names")
-              ),
-              conditionalPanel(
-                condition = "input.somplottype == 'color'",
-                plotOutput("somplot_color")
-              ),
-              conditionalPanel(
-                condition = "input.somplotwhat == 'obs' && input.somplottype == 'barplot'",
-                plotlyOutput("somplot_obs_bar")
-              ),
-              conditionalPanel(
-                condition = "input.somplotwhat == 'prototypes' && input.somplottype == '3d'",
-                plotlyOutput("somplot_3d", height = "800px", width = "1200px")
-              ),
-              conditionalPanel(
-                condition = "input.somplotwhat == 'prototypes' && input.somplottype == 'smooth.dist'",
-                plotlyOutput("somplot_smooth_dist", height = "800px", width = "1200px")
-              ),
-              conditionalPanel(
-                condition = "input.somplotwhat == 'prototypes' && input.somplottype == 'barplot'",
-                plotlyOutput("somplot_prototypes_bar")
-              ),
-              conditionalPanel(
-                condition = "input.somplotwhat == 'prototypes' && input.somplottype == 'umatrix'",
-                plotOutput("somplot_umatrix")
-              )
-              
-      ),
       
       ##### SCENARIOS TAB #####
       tabItem("scenarios",
@@ -392,7 +481,7 @@ ui <- dashboardPage(
               
               br(),
               
-              verbatimTextOutput("Agent_Warning"),
+              #verbatimTextOutput("Agent_Warning"),
               fluidRow(
                 column(3,
                        
@@ -451,7 +540,7 @@ ui <- dashboardPage(
                        
                 ),
                 column(9,
-                       #conditionalPanel("input.Agent_Setup > 0",
+                       conditionalPanel("input.Agent_Setup > 0",
                                         
                                         
                                         tabsetPanel(type = 'tabs', 
@@ -468,7 +557,7 @@ ui <- dashboardPage(
                                                     tabPanel('Agent SOM Plot', plotOutput("agent_somplot"))
                                                     
                                                     )
-                                        
+                       ) #Could comment this out so it by default shows the options
                                         
                        ))
               
@@ -480,7 +569,7 @@ ui <- dashboardPage(
               
               tags$h4(HTML("Here we will use your trained SOM GRID (TAB 4) to predict the cluster profile(s) that best represent a new set of cases"), style = "text-align: center;"),
 
-              verbatimTextOutput("Predict_Warning"),
+              #verbatimTextOutput("Predict_Warning"),
               
               br(),
               
@@ -517,7 +606,7 @@ ui <- dashboardPage(
                            
                            checkboxInput('load_prev_som', 'Use Previous SOM Solution? If unchecked it will use SOM solution from this session.'),
                            
-                           numericInput("nrow.result_pred","Number of rows in the results:" ,20, min = 1, max = 100)
+                           #numericInput("nrow.result_pred","Number of rows in the results:" ,20, min = 1, max = 100)
                            
                            )
                        
@@ -530,7 +619,7 @@ ui <- dashboardPage(
                        
                        tabsetPanel(type = 'tabs', 
                                    
-                                   tabPanel('Table of Predictions', tableOutput("view_predict")), 
+                                   tabPanel('Table of Predictions', DTOutput("view_predict")), 
                                    
                                    tabPanel('Prediction SOM Plot', plotOutput("predict_somplot"))
                                    
@@ -557,7 +646,7 @@ ui <- dashboardPage(
     
                  The map is generated using the <a href='https://dictionary.apa.org/zero-order-correlation'>zero-order correlations</a> amongst your variables."), style = "text-align: center;"),
               
-              verbatimTextOutput("network_warning"),
+              #verbatimTextOutput("network_warning"),
               
               
               fluidRow(
@@ -689,7 +778,7 @@ ui <- dashboardPage(
                                     data.intro = "Here you can filter for what threshold of positive or negative correlation must be achieved for a connection to be drawn between your nodes."),
                            
                            
-                           introBox(# Adding dropdown to change network ----
+                           introBox(# Adding dropdown to change network ---- 
                                     selectInput("layout", "Choose layout algorithm:",
                                                 c("Circle" = "layout_in_circle",
                                                   "Random" = "layout_randomly",
@@ -807,7 +896,7 @@ ui <- dashboardPage(
                                data.intro = "Here you can set how many degrees away from your ego-network node you will show in your network.")),
                          
                          data.step = 11,
-                         data.intro = "[INSERT TEXT FOR EGO NETWORK]" ),
+                         data.intro = "Here you can create an ego-network of as many desired degrees of separation from a chosen node." ),
                        
                        
                                               actionButton(inputId = "egoNetwork", label = "Show / Hide"),
@@ -846,7 +935,7 @@ ui <- dashboardPage(
                                       data.intro = "Here you can select what nodes you want to show a shortest path to and from. If you add weights these will be considered when showing you your shortest paths." )),
                          
                                 data.step = 14,
-                                data.intro = "[INSERT TEXT FOR EGO NETWORK]" ),
+                                data.intro = "Here you can show the shortest path between two nodes, if a path exists." ),
                        
                        actionButton(inputId = "shortestPaths", label = "Show / Hide"),
                        ######################## EGO NETWORK CHECKBOX END ########################
@@ -899,7 +988,7 @@ ui <- dashboardPage(
                          
                          
                                 data.step = 17,
-                                data.intro = "[INSERT WEIGHTS BOX INFO]"),
+                                data.intro = "Here you can add weights to the connections between your nodes, which will be factored into any shortest path calculations."),
                        
                        actionButton(inputId = "weightsOptions", label = "Show / Hide"),
                        
@@ -952,7 +1041,7 @@ ui <- dashboardPage(
                              ),
                          
                          data.step = 21,
-                         data.intro = "[INSERT EXPORT BOX INSTRUCTIONS]"),
+                         data.intro = "Here you can add annotations to your network and export the network as an interactive HMTL file or export the underlying data"),
                        
                        
                        
