@@ -486,6 +486,24 @@ server <- function(input, output, session) {
       
     })
     
+    
+    
+    output$som_3Dplot <- renderPlot({
+      
+      #browser()
+      
+      SOM_SC <- superClass(sommap=som_solution$current_som_solution, method='complete', k=input$som_3Dplot_superclusters)
+      
+      plot(SOM_SC, what='prototypes', type='dendrogram')
+      
+    })
+    
+    
+    
+    
+    
+    
+    
     #   output$trainnotice_advanced_table <- renderUI({
     #
     #     shinyjs::hidden(
@@ -1705,7 +1723,7 @@ server <- function(input, output, session) {
       
       print('Line 3021 printing')
       
-      browser()
+      #browser()
       
       #rawcases <-
       #  if (!is.null(input$file1) && !is.null(current_data_file)) {
@@ -2381,11 +2399,11 @@ server <- function(input, output, session) {
         file_names <- c(file_names, predict_files)
         info_text <-c(info_text,predict_files)
       }
-      # if(is.null(network_initialised) == FALSE){
-      #   file_names <- c(file_names, systems_mapping_files)
-      #   info_text <-c(info_text,systems_mapping_files)
-      # 
-      # }
+      if(is.null(systems_mapping_values$network_initialised) == FALSE){
+        file_names <- c(file_names, systems_mapping_files)
+        info_text <-c(info_text,systems_mapping_files)
+
+      }
       
       fs <-file_names
       fileConn<-file("info.txt")
@@ -2482,23 +2500,23 @@ server <- function(input, output, session) {
         
       }
       
-      # if(is.null(network_initialised) == FALSE){
-      # 
-      #   write.csv(nodes4_download, file ="nodes_list.csv")
-      # 
-      #   links5_download <- links5_download[, !(names(links5_download) %in% c("color", "width"))]
-      # 
-      #   links5_download$to <- names(dynamic_nodes_ids)[match(links5_download$to, dynamic_nodes_ids)]
-      #   links5_download$from <- names(dynamic_nodes_ids)[match(links5_download$from, dynamic_nodes_ids)]
-      # 
-      #   write.csv(links5_download, file ="edges_list.csv")
-      # 
-      #   fileConn<-file("set_network_seed.txt")
-      #   set_seed_info <- paste('Seed set for network visualisation is: ', user_set_seed, sep = '')
-      #   writeLines(set_seed_info, fileConn)
-      #   close(fileConn)
-      # 
-      # }
+      if(is.null(systems_mapping_values$network_initialised) == FALSE){
+
+        write.csv(systems_mapping_values$nodes4_download, file ="nodes_list.csv")
+
+        systems_mapping_values$links5_download <- systems_mapping_values$links5_download[, !(names(systems_mapping_values$links5_download) %in% c("color", "width"))]
+
+        systems_mapping_values$links5_download$to <- names(dynamic_nodes_ids_values$dynamic_nodes_ids)[match(systems_mapping_values$links5_download$to, dynamic_nodes_ids_values$dynamic_nodes_ids)]
+        systems_mapping_values$links5_download$from <- names(dynamic_nodes_ids_values$dynamic_nodes_ids)[match(systems_mapping_values$links5_download$from, dynamic_nodes_ids_values$dynamic_nodes_ids)]
+
+        write.csv(systems_mapping_values$links5_download, file ="edges_list.csv")
+
+        fileConn<-file("set_network_seed.txt")
+        set_seed_info <- paste('Seed set for network visualisation is: ', systems_mapping_values$user_set_seed, sep = '')
+        writeLines(set_seed_info, fileConn)
+        close(fileConn)
+
+      }
       
       zip(zipfile=fname, files=fs)
     },

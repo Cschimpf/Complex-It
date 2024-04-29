@@ -54,6 +54,7 @@ library(DT)
 library(fresh)
 library(plotly)
 library(shinycssloaders)
+library(shinyBS)
 
 mytheme <- create_theme(
   adminlte_color(
@@ -183,7 +184,7 @@ ui <- dashboardPage(
               
               tags$h3("STEP 1: IMPORTING YOUR DATABASE", style = "text-align: center;"),
               
-              tags$h4(HTML("Here you will upload your data"), style = "text-align: center;"),
+              tags$h4(HTML("Here you will upload your data. You can also create a conceptual systems map of your data if you like."), style = "text-align: center;"),
               
               
               p(HTML('For TUTORIALS on preparing and importing your data for COMPLEX-IT <a href= 
@@ -196,41 +197,81 @@ ui <- dashboardPage(
               
               br(), 
               
-              
-              fluidRow(
-                
-                column(3, 
-                       
-                       box(width = 12, 
-                           
-                           fileInput('file1', 'Choose CSV File', buttonLabel='Browse',accept = c(
-                             "text/csv",
-                             "text/comma-separated-values,text/plain",
-                             ".csv")
-                           ),
-                           checkboxInput('header', ' Header?', TRUE),
-                           selectInput('sep', 'Separator:',
-                                       c("Comma","Semicolon","Tab","Space"), 'Comma'),
-                           
-                           uiOutput("varchoice"),
-                           # numericInput('nrow.preview','Number of rows in the preview:',20, min = 1, max = 100),
-                           # numericInput('ncol.preview', 'Number of columns in the preview:',
-                           #              10,min = 1, max = 100),
-                           helpText("Note: Even if the preview only shows a restricted
+              bsCollapse(open="Import Your Data",
+                              
+                              bsCollapsePanel("Import Your Data", 
+                                              
+                                              div(
+                                                
+                                                style = "height: 50vh",
+                                                
+                                                fluidRow(
+                                                  
+                                                  column(3, 
+                                                         
+                                                         box(width = 12, 
+                                                             
+                                                             fileInput('file1', 'Choose CSV File', buttonLabel='Browse',accept = c(
+                                                               "text/csv",
+                                                               "text/comma-separated-values,text/plain",
+                                                               ".csv")
+                                                             ),
+                                                             checkboxInput('header', ' Header?', TRUE),
+                                                             selectInput('sep', 'Separator:',
+                                                                         c("Comma","Semicolon","Tab","Space"), 'Comma'),
+                                                             
+                                                             uiOutput("varchoice"),
+                                                             # numericInput('nrow.preview','Number of rows in the preview:',20, min = 1, max = 100),
+                                                             # numericInput('ncol.preview', 'Number of columns in the preview:',
+                                                             #              10,min = 1, max = 100),
+                                                             helpText("Note: Even if the preview only shows a restricted
                                         number of observations, the map will be based on the full dataset.")
-                           
-                       )
-                       
-                       
-                       
-                ), 
-                
-                column(9, 
-                       
-                       DTOutput("view")
-                       
-                )
-              )
+                                                             
+                                                         )
+                                                         
+                                                         
+                                                         
+                                                  ), 
+                                                  
+                                                  column(9, 
+                                                         
+                                                         DTOutput("view")
+                                                         
+                                                  )
+                                                )
+                                                
+                                              )
+                                              
+                              ),
+                              
+                              
+                              
+                              bsCollapsePanel("Create a Conceptual Systems Map of Your Data", 
+                                              
+                                              div(
+                                                
+                                                style = "height: 65vh",
+                                                
+                                                fluidRow(
+                                                  column(width = 12,
+                                                         tags$iframe(style="border: none; width: 100%; height: 600px",
+                                                                     src = "https://prsm.uk/prsm.html")
+                                                  )
+                                                )
+                                                
+                                              )
+                                              
+                              )
+                              
+                              )
+              
+
+              
+              
+              
+              
+              
+              
       ),
       
       ##### CLUSTER CASES TAB #####
@@ -379,11 +420,27 @@ ui <- dashboardPage(
                        
                        br(),
                        
-                       uiOutput("trainnotice_advanced_trigger"),
+                       tabsetPanel(type = 'tabs', 
+                                   
+                                   tabPanel("Dendrogram",
+                                            
+                                            numericInput("som_3Dplot_superclusters", "Number of superclusters:", 2,
+                                                         min = 2, max = 10), 
+                                            
+                                            plotOutput(outputId = "som_3Dplot", width = "50%", height = "500px")
+                                            
+                                            ), 
+                                   
+                                   tabPanel("Advanced Information", 
+                                            
+                                            uiOutput("trainnotice_advanced_trigger"),
+                                            
+                                            uiOutput("trainnotice_advanced_info")
+                                            
+                                            )
+                                   
+                                   )
                        
-                       uiOutput("trainnotice_advanced_info")
-                       
-                       #plotOutput(outputId = "som_3Dplot", width = "50%", height = "500px")
                        
                 )
                 
