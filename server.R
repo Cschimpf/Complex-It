@@ -459,13 +459,13 @@ server <- function(input, output, session) {
     
     output$trainnotice_advanced_info <- renderUI({
       
-      useShinyjs()
+      #useShinyjs()
       
       ### post the quality control factors as well
       qual_measures <- quality(som_solution$current_som_solution)
       anova_results <- retrieve_ANOVA_results(som_solution$current_som_solution)
       
-      shinyjs::hidden(
+      #shinyjs::hidden(
         div(id = "advanced_info",
             #now print out the results
             tagList(
@@ -482,7 +482,7 @@ server <- function(input, output, session) {
             ),
             renderDT(parsed_anova_results())
         )
-      )
+      #)
       
     })
     
@@ -492,13 +492,22 @@ server <- function(input, output, session) {
       
       #browser()
       
-      SOM_SC <- superClass(sommap=som_solution$current_som_solution, method='complete', k=input$som_3Dplot_superclusters)
+      SOM_SC <- superClass(sommap=som_solution$current_som_solution, method='ward.D', k=input$som_3Dplot_superclusters)
       
       plot(SOM_SC, what='prototypes', type='dendrogram')
       
     })
     
-    
+  
+    output$som_3DMap <- renderPlot({
+      
+      #browser()
+      
+      SOM_SC <- superClass(sommap=som_solution$current_som_solution, method='ward.D', k=input$som_3DMap_superclusters)
+      
+      plot(SOM_SC, what='prototypes', type='grid')
+      
+    })
     
     
     

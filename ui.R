@@ -94,12 +94,12 @@ ui <- dashboardPage(
     
     sidebarMenu(
       
-      HTML('<img src="Complexit_LOGO4.png" style="margin-bottom: 20px;margin-top: 10px; display: block; margin-left: auto; margin-right: auto;">'),
+      HTML('<img src="Complexit_LOGO4.jpg" style="margin-bottom: 20px;margin-top: 10px; display: block; margin-left: auto; margin-right: auto;">'),
       
       id = 'tabs',
       
-      menuItem("Import Your Cases",
-               menuSubItem("Import Cases", tabName = "importing")
+      menuItem("Import Your Cases and Map Your Theory",
+               menuSubItem("Import Cases and Map Theory", tabName = "importing")
       ), 
       
       menuItem("Build, Confirm and Explore Your Model",
@@ -112,11 +112,11 @@ ui <- dashboardPage(
                menuSubItem("Simulate Your Scenarios, Policies, or Interventions", tabName = "scenarios")
       ), 
       
-      menuItem("Data Forecasting",
+      menuItem("Forecast New Data",
                menuSubItem("Use AI to Predict the Cluster Membership of New Cases", tabName = "forecasting")
       ), 
       
-      menuItem("Systems Mapping",
+      menuItem("Explore Systems Map",
                menuSubItem("Use Systems Mapping to Explore Cluster Variables", tabName = "systems_mapping")
       ), 
       
@@ -182,12 +182,12 @@ ui <- dashboardPage(
       ##### IMPORT TAB #####
       tabItem("importing",
               
-              tags$h3("STEP 1: IMPORTING YOUR DATABASE", style = "text-align: center;"),
+              tags$h3("STEP 1: IMPORT YOUR DATABASE AND MAP YOUR THEORY", style = "text-align: center;"),
               
-              tags$h4(HTML("Here you will upload your data. You can also create a conceptual systems map of your data if you like."), style = "text-align: center;"),
+              tags$h4(HTML("Here you will upload your data. You can also create a conceptual systems map with of your data with PRSM."), style = "text-align: center;"),
               
               
-              p(HTML('For TUTORIALS on preparing and importing your data for COMPLEX-IT <a href= 
+              p(HTML('For TUTORIALS on preparing and importing your data for COMPLEX-IT and using the PRSM systems mapping tab <a href= 
                                                     "https://www.art-sciencefactory.com/tutorials.html"
                                       target="_blank">CLICK HERE</a>'), style = "text-align: center;"),
               
@@ -279,7 +279,7 @@ ui <- dashboardPage(
               
               tags$h3("STEP 2: CLUSTER YOUR CASES USING K-MEANS", style = "text-align: center;"), 
               
-              tags$h4(HTML("Here we will use the k-means clustering algorithm to group your cases into self-similar 'clusters'"), style = "text-align: center;"),
+              tags$h4(HTML("Here we will use cluster analysis to group your cases based on their different configurations of factors"), style = "text-align: center;"),
               
               br(),
               
@@ -421,26 +421,35 @@ ui <- dashboardPage(
                        br(),
                        
                        tabsetPanel(type = 'tabs', 
-                                   
-                                   tabPanel("Dendrogram",
-                                            
-                                            numericInput("som_3Dplot_superclusters", "Number of superclusters:", 2,
-                                                         min = 2, max = 10), 
-                                            
-                                            plotOutput(outputId = "som_3Dplot", width = "50%", height = "500px")
-                                            
-                                            ), 
+
                                    
                                    tabPanel("Advanced Information", 
                                             
                                             uiOutput("trainnotice_advanced_trigger"),
                                             
                                             uiOutput("trainnotice_advanced_info")
-                                            
-                                            )
+                                   ),
                                    
-                                   )
-                       
+                                   tabPanel("SOM Cluster Solution",
+                                            
+                                            numericInput("som_3Dplot_superclusters", "Number of superclusters:", 2,
+                                                         min = 2, max = 10), 
+                                            
+                                            plotOutput(outputId = "som_3Dplot", width = "80%", height = "500px")
+                                            
+                                            ),
+                                   
+                                   
+                                   tabPanel("Mapping SOM Cluster Solution",
+                                            
+                                            numericInput("som_3DMap_superclusters", "Number of superclusters:", 2,
+                                                         min = 2, max = 10), 
+                                            
+                                            plotOutput(outputId = "som_3DMap", width = "80%", height = "500px")
+                                            
+                                   ),
+                                   
+                                            )
                        
                 )
                 
@@ -453,7 +462,7 @@ ui <- dashboardPage(
       
       ##### COMPARE AND VISUALISE TAB #####
       tabItem("compare_and_visualise",
-              tags$h3("STEP 4: VISUALISING AND EXPLORING YOUR CLUSTER SOLUTIONS", style = "text-align: center;"),
+              tags$h3("STEP 4: VISUALISE AND EXPLORE YOUR CLUSTER AND AI SOLUTIONS", style = "text-align: center;"),
               
               tags$h4(HTML("Here we visualize the results of both your k-means and SOM AI  cluster solutions"), style = "text-align: center;"),
               
@@ -466,7 +475,8 @@ ui <- dashboardPage(
                        
                        selectInput("somplotwhat", "Plot what?", 
                                    choices= list("Observations"= "obs",
-                                                 "Prototypes"= "prototypes"))
+                                                 "Prototypes"= "prototypes"
+                                                 ))
                 ), 
                 
                 
@@ -489,23 +499,48 @@ ui <- dashboardPage(
                 ),
                 
                 
+                
+                
                 column(3, 
-                       
-                       column(6, 
-                              
-                              conditionalPanel("input.trainbutton > 0", 
-                                               actionButton("save_som", "Save SOM Results")), 
-                              
-                              uiOutput("save_som_notice") # SHOULD SAVE SOM BE IN THE PRIOR TAB?
-                              
-                       ), 
-                       
-                       column(6, 
-                              
-                              actionButton("infoButton_plot_map", "Info", class = "full-width-button")
-                              
+                       fluidRow(
+                         column(12, 
+                                conditionalPanel("input.trainbutton > 0", 
+                                                 actionButton("save_som", "Save SOM Results", class = "full-width-button")
+                                )
+                         ),
+                         column(12, 
+                                uiOutput("save_som_notice") # SHOULD SAVE SOM BE IN THE PRIOR TAB?
+                         )
+                       ),
+                       fluidRow(
+                         column(12, 
+                                actionButton("infoButton_plot_map", "Info", class = "full-width-button")
+                         )
                        )
                 )
+                
+                
+                
+                
+                
+                
+                # column(3, 
+                #        
+                #        column(6, 
+                #               
+                #               conditionalPanel("input.trainbutton > 0", 
+                #                                actionButton("save_som", "Save SOM Results")), 
+                #               
+                #               uiOutput("save_som_notice") # SHOULD SAVE SOM BE IN THE PRIOR TAB?
+                #               
+                #        ), 
+                #        
+                #        column(6, 
+                #               
+                #               actionButton("infoButton_plot_map", "Info", class = "full-width-button")
+                #               
+                #        )
+                # )
                 
               ),
               # conditionalPanel("input.somplottype == 'boxplot'",
@@ -549,13 +584,17 @@ ui <- dashboardPage(
                      conditionalPanel(
                        condition = "input.somplotwhat == 'prototypes' && input.somplottype == 'umatrix'",
                        withSpinner(plotOutput("somplot_umatrix", height = "600px"))
-                     )
+                     ) 
+#                     conditionalPanel(
+#                        condition = "input.somplotwhat == 'prototypes' && input.somplottype == 'grid'",
+#                        withSpinner(plotlyOutput("somplot_grid", height = "600px"))
+#                       )
               )
       ),
       
       ##### SCENARIOS TAB #####
       tabItem("scenarios",
-              tags$h3("STEP 5: USING YOUR MODEL TO RUN SCENARIO SIMULATIONS", style = "text-align: center;"), 
+              tags$h3("STEP 5: USING YOUR THEORY/MODEL TO RUN SCENARIO SIMULATIONS", style = "text-align: center;"), 
               
               tags$h4("Here we will use your model to explore different scenarios, policies, and interventions", style = "text-align: center;"),
               
@@ -647,7 +686,7 @@ ui <- dashboardPage(
       
       ##### FORECASTING TAB #####
       tabItem("forecasting",
-              tags$h3("STEP 6: USING YOUR SOM AI TO PREDICT THE CLUSTER MEMBERSHIP OF NEW CASES", style = "text-align: center;"), 
+              tags$h3("STEP 6: USE YOUR RESULTS TO PREDICT THE CLUSTER MEMBERSHIP OF NEW CASES", style = "text-align: center;"), 
               
               tags$h4(HTML("Here we will use your trained SOM GRID (TAB 4) to predict the cluster profile(s) that best represent a new set of cases"), style = "text-align: center;"),
               
@@ -846,7 +885,7 @@ ui <- dashboardPage(
                                          label = "Threshold for Negative Correlations:",
                                          min = 0,
                                          max = 1,
-                                         value = 0.7,
+                                         value = 0.2,
                                          step = 0.05),
                              
                              # Input: Slider for maximum correlation ----
@@ -854,7 +893,7 @@ ui <- dashboardPage(
                                          label = "Threshold for Positive Correlations:",
                                          min = 0,
                                          max = 1,
-                                         value = 0.5, 
+                                         value = 0.2, 
                                          step = 0.05),
                              data.step = 4,
                              data.intro = "Here you can filter for what threshold of positive or negative correlation must be achieved for a connection to be drawn between your nodes."),
