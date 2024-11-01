@@ -618,6 +618,8 @@ server <- function(input, output, session) {
   # Plot the SOM
   somplot_output_plot <- reactive({
     
+    browser()
+    
     tmp.view <- NULL
     if (input$somplottype =="boxplot") {
       # tmp.var <- (1:ncol(current_som_solution$data))[colnames(current_som_solution$data) %in%

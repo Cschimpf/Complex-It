@@ -243,10 +243,13 @@ ui <- dashboardPage(
                                               )
                                               
                               ),
-                              
-                              
+                  
                               
                               bsCollapsePanel("Create a Conceptual Systems Map of Your Data", 
+                                              
+                                              tags$h4(HTML("PLEASE SAVE YOUR PRSM FILE BEFORE USING AND OPEN PRSM IN ANOTHER WEB-BROWSER TAB"), style = "text-align: center; color: red"),
+                                              
+                                              br(),
                                               
                                               div(
                                                 
@@ -432,6 +435,12 @@ ui <- dashboardPage(
                                    
                                    tabPanel("SOM Cluster Solution",
                                             
+                                            h5("NOTE: The SOM Cluster Solution shown here is for its quadrant map 
+                                               (Default 5X5). This solution can be compared to the k-means solution 
+                                               for corroboration. It also shows how the SOM clusters are distributed 
+                                               across its map, which helps to decipher the data visualisation tab.", 
+                                               style = "text-align: center;"),
+                                            
                                             numericInput("som_3Dplot_superclusters", "Number of superclusters:", 2,
                                                          min = 2, max = 10), 
                                             
@@ -441,6 +450,12 @@ ui <- dashboardPage(
                                    
                                    
                                    tabPanel("Mapping SOM Cluster Solution",
+                                            
+                                            h5("NOTE: The SOM Cluster Solution shown here is for its quadrant map 
+                                               (Default 5X5). This solution can be compared to the k-means solution 
+                                               for corroboration. It also shows how the SOM clusters are distributed 
+                                               across its map, which helps to decipher the data visualisation tab.", 
+                                               style = "text-align: center;"),
                                             
                                             numericInput("som_3DMap_superclusters", "Number of superclusters:", 2,
                                                          min = 2, max = 10), 
