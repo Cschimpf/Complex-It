@@ -681,3 +681,22 @@ create_nice_ggplot <- function(superclusters_object, current_som_solution_object
   
   
 }  
+
+remove_xaxis_labels <- function(p) {
+  
+  x_axis_names <- names(p$x$layout)[grepl("^xaxis", names(p$x$layout))]
+  
+  code_to_append <- NULL
+  
+  for(xaxis in x_axis_names){
+    
+    code_to_append <- paste0(code_to_append,
+                             '%>% layout(', xaxis, '= list(showticklabels = FALSE, ticks=""),
+    margin = list(b = 20))'
+    )
+    
+  }
+  
+  eval(parse(text = paste0('p ', code_to_append)))
+  
+}

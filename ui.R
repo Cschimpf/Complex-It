@@ -1,9 +1,9 @@
 library(shiny)
+library(shinyBS)
 library(shinythemes)
 library(rhandsontable)
 suppressMessages(library(SOMbrero))
 library(cluster)
-library(rhandsontable)
 library(Hmisc)
 library(GGally)
 library(network)
@@ -14,7 +14,6 @@ library(intergraph)
 library(tibble)
 library(tidyr)
 library(tidyverse)
-library(shiny)
 library(shinyjs)
 library(visNetwork)
 library(shinyalert)
@@ -24,37 +23,9 @@ library(shinydashboard)
 library(zip)
 library(rintrojs)
 library(fresh)
-library(plotly)
 library(DT)
-library(shinycssloaders)
-suppressMessages(library(SOMbrero))
-library(cluster)
-library(rhandsontable)
-library(Hmisc)
-library(GGally)
-library(network)
-library(sna)
-library(ggplot2)
-library(igraph)
-library(intergraph)
-library(tibble)
-library(tidyr)
-library(tidyverse)
-library(shiny)
-library(shinyjs)
-library(visNetwork)
-library(shinyalert)
-library(htmltools)
-library(crayon)
-library(shinydashboard)
-library(zip)
-library(rintrojs)
-library(plotly)
-library(DT)
-library(fresh)
 library(plotly)
 library(shinycssloaders)
-library(shinyBS)
 library(ggfittext)
 
 mytheme <- create_theme(
@@ -183,18 +154,19 @@ ui <- dashboardPage(
       ##### IMPORT TAB #####
       tabItem("importing",
               
-              tags$h3("STEP 1: IMPORT YOUR DATABASE AND MAP YOUR THEORY", style = "text-align: center;"),
+              tags$h2("STEP 1: IMPORT YOUR DATABASE AND MAP YOUR THEORY", style = "text-align: center;"),
               
-              tags$h4(HTML("Here you will upload your data. You can also create a conceptual systems map with of your data with PRSM."), style = "text-align: center;"),
+              tags$h3(HTML("Here you will upload your data. <br> 
+                           You can also create a conceptual systems map with of your data using PRSM."), style = "text-align: center;"),
               
               
-              p(HTML('For TUTORIALS on preparing and importing your data for COMPLEX-IT and using the PRSM systems mapping tab <a href= 
+              h4(HTML('For TUTORIALS on preparing and importing your data for COMPLEX-IT and using the PRSM conceptual map <a href= 
                                                     "https://www.art-sciencefactory.com/tutorials.html"
                                       target="_blank">CLICK HERE</a>'), style = "text-align: center;"),
               
-              p(HTML('Your data must be in the form of a csv file. For more on creating csv files <a href= 
-                                                    "https://www.wikihow.com/Create-a-CSV-File"
-                                      target="_blank">CLICK HERE</a>'), style = "text-align: center;"),
+              # h4(HTML('Your data must be in the form of a .CSV file. For more on creating .CSV files <a href= 
+              #                                       "https://www.wikihow.com/Create-a-CSV-File"
+              #                         target="_blank">CLICK HERE</a>'), style = "text-align: center;"),
               
               br(), 
               
@@ -212,14 +184,16 @@ ui <- dashboardPage(
                                                          
                                                          box(width = 12, 
                                                              
-                                                             fileInput('file1', 'Choose CSV File', buttonLabel='Browse',accept = c(
-                                                               "text/csv",
-                                                               "text/comma-separated-values,text/plain",
-                                                               ".csv")
-                                                             ),
-                                                             checkboxInput('header', ' Header?', TRUE),
-                                                             selectInput('sep', 'Separator:',
-                                                                         c("Comma","Semicolon","Tab","Space"), 'Comma'),
+                                                             actionButton("show_modal", "Upload your data"),
+                                                             
+                                                             # fileInput('file1', 'Choose CSV File', buttonLabel='Browse',accept = c(
+                                                             #   "text/csv",
+                                                             #   "text/comma-separated-values,text/plain",
+                                                             #   ".csv")
+                                                             # ),
+                                                             # checkboxInput('header', ' Header?', TRUE),
+                                                             # selectInput('sep', 'Separator:',
+                                                             #             c("Comma","Semicolon","Tab","Space"), 'Comma'),
                                                              
                                                              uiOutput("varchoice"),
                                                              # numericInput('nrow.preview','Number of rows in the preview:',20, min = 1, max = 100),
@@ -281,9 +255,9 @@ ui <- dashboardPage(
       ##### CLUSTER CASES TAB #####
       tabItem("cluster_cases",
               
-              tags$h3("STEP 2: CLUSTER YOUR CASES USING K-MEANS", style = "text-align: center;"), 
+              tags$h2("STEP 2: CLUSTER YOUR CASES USING K-MEANS", style = "text-align: center;"), 
               
-              tags$h4(HTML("Here we will use cluster analysis to group your cases based on their different configurations of factors"), style = "text-align: center;"),
+              tags$h3(HTML("Here we will use cluster analysis to group your cases based on their different configurations of factors"), style = "text-align: center;"),
               
               br(),
               
@@ -340,12 +314,32 @@ ui <- dashboardPage(
                                    
                                    tabPanel('K-Means Clusters', 
                                             uiOutput("kmeans_title"), #title for the table
+                                            textOutput("pseudoF"),
                                             DTOutput("kmeans_tab")), 
                                    
                                    tabPanel('Additional Statistics', 
-                                            textOutput("pseudoF"),
-                                            br(),
-                                            plotOutput(outputId = "kmeans_silh", inline=TRUE))
+                                            
+                                            column(3, align="center",
+                                                   
+                                                   selectInput("k_means_plot", "What chart?", 
+                                                               choices= list("Jitter",
+                                                                             "Violin",
+                                                                             "Histogram",
+                                                                             "Silhouette")
+                                                               ),
+                                                   
+                                                   selectInput("k_means_cluster", "What cluster?", 
+                                                               choices = NULL
+                                                               )
+                                                   ),
+                                            
+                                            column(9, align="center", 
+                                                   
+                                                   plotOutput(outputId = "kmeans_silh", height = "600px")
+                                                   
+                                                   )
+                                            
+                                            )
                        )
                        
                        # uiOutput("kmeans_title"), #title for the table
@@ -365,9 +359,9 @@ ui <- dashboardPage(
       
       ##### AI CLUSTERS TAB #####
       tabItem("AI_clusters",
-              tags$h3("STEP 3: USING 'AI' TO CONFIRM YOUR CLUSTER SOLUTION", style = "text-align: center;"),
+              tags$h2("STEP 3: USING 'AI' TO CONFIRM YOUR CLUSTER SOLUTION", style = "text-align: center;"),
               
-              tags$h4(HTML("Here we will use the Self-Organising Map AI to explore further your k-means cluster solution"), style = "text-align: center;"),
+              tags$h3(HTML("Here we will use the Self-Organising Map AI to explore further your k-means cluster solution"), style = "text-align: center;"),
               
               #verbatimTextOutput("som_warning"),
               
@@ -420,16 +414,19 @@ ui <- dashboardPage(
                 
                 column(9, align="center", 
                        
-                       uiOutput("trainnotice_header"),
+                       # uiOutput("trainnotice_header"),
                        
                        br(),
                        
                        tabsetPanel(type = 'tabs', 
 
                                    
-                                   tabPanel("Advanced Information", 
+                                   tabPanel("Advanced Information",
                                             
-                                            uiOutput("trainnotice_advanced_trigger"),
+                                            uiOutput("trainnotice_header"),
+                                            
+                                            # uiOutput("trainnotice_advanced_trigger"),
+                                            actionButton(inputId = "advancedSOMinfo", label = "Show / Hide Advanced Information"),
                                             
                                             uiOutput("trainnotice_advanced_info")
                                    ),
@@ -478,9 +475,9 @@ ui <- dashboardPage(
       
       ##### COMPARE AND VISUALISE TAB #####
       tabItem("compare_and_visualise",
-              tags$h3("STEP 4: VISUALISE AND EXPLORE YOUR CLUSTER AND AI SOLUTIONS", style = "text-align: center;"),
+              tags$h2("STEP 4: VISUALISE AND EXPLORE YOUR CLUSTER AND AI SOLUTIONS", style = "text-align: center;"),
               
-              tags$h4(HTML("Here we visualize the results of both your k-means and SOM AI  cluster solutions"), style = "text-align: center;"),
+              tags$h3(HTML("Here we visualize the results of both your k-means and SOM AI cluster solutions"), style = "text-align: center;"),
               
               br(),
               
@@ -620,11 +617,11 @@ ui <- dashboardPage(
       
       ##### SCENARIOS TAB #####
       tabItem("scenarios",
-              tags$h3("STEP 5: USING YOUR THEORY/MODEL TO RUN SCENARIO SIMULATIONS", style = "text-align: center;"), 
+              tags$h2("STEP 5: USING YOUR THEORY/MODEL TO RUN SCENARIO SIMULATIONS", style = "text-align: center;"), 
               
-              tags$h4("Here we will use your model to explore different scenarios, policies, and interventions", style = "text-align: center;"),
-              
-              tags$h4("To do that, we will be using your k-means clusters and your SOM AI solution and grid.", style = "text-align: center;"),                             
+              tags$h3(HTML("Here we will use your model to explore different scenarios, policies, and interventions. <br>
+                           
+                           To do that, we will be using your k-means clusters and your SOM AI solution and grid."), style = "text-align: center;"),                 
               
               br(),
               
@@ -712,9 +709,9 @@ ui <- dashboardPage(
       
       ##### FORECASTING TAB #####
       tabItem("forecasting",
-              tags$h3("STEP 6: USE YOUR RESULTS TO PREDICT THE CLUSTER MEMBERSHIP OF NEW CASES", style = "text-align: center;"), 
+              tags$h2("STEP 6: USE YOUR RESULTS TO PREDICT THE CLUSTER MEMBERSHIP OF NEW CASES", style = "text-align: center;"), 
               
-              tags$h4(HTML("Here we will use your trained SOM GRID (TAB 4) to predict the cluster profile(s) that best represent a new set of cases"), style = "text-align: center;"),
+              tags$h3(HTML("Here we will use your trained SOM GRID (TAB 4) to predict the cluster profile(s) that best represent a new set of cases"), style = "text-align: center;"),
               
               #verbatimTextOutput("Predict_Warning"),
               
@@ -787,9 +784,9 @@ ui <- dashboardPage(
               # App title ----
               #titlePanel("STEP 8: USING SYSTEMS MAPPING TO EXPLORE CLUSTER VARIABLES"),
               
-              tags$h3("STEP 7: USING SYSTEMS MAPPING TO EXPLORE CLUSTER VARIABLES", style = "text-align: center;"), 
+              tags$h2("STEP 7: USING SYSTEMS MAPPING TO EXPLORE CLUSTER VARIABLES", style = "text-align: center;"), 
               
-              tags$h4(HTML("Here we will use Systems Mapping to visually explore the configuration of variables you used to cluster your data. <br>
+              tags$h3(HTML("Here we will use Systems Mapping to visually explore the configuration of variables you used to cluster your data. <br>
     
                  The map is generated using the <a href='https://dictionary.apa.org/zero-order-correlation'>zero-order correlations</a> amongst your variables."), style = "text-align: center;"),
               
@@ -1208,9 +1205,9 @@ ui <- dashboardPage(
       
       ##### GENERATE REPORT TAB #####
       tabItem("generate_report",
-              tags$h3("STEP 8: GENERATING A REPORT FROM YOUR VARIOUS ANALYSES", style = "text-align: center;"), 
+              tags$h2("STEP 8: GENERATING A REPORT FROM YOUR VARIOUS ANALYSES", style = "text-align: center;"), 
               
-              tags$h4(HTML("Here you be able to create and download a report of all your key statistical and visual information."), style = "text-align: center;"),
+              tags$h3(HTML("Here you be able to create and download a report of all your key statistical and visual information."), style = "text-align: center;"),
               
               p(HTML('For TUTORIALS on what is contained in a COMPLEX-IT report, <a href= 
                                     "https://www.art-sciencefactory.com/tutorials.html"
