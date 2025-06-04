@@ -510,28 +510,28 @@ server <- function(input, output, session) {
   
   cluster_text <- gsub("\n", "<br>", cluster_text) 
   
-  observe({
-    # Check if the tab "Using Sytems Mapping To Explore Cluster Variables" is selected
-    if (!is.null(input$tabs) && input$tabs == "cluster_cases" && !pop_ups$pop_up_clusters ) {
-      shinyalert(
-        title = "<u><b>Using the K-Means Clusters</b></u>",
-        text = cluster_text,
-        size = "l",
-        closeOnEsc = TRUE,
-        closeOnClickOutside = FALSE,
-        html = TRUE,
-        type = "info",
-        showConfirmButton = TRUE,
-        showCancelButton = FALSE,
-        confirmButtonText = "OK",
-        confirmButtonCol = "#bce7fa",
-        timer = 0,
-        imageUrl = "",
-        animation = TRUE
-      )
-      pop_ups$pop_up_clusters <- TRUE
-    }
-  })
+  # observe({
+  #   # Check if the tab "Using Sytems Mapping To Explore Cluster Variables" is selected
+  #   if (!is.null(input$tabs) && input$tabs == "cluster_cases" && !pop_ups$pop_up_clusters ) {
+  #     shinyalert(
+  #       title = "<u><b>Using the K-Means Clusters</b></u>",
+  #       text = cluster_text,
+  #       size = "l",
+  #       closeOnEsc = TRUE,
+  #       closeOnClickOutside = FALSE,
+  #       html = TRUE,
+  #       type = "info",
+  #       showConfirmButton = TRUE,
+  #       showCancelButton = FALSE,
+  #       confirmButtonText = "OK",
+  #       confirmButtonCol = "#bce7fa",
+  #       timer = 0,
+  #       imageUrl = "",
+  #       animation = TRUE
+  #     )
+  #     pop_ups$pop_up_clusters <- TRUE
+  #   }
+  # })
   
   observeEvent(input$infoButton_kmean, {
     shinyalert(
@@ -954,27 +954,27 @@ server <- function(input, output, session) {
   
   train_SOM_text <- gsub("\n", "<br>", train_SOM_text) # Convert newline characters to HTML line breaks
   
-  observe({
-    if (!is.null(input$tabs) && input$tabs == "AI_clusters" && !pop_ups$pop_up_SOM ) {
-      shinyalert(
-        title = "<u><b>Using the SOM AI</b></u>",
-        text = train_SOM_text,
-        size = "m",
-        closeOnEsc = TRUE,
-        closeOnClickOutside = FALSE,
-        html = TRUE,
-        type = "info",
-        showConfirmButton = TRUE,
-        showCancelButton = FALSE,
-        confirmButtonText = "OK",
-        confirmButtonCol = "#bce7fa",
-        timer = 0,
-        imageUrl = "",
-        animation = TRUE
-      )
-      pop_ups$pop_up_SOM <- TRUE
-    }
-  })
+  # observe({
+  #   if (!is.null(input$tabs) && input$tabs == "AI_clusters" && !pop_ups$pop_up_SOM ) {
+  #     shinyalert(
+  #       title = "<u><b>Using the SOM AI</b></u>",
+  #       text = train_SOM_text,
+  #       size = "m",
+  #       closeOnEsc = TRUE,
+  #       closeOnClickOutside = FALSE,
+  #       html = TRUE,
+  #       type = "info",
+  #       showConfirmButton = TRUE,
+  #       showCancelButton = FALSE,
+  #       confirmButtonText = "OK",
+  #       confirmButtonCol = "#bce7fa",
+  #       timer = 0,
+  #       imageUrl = "",
+  #       animation = TRUE
+  #     )
+  #     pop_ups$pop_up_SOM <- TRUE
+  #   }
+  # })
   
   observeEvent(input$infoButton_som, {
     shinyalert(
@@ -1158,12 +1158,12 @@ server <- function(input, output, session) {
             h3(paste("Advanced Information"), style = "text-align: center;"),
             #p(paste("Trained SOM ", format(Sys.time(),format="%Y-%m-%d-%H:%M:%S"),sep=" ")),
             h4(paste("Topo Error:  ", format(qual_measures$topographic,digits=4),sep=" ")),
-            h5(paste("Topo Error is...")),
+            # h5(paste("Topo Error is...")),
             h4(paste("Quant Error: ", format(qual_measures$quantization,digits=4),sep=" ")),
-            h5(paste("Quant Error is...")),
+            # h5(paste("Quant Error is...")),
             br(),
             h4(paste("ANOVA Results")),
-            h5(paste("ANOVA results are...")),
+            # h5(paste("ANOVA results are...")),
             #lapply(length(anova_results):1, function(i, y) { p(paste(y[i])) }, y=anova_results)
             
             h4(paste(anova_results[length(anova_results)])),
@@ -1242,27 +1242,27 @@ server <- function(input, output, session) {
   
   plot_map_text <- gsub("\n", "<br>", plot_map_text) # Convert newline characters to HTML line breaks
   
-  observe({
-    if (!is.null(input$tabs) && input$tabs == "compare_and_visualise" && !pop_ups$pop_up_plot_map ) {
-      shinyalert(
-        title = "<u><b>Using the SOM AI</b></u>",
-        text = plot_map_text,
-        size = "l",
-        closeOnEsc = TRUE,
-        closeOnClickOutside = FALSE,
-        html = TRUE,
-        type = "info",
-        showConfirmButton = TRUE,
-        showCancelButton = FALSE,
-        confirmButtonText = "OK",
-        confirmButtonCol = "#bce7fa",
-        timer = 0,
-        imageUrl = "",
-        animation = TRUE
-      )
-      pop_ups$pop_up_plot_map <- TRUE
-    }
-  })
+  # observe({
+  #   if (!is.null(input$tabs) && input$tabs == "compare_and_visualise" && !pop_ups$pop_up_plot_map ) {
+  #     shinyalert(
+  #       title = "<u><b>Using the SOM AI</b></u>",
+  #       text = plot_map_text,
+  #       size = "l",
+  #       closeOnEsc = TRUE,
+  #       closeOnClickOutside = FALSE,
+  #       html = TRUE,
+  #       type = "info",
+  #       showConfirmButton = TRUE,
+  #       showCancelButton = FALSE,
+  #       confirmButtonText = "OK",
+  #       confirmButtonCol = "#bce7fa",
+  #       timer = 0,
+  #       imageUrl = "",
+  #       animation = TRUE
+  #     )
+  #     pop_ups$pop_up_plot_map <- TRUE
+  #   }
+  # })
   
   observeEvent(input$infoButton_plot_map, {
     shinyalert(
@@ -1550,27 +1550,27 @@ server <- function(input, output, session) {
   
   new_prediction_text <- gsub("\n", "<br>", new_prediction_text) # Convert newline characters to HTML line breaks
   
-  observe({
-    if (!is.null(input$tabs) && input$tabs == "forecasting" && !pop_ups$pop_up_new_prediction ) {
-      shinyalert(
-        title = "<u><b>Using the Case Prediction Tab</b></u>",
-        text = new_prediction_text,
-        size = "l",
-        closeOnEsc = TRUE,
-        closeOnClickOutside = FALSE,
-        html = TRUE,
-        type = "info",
-        showConfirmButton = TRUE,
-        showCancelButton = FALSE,
-        confirmButtonText = "OK",
-        confirmButtonCol = "#bce7fa",
-        timer = 0,
-        imageUrl = "",
-        animation = TRUE
-      )
-      pop_ups$pop_up_new_prediction <- TRUE
-    }
-  })
+  # observe({
+  #   if (!is.null(input$tabs) && input$tabs == "forecasting" && !pop_ups$pop_up_new_prediction ) {
+  #     shinyalert(
+  #       title = "<u><b>Using the Case Prediction Tab</b></u>",
+  #       text = new_prediction_text,
+  #       size = "l",
+  #       closeOnEsc = TRUE,
+  #       closeOnClickOutside = FALSE,
+  #       html = TRUE,
+  #       type = "info",
+  #       showConfirmButton = TRUE,
+  #       showCancelButton = FALSE,
+  #       confirmButtonText = "OK",
+  #       confirmButtonCol = "#bce7fa",
+  #       timer = 0,
+  #       imageUrl = "",
+  #       animation = TRUE
+  #     )
+  #     pop_ups$pop_up_new_prediction <- TRUE
+  #   }
+  # })
   
   observeEvent(input$infoButton_new_prediction, {
     shinyalert(
@@ -1729,27 +1729,27 @@ server <- function(input, output, session) {
   
   
   
-  observe({
-    if (!is.null(input$tabs) && input$tabs == "scenarios" && !pop_ups$pop_up_scenarios ) {
-      shinyalert(
-        title = "<u><b>Using the Scenarios Tab</b></u>",
-        text = scenarios_text,
-        size = "l",
-        closeOnEsc = TRUE,
-        closeOnClickOutside = FALSE,
-        html = TRUE,
-        type = "info",
-        showConfirmButton = TRUE,
-        showCancelButton = FALSE,
-        confirmButtonText = "OK",
-        confirmButtonCol = "#bce7fa",
-        timer = 0,
-        imageUrl = "",
-        animation = TRUE
-      )
-      pop_ups$pop_up_scenarios <- TRUE
-    }
-  })
+  # observe({
+  #   if (!is.null(input$tabs) && input$tabs == "scenarios" && !pop_ups$pop_up_scenarios ) {
+  #     shinyalert(
+  #       title = "<u><b>Using the Scenarios Tab</b></u>",
+  #       text = scenarios_text,
+  #       size = "l",
+  #       closeOnEsc = TRUE,
+  #       closeOnClickOutside = FALSE,
+  #       html = TRUE,
+  #       type = "info",
+  #       showConfirmButton = TRUE,
+  #       showCancelButton = FALSE,
+  #       confirmButtonText = "OK",
+  #       confirmButtonCol = "#bce7fa",
+  #       timer = 0,
+  #       imageUrl = "",
+  #       animation = TRUE
+  #     )
+  #     pop_ups$pop_up_scenarios <- TRUE
+  #   }
+  # })
   
   observeEvent(input$infoButton_scenarios, {
     shinyalert(
@@ -2163,28 +2163,28 @@ server <- function(input, output, session) {
   
   systems_mapping_tab_button_pressed_tracker <- reactiveValues(pop_up_systems = FALSE, exportOptionsToggle=0, egoNetworkToggle=0, advancedOptionsToggle=0, shortestPathsToggle=0, weightsOptionsToggle=0)
   
-  observe({
-    # Check if the tab "Using Sytems Mapping To Explore Cluster Variables" is selected
-    if (!is.null(input$tabs) && input$tabs == "systems_mapping" && !systems_mapping_tab_button_pressed_tracker$pop_up_systems ) {
-      shinyalert(
-        title = "<u><b>Using the Map</b></u>",
-        text = text,
-        size = "m",
-        closeOnEsc = TRUE,
-        closeOnClickOutside = FALSE,
-        html = TRUE,
-        type = "info",
-        showConfirmButton = TRUE,
-        showCancelButton = FALSE,
-        confirmButtonText = "OK",
-        confirmButtonCol = "#bce7fa",
-        timer = 0,
-        imageUrl = "",
-        animation = TRUE
-      )
-      systems_mapping_tab_button_pressed_tracker$pop_up_systems <- TRUE
-    }
-  })
+  # observe({
+  #   # Check if the tab "Using Sytems Mapping To Explore Cluster Variables" is selected
+  #   if (!is.null(input$tabs) && input$tabs == "systems_mapping" && !systems_mapping_tab_button_pressed_tracker$pop_up_systems ) {
+  #     shinyalert(
+  #       title = "<u><b>Using the Map</b></u>",
+  #       text = text,
+  #       size = "m",
+  #       closeOnEsc = TRUE,
+  #       closeOnClickOutside = FALSE,
+  #       html = TRUE,
+  #       type = "info",
+  #       showConfirmButton = TRUE,
+  #       showCancelButton = FALSE,
+  #       confirmButtonText = "OK",
+  #       confirmButtonCol = "#bce7fa",
+  #       timer = 0,
+  #       imageUrl = "",
+  #       animation = TRUE
+  #     )
+  #     systems_mapping_tab_button_pressed_tracker$pop_up_systems <- TRUE
+  #   }
+  # })
   
   observeEvent(infoButton(), {
     shinyalert(
