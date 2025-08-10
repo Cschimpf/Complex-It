@@ -122,22 +122,7 @@ ui <- dashboardPage(
           color: #000000;
         }
       '))),
-    
-    
-    # tags$style("#varchoice ~ .selectize-control .select-input {
-    # max-height: 150px;
-    # overflow-y: auto;
-    #                 }"),
-    
-    # tags$head(
-    #   tags$style(HTML("#trainnotice_advanced_trigger {text-align: center;}"))),
-    # 
-    # tags$head(
-    #   tags$style(HTML("#trainnotice_advanced_info {text-align: center;}"))),
-    
-    # tags$head(
-    #   tags$style(HTML("#kmeans_title {text-align: center;}"))),
-    
+
     tags$style(HTML(".full-width-button { width: 100%; }")),
     
     tags$style("
@@ -163,11 +148,7 @@ ui <- dashboardPage(
               h4(HTML('For TUTORIALS on preparing and importing your data for COMPLEX-IT and using the PRSM conceptual map <a href= 
                                                     "https://www.art-sciencefactory.com/tutorials.html"
                                       target="_blank">CLICK HERE</a>'), style = "text-align: center;"),
-              
-              # h4(HTML('Your data must be in the form of a .CSV file. For more on creating .CSV files <a href= 
-              #                                       "https://www.wikihow.com/Create-a-CSV-File"
-              #                         target="_blank">CLICK HERE</a>'), style = "text-align: center;"),
-              
+
               br(), 
               
               bsCollapse(open="Import Your Data",
@@ -185,20 +166,9 @@ ui <- dashboardPage(
                                                          box(width = 12, 
                                                              
                                                              actionButton("show_modal", "Upload your data"),
-                                                             
-                                                             # fileInput('file1', 'Choose CSV File', buttonLabel='Browse',accept = c(
-                                                             #   "text/csv",
-                                                             #   "text/comma-separated-values,text/plain",
-                                                             #   ".csv")
-                                                             # ),
-                                                             # checkboxInput('header', ' Header?', TRUE),
-                                                             # selectInput('sep', 'Separator:',
-                                                             #             c("Comma","Semicolon","Tab","Space"), 'Comma'),
-                                                             
+
                                                              uiOutput("varchoice"),
-                                                             # numericInput('nrow.preview','Number of rows in the preview:',20, min = 1, max = 100),
-                                                             # numericInput('ncol.preview', 'Number of columns in the preview:',
-                                                             #              10,min = 1, max = 100),
+
                                                              helpText("Note: Even if the preview only shows a restricted
                                         number of observations, the map will be based on the full dataset.")
                                                              
@@ -261,100 +231,104 @@ ui <- dashboardPage(
               
               br(),
               
-              #verbatimTextOutput("kmean_warning"),
-              
               fluidRow(
                 
-                
-                column(3, 
-                       
-                       
+                column(3,
                        box(width = 12,
                            
-                           actionButton(inputId = "init_kmeans", label="Get Clusters", class = "full-width-button",
-                                        style = "foreground-color:white; 
-                                                     background-color:darksalmon;
-                                                     color:black;
-                                                     float:center;
-                                                     height: 50px;
-                                                     text-align:center;
-                                                     border-color:black;
-                                                     border-radius: 5px;
-                                                     border-width: 5px;
-                                                     margin-bottom: 5px;
-                                                     margin-top: 5px;"),
+                           introBox(
+                             actionButton(inputId = "init_kmeans",
+                                          label="Get Clusters",
+                                          class = "full-width-button",
+                                          style = "foreground-color:white;
+                                          background-color:darksalmon;
+                                          color:black;
+                                          float:center;
+                                          height: 50px;
+                                          text-align:center;
+                                          border-color:black;
+                                          border-radius: 5px;
+                                          border-width: 5px;
+                                          margin-bottom: 5px;
+                                          margin-top: 5px;")
+                             ),
                            
-                           actionButton("infoButton_kmean", "Info", class = "full-width-button",
-                                        style = "margin-bottom: 5px;
-                                                     margin-top: 5px;"),
+                           introBox(
+                             actionButton("infoButton_kmean",
+                                          "Info",
+                                          class = "full-width-button",
+                                          style = "margin-bottom: 5px;
+                                          margin-top: 5px;")
+                             ),
                            
-                           #helpText("Select display options."),
+                           actionButton("tour_kmeans",
+                                        "Guided Tour of Inputs",
+                                        class = "full-width-button",
+                                        style = "margin-bottom: 20px;
+                                        margin-top: 5px;"),
                            
-                           #checkboxInput('silhouette', 'Silhouette?'),
-                           #checkboxInput('pseudo_f', 'Pseudo F?'),
+                           introBox(
+                             numericInput(inputId = "clusters",
+                                          label = "Select the number of clusters",
+                                          value = 2,
+                                          min = 2)
+                             ),
                            
-                           numericInput(inputId = "clusters", label = "Select the number of clusters", value = 2, min = 2),
+                           introBox(
+                             radioButtons("setrandseedkmean",
+                                          HTML("Do you want to set a seed for reproducible results?"),
+                                          c("Yes", "No"),
+                                          selected = "No")
+                             ),
                            
-                           radioButtons("setrandseedkmean", HTML("Do you want to set a seed for reproducible results?"),c("Yes", "No"), selected = "No"),
                            conditionalPanel("input.setrandseedkmean == 'Yes'",
                                             numericInput("randseedkmean",
-                                                         HTML("Set a random seed."), sample(1:9999, size= 1), 
-                                                         min = 1, max = 9999))
-                           
-                           
-                       )
-                       
-                ), 
-                
+                                                         HTML("Set a random seed."),
+                                                         sample(1:9999, size= 1), 
+                                                         min = 1, max = 9999)
+                                            )
+                           )
+                       ),
                 
                 column(9, align="center",
                        
-                       
-                       tabsetPanel(type = 'tabs', 
-                                   
-                                   tabPanel('K-Means Clusters', 
-                                            uiOutput("kmeans_title"), #title for the table
-                                            textOutput("pseudoF"),
-                                            DTOutput("kmeans_tab")), 
-                                   
-                                   tabPanel('Additional Statistics', 
-                                            
-                                            column(3, align="center",
-                                                   
-                                                   selectInput("k_means_plot", "What chart?", 
-                                                               choices= list("Jitter",
-                                                                             "Violin",
-                                                                             "Histogram",
-                                                                             "Silhouette")
-                                                               ),
-                                                   
-                                                   selectInput("k_means_cluster", "What cluster?", 
-                                                               choices = NULL
-                                                               )
-                                                   ),
-                                            
-                                            column(9, align="center", 
-                                                   
-                                                   plotOutput(outputId = "kmeans_silh", height = "600px")
-                                                   
-                                                   )
-                                            
-                                            )
+                       introBox(
+                         tabsetPanel(
+                           type = 'tabs',
+                           
+                           tabPanel('K-Means Clusters',
+                                    uiOutput("kmeans_title"), #title for the table
+                                    textOutput("pseudoF"),
+                                    DTOutput("kmeans_tab")),
+                           
+                           tabPanel('Additional Charts',
+                                    
+                                    column(3, align="center",
+                                           selectInput("k_means_plot",
+                                                       "What chart?",
+                                                       choices= list("Jitter",
+                                                                     "Violin",
+                                                                     "Histogram",
+                                                                     "Silhouette")
+                                                       ),
+                                           
+                                           selectInput("k_means_cluster",
+                                                       "What cluster?",
+                                                       choices = NULL
+                                                       )
+                                           ),
+                                    
+                                    column(9, align="center",
+                                           plotOutput(outputId = "kmeans_silh",
+                                                      height = "600px")
+                                           )
+                                    )
+                           ),
+                         id = "kmeans_tabs_box"
+                         )
                        )
-                       
-                       # uiOutput("kmeans_title"), #title for the table
-                       # tableOutput("kmeans_tab"),
-                       # br(),
-                       # textOutput("pseudoF"),
-                       # br(),
-                       # plotOutput(outputId = "kmeans_silh", inline=TRUE)
-                       
                 )
-                
-                
-                
-              )
-      ),
+              ),
       
       
       ##### AI CLUSTERS TAB #####
@@ -363,108 +337,178 @@ ui <- dashboardPage(
               
               tags$h3(HTML("Here we will use the Self-Organising Map AI to explore further your k-means cluster solution"), style = "text-align: center;"),
               
-              #verbatimTextOutput("som_warning"),
-              
               br(),
               
-              
               fluidRow(
-                
                 column(3,
-                       
-                       box(width = 12, 
+                       box(width = 12,
+                           actionButton(
+                             "trainbutton",
+                             "Train SOM",
+                             class = "full-width-button",
+                             style = "foreground-color:white;
+                             background-color:darksalmon;
+                             color:black;
+                             float:center;
+                             height: 50px;
+                             text-align:center;
+                             border-color:black;
+                             border-radius: 5px;
+                             border-width: 5px;
+                             margin-bottom: 5px;
+                             margin-top: 5px;"
+                             ),
                            
-                           actionButton("trainbutton","Train SOM", class = "full-width-button",
-                                        style = "foreground-color:white; 
-                                                     background-color:darksalmon;
-                                                     color:black;
-                                                     float:center;
-                                                     height: 50px;
-                                                     text-align:center;
-                                                     border-color:black;
-                                                     border-radius: 5px;
-                                                     border-width: 5px;
-                                                     margin-bottom: 5px;
-                                                     margin-top: 5px;"),
+                           actionButton(
+                             "infoButton_som",
+                             "Info",
+                             class = "full-width-button",
+                             style = "margin-bottom: 5px; margin-top: 5px;"
+                             ),
                            
-                           actionButton("infoButton_som", "Info", class = "full-width-button",
-                                        style = "margin-bottom: 5px;
-                                                     margin-top: 5px;"),
+                           actionButton(
+                             "tour_som",
+                             "Guided Tour of Inputs",
+                             class = "full-width-button",
+                             style = "margin-bottom: 20px; margin-top: 5px;"
+                             ),
                            
-                           h4("Map Dimensions", style = "text-align: center;"),
+                           h4(
+                             "Map Dimensions",
+                             style = "text-align: center;"
+                             ),
                            
-                           numericInput("dimx", "Map dimension X:", 5, min= 3, max= 15),
-                           numericInput("dimy", "Map dimension Y:", 5, min= 3, max= 15),
+                           introBox(
+                             numericInput(
+                               "dimx",
+                               "Map dimension X:",
+                               5,
+                               min= 3,
+                               max= 15
+                               ),
+                             
+                             numericInput(
+                               "dimy",
+                               "Map dimension Y:",
+                               5,
+                               min= 3,
+                               max= 15
+                               ),
+                             
+                             id = "som_dimensions"
+                             
+                             ),
                            
-                           h4("Advanced Options", style = "text-align: center;"),
-                           uiOutput("initproto"),
-                           numericInput("maxit", "Max. iterations:", 500),
-                           uiOutput("scaling"), 
-                           numericInput("eps0", "Scaling value for gradient descent", 1,
-                                        min= 0.01, step= .01),
-                           radioButtons("setrandseed", HTML("Do you want to set a seed for reproducible results?"),c("Yes", "No"), selected = "No"),
-                           conditionalPanel("input.setrandseed == 'Yes'",
-                                            numericInput("randseed",
-                                                         HTML("Set a random seed."), sample(1:9999, size= 1), 
-                                                         min = 1, max = 9999))
+                           introBox(
+                             h4(
+                               "Advanced Options",
+                               style = "text-align: center;"
+                               ),
+                             
+                             uiOutput(
+                               "initproto"
+                               ),
+                             
+                             numericInput(
+                               "maxit",
+                               "Max. iterations:",
+                               500
+                               ),
+                             
+                             uiOutput(
+                               "scaling"
+                               ), 
+                             
+                             numericInput(
+                               "eps0",
+                               "Scaling value for gradient descent",
+                               1,
+                               min = 0.01,
+                               step = .01
+                               ),
+                             
+                             id="advanced_options_intro"
+                             
+                             ),
                            
-                       )
-                       
-                ),
+                           radioButtons(
+                             "setrandseed",
+                             HTML("Do you want to set a seed for reproducible results?"),
+                             c("Yes", "No"),
+                             selected = "No"
+                             ),
+                           
+                           conditionalPanel(
+                             "input.setrandseed == 'Yes'",
+                             numericInput(
+                               "randseed",
+                               HTML("Set a random seed."),
+                               sample(1:9999, size= 1),
+                               min = 1,
+                               max = 9999
+                               )
+                             )
+                           )
+                       ),
                 
                 column(9, align="center", 
                        
-                       # uiOutput("trainnotice_header"),
-                       
                        br(),
                        
-                       tabsetPanel(type = 'tabs', 
-
-                                   
-                                   tabPanel("Advanced Information",
-                                            
-                                            uiOutput("trainnotice_header"),
-                                            
-                                            # uiOutput("trainnotice_advanced_trigger"),
-                                            actionButton(inputId = "advancedSOMinfo", label = "Show / Hide Advanced Information"),
-                                            
-                                            uiOutput("trainnotice_advanced_info")
-                                   ),
-                                   
-                                   tabPanel("SOM Cluster Solution",
-                                            
-                                            h5("NOTE: The SOM Cluster Solution shown here is for its quadrant map 
-                                               (Default 5X5). This solution can be compared to the k-means solution 
-                                               for corroboration. It also shows how the SOM clusters are distributed 
-                                               across its map, which helps to decipher the data visualisation tab.", 
-                                               style = "text-align: center;"),
-                                            
-                                            numericInput("som_3Dplot_superclusters", "Number of superclusters:", 2,
-                                                         min = 2, max = 10), 
-                                            
-                                            plotOutput(outputId = "som_3Dplot", width = "80%", height = "500px")
-                                            
-                                            ),
-                                   
-                                   
-                                   tabPanel("Mapping SOM Cluster Solution",
-                                            
-                                            h5("NOTE: The SOM Cluster Solution shown here is for its quadrant map 
-                                               (Default 5X5). This solution can be compared to the k-means solution 
-                                               for corroboration. It also shows how the SOM clusters are distributed 
-                                               across its map, which helps to decipher the data visualisation tab.", 
-                                               style = "text-align: center;"),
-                                            
-                                            numericInput("som_3DMap_superclusters", "Number of superclusters:", 2,
-                                                         min = 2, max = 10), 
-                                            
-                                            plotOutput(outputId = "som_3DMap", width = "80%", height = "500px")
-                                            
-                                   ),
-                                   
-                                            )
+                       introBox(
+                         tabsetPanel(type = 'tabs',
+                                     tabPanel("Advanced Information",
+                                              uiOutput("trainnotice_header"),
+                                              actionButton(inputId = "advancedSOMinfo",
+                                                           label = "Show / Hide Advanced Information"),
+                                              uiOutput("trainnotice_advanced_info")
+                                     ),
+                                     
+                                     tabPanel("SOM Cluster Solution",
+                                     
+                                     h5("NOTE: The SOM Cluster Solution shown here is for its quadrant map
+                                     (Default 5X5). This solution can be compared to the k-means solution 
+                                     for corroboration. It also shows how the SOM clusters are distributed 
+                                     across its map, which helps to decipher the data visualisation tab.",
+                                        style = "text-align: center;"),
+                                     
+                                     numericInput("som_3Dplot_superclusters",
+                                                  "Number of superclusters:",
+                                                  2,
+                                                  min = 2,
+                                                  max = 10),
+                                     
+                                     plotOutput(outputId = "som_3Dplot",
+                                                width = "80%",
+                                                height = "500px")
+                                              
+                                     ),
+                                     
+                                     tabPanel("Mapping SOM Cluster Solution",
+                                     
+                                     h5("NOTE: The SOM Cluster Solution shown here is for its quadrant map 
+                                     (Default 5X5). This solution can be compared to the k-means solution 
+                                     for corroboration. It also shows how the SOM clusters are distributed 
+                                     across its map, which helps to decipher the data visualisation tab.", 
+                                        style = "text-align: center;"),
+                                     
+                                     numericInput("som_3DMap_superclusters",
+                                                  "Number of superclusters:",
+                                                  2,
+                                                  min = 2,
+                                                  max = 10),
+                                     
+                                     plotOutput(outputId = "som_3DMap",
+                                                width = "80%",
+                                                height = "500px")
+                                              
+                                     ),
+                                     
+                         ),
+                         id = "SOM_AI_tabset"
+                       )
                        
-                )
+                       )
                 
                 
               )
@@ -481,139 +525,160 @@ ui <- dashboardPage(
               
               br(),
               
-              
               fluidRow(
-                
-                column(3, 
-                       
-                       selectInput("somplotwhat", "Plot what?", 
-                                   choices= list("Observations"= "obs",
-                                                 "Prototypes"= "prototypes"
-                                                 ))
-                ), 
-                
-                
-                column(3, 
-                       
-                       selectInput("somplottype", "Type of plot:", 
-                                   choices= c('color',
-                                              'barplot',
-                                              'names',
-                                              'boxplot'))
-                ), 
-                
-                
-                column(3, 
-                       
-                       conditionalPanel("input.somplottype == 'color' ||
-                                                input.somplottype == '3d'",
-                                        selectInput("somplotvar", 
-                                                    "Variable:", 
-                                                    choices= "(Not Available)")),
-                       
-                       conditionalPanel("input.somplottype == 'names'",
-                                        numericInput("names_SC_num", 
-                                                    "Number of superclusters:", 
-                                                    2,
-                                                    min = 2,
-                                                    max = 10,
-                                                    step = 1))
-                       
-                ),
-                
-                
-                
-                
-                column(3, 
-                       fluidRow(
-                         column(12, 
-                                conditionalPanel("input.trainbutton > 0", 
-                                                 actionButton("save_som", "Save SOM Results", class = "full-width-button")
-                                )
-                         ),
-                         column(12, 
-                                uiOutput("save_som_notice") # SHOULD SAVE SOM BE IN THE PRIOR TAB?
-                         )
+                column(3,
+                       box(width=12,
+                           
+                           selectInput(
+                             "somplotwhat",
+                             "Plot What?",
+                             choices = list("Observations"= "obs",
+                                            "Prototypes"= "prototypes")
+                                       ),
+                           
+                           selectInput(
+                             "somplottype",
+                             "Type of Plot:",
+                             choices = c('color',
+                                         'barplot',
+                                         'names',
+                                         'boxplot')
+                             ),
+                           
+                           conditionalPanel(
+                             "input.somplottype == 'color' || input.somplottype == '3d'",
+                             selectInput(
+                               "somplotvar",
+                               "Variable:",
+                               choices = "(Not Available)"
+                               )
+                             ),
+                           
+                           conditionalPanel(
+                             "input.somplottype == 'names'",
+                             numericInput(
+                               "names_SC_num",
+                               "Number of Superclusters:",
+                               2,
+                               min = 2,
+                               max = 10,
+                               step = 1
+                               )
+                             ),
+                           
+                           # conditionalPanel(
+                           #   "input.trainbutton > 0",
+                             actionButton(
+                               "save_som",
+                               "Save SOM Results",
+                               class = "full-width-button",
+                               style = "margin-bottom: 5px; margin-top: 5px;"
+                               ),
+                             # ),
+                           
+                           uiOutput("save_som_notice"),
+                           
+                           actionButton(
+                             "infoButton_plot_map",
+                             "Info",
+                             class = "full-width-button",
+                             style = "margin-bottom: 5px; margin-top: 5px;"
+                             )
+                           )
                        ),
-                       fluidRow(
-                         column(12, 
-                                actionButton("infoButton_plot_map", "Info", class = "full-width-button")
+                
+                column(9, align="center",
+                       
+                       conditionalPanel(
+                         condition = "input.somplottype == 'boxplot'",
+                         withSpinner(
+                           plotlyOutput(
+                             "somplot_box",
+                             height = "80vh",
+                             width = "65vw"
+                             )
+                           )
+                         ),
+                       
+                       conditionalPanel(
+                         condition = "input.somplottype == 'names'",
+                         withSpinner(
+                           plotOutput(
+                             "somplot_names",
+                             height = "80vh",
+                             width = "65vw"
+                             )
+                           )
+                         ),
+                       
+                       conditionalPanel(
+                         condition = "input.somplottype == 'color'",
+                         withSpinner(
+                           plotOutput(
+                             "somplot_color",
+                             height = "80vh",
+                             width = "65vw"
+                             )
+                           )
+                         ),
+                       
+                       conditionalPanel(
+                         condition = "input.somplotwhat == 'obs' && input.somplottype == 'barplot'",
+                         withSpinner(
+                           plotlyOutput(
+                             "somplot_obs_bar",
+                             height = "80vh",
+                             width = "65vw"
+                             )
+                           )
+                         ),
+                       
+                       conditionalPanel(
+                         condition = "input.somplotwhat == 'prototypes' && input.somplottype == '3d'",
+                         withSpinner(
+                           plotlyOutput(
+                             "somplot_3d",
+                             height = "80vh",
+                             width = "65vw"
+                             )
+                           )
+                         ),
+                       
+                       conditionalPanel(
+                         condition = "input.somplotwhat == 'prototypes' && input.somplottype == 'smooth.dist'",
+                         withSpinner(
+                           plotlyOutput(
+                             "somplot_smooth_dist",
+                             height = "80vh",
+                             width = "65vw"
+                             )
+                           )
+                         ),
+                       
+                       conditionalPanel(
+                         condition = "input.somplotwhat == 'prototypes' && input.somplottype == 'barplot'",
+                         withSpinner(
+                           plotlyOutput(
+                             "somplot_prototypes_bar",
+                             height = "80vh",
+                             width = "65vw"
+                             )
+                           )
+                         ),
+                       
+                       conditionalPanel(
+                         condition = "input.somplotwhat == 'prototypes' && input.somplottype == 'umatrix'",
+                         withSpinner(
+                           plotOutput(
+                             "somplot_umatrix",
+                             height = "80vh",
+                             width = "65vw"
+                             )
+                           )
                          )
                        )
                 )
-                
-                
-                
-                
-                
-                
-                # column(3, 
-                #        
-                #        column(6, 
-                #               
-                #               conditionalPanel("input.trainbutton > 0", 
-                #                                actionButton("save_som", "Save SOM Results")), 
-                #               
-                #               uiOutput("save_som_notice") # SHOULD SAVE SOM BE IN THE PRIOR TAB?
-                #               
-                #        ), 
-                #        
-                #        column(6, 
-                #               
-                #               actionButton("infoButton_plot_map", "Info", class = "full-width-button")
-                #               
-                #        )
-                # )
-                
               ),
-              # conditionalPanel("input.somplottype == 'boxplot'",
-              #                  selectInput("somplotvar2", 
-              #                              "Variable: (hold Ctrl to select
-              #                              multiple variables)", 
-              #                              choices= "(Not Available)", 
-              #                              multiple= TRUE)),
-              
-              column(12, align="center",
-                     
-                     
-                     conditionalPanel(
-                       condition = "input.somplottype == 'boxplot'",
-                       withSpinner(plotlyOutput("somplot_box", height = "600px"))  #, width = "1000px"
-                     ),
-                     conditionalPanel(
-                       condition = "input.somplottype == 'names'",
-                       withSpinner(plotOutput("somplot_names", height = "600px"))
-                     ),
-                     conditionalPanel(
-                       condition = "input.somplottype == 'color'",
-                       withSpinner(plotOutput("somplot_color", height = "600px"))
-                     ),
-                     conditionalPanel(
-                       condition = "input.somplotwhat == 'obs' && input.somplottype == 'barplot'",
-                       withSpinner(plotlyOutput("somplot_obs_bar", height = "600px"))
-                     ),
-                     conditionalPanel(
-                       condition = "input.somplotwhat == 'prototypes' && input.somplottype == '3d'",
-                       withSpinner(plotlyOutput("somplot_3d", height = "600px"))
-                     ),
-                     conditionalPanel(
-                       condition = "input.somplotwhat == 'prototypes' && input.somplottype == 'smooth.dist'",
-                       withSpinner(plotlyOutput("somplot_smooth_dist", height = "600px"))
-                     ),
-                     conditionalPanel(
-                       condition = "input.somplotwhat == 'prototypes' && input.somplottype == 'barplot'",
-                       withSpinner(plotlyOutput("somplot_prototypes_bar", height = "600px"))
-                     ),
-                     conditionalPanel(
-                       condition = "input.somplotwhat == 'prototypes' && input.somplottype == 'umatrix'",
-                       withSpinner(plotOutput("somplot_umatrix", height = "600px"))
-                     ) 
-#                     conditionalPanel(
-#                        condition = "input.somplotwhat == 'prototypes' && input.somplottype == 'grid'",
-#                        withSpinner(plotlyOutput("somplot_grid", height = "600px"))
-#                       )
-              )
-      ),
       
       ##### SCENARIOS TAB #####
       tabItem("scenarios",
@@ -625,7 +690,7 @@ ui <- dashboardPage(
               
               br(),
               
-              #verbatimTextOutput("Agent_Warning"),
+              
               fluidRow(
                 column(3,
                        
@@ -750,8 +815,6 @@ ui <- dashboardPage(
                            
                            checkboxInput('load_prev_som', 'Use Previous SOM Solution? If unchecked it will use SOM solution from this session.'),
                            
-                           #numericInput("nrow.result_pred","Number of rows in the results:" ,20, min = 1, max = 100)
-                           
                        )
                        
                        
@@ -790,15 +853,12 @@ ui <- dashboardPage(
     
                  The map is generated using the <a href='https://dictionary.apa.org/zero-order-correlation'>zero-order correlations</a> amongst your variables."), style = "text-align: center;"),
               
-              #verbatimTextOutput("network_warning"),
-              
               
               fluidRow(
                 
                 column(10, 
                        
                        # Output: Histogram ----
-                       
                        
                        introBox(
                          visNetworkOutput("networkPlot", height = '600px'), 
@@ -829,11 +889,15 @@ ui <- dashboardPage(
                        ),
                        
                        
-                       introBox(actionButton("infoButton", "Info", class = "full-width-button",
-                                             style = "margin-bottom: 5px;
-                                                     margin-top: 5px;"),
-                                data.step = 2,
-                                data.intro = "Clicking this button lets you re-read the information on the pop-up when first entering the Systems Mapping tab."
+                       introBox(
+                         actionButton("infoButton",
+                                      "Info",
+                                      class = "full-width-button",
+                                      style = "margin-bottom: 5px;
+                                      margin-top: 5px;"),
+                         data.step = 2,
+                         data.intro = "Clicking this button lets you read some
+                         information about using the Systems Mapping tab."
                        ),
                        
                        actionButton("tour_systems_mapping", "Guided Tour of Inputs", class = "full-width-button",
@@ -1179,9 +1243,6 @@ ui <- dashboardPage(
                                data.step = 24,
                                data.intro = "Here you can download your network's nodes and edges."),
                              
-                             
-                             
-                             # downloadButton('pngSave', 'Download', label = "Download your network as an PNG file"),
                          ),
                          
                          data.step = 21,
@@ -1233,5 +1294,3 @@ ui <- dashboardPage(
     )
   )
 )
-
-#####

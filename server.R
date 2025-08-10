@@ -249,13 +249,6 @@ server <- function(input, output, session) {
       uploaded_data_values$the_table <- the.table
       
     }, error = function(e) {
-      # If an error occurs (e.g., invalid sheet number), show a modal with an error message
-      # showModal(modalDialog(
-      #   title = "Error",
-      #   "Invalid sheet selection",
-      #   easyClose = TRUE,
-      #   footer = NULL
-      # ))
       
       shinyalert(
         title = "Error!",
@@ -378,72 +371,7 @@ server <- function(input, output, session) {
     }
   })
   
-  
-  
-  
-  
-  # observe({
-  #   if (is.null(input$file1))
-  #     return(NULL)
-  #   
-  #   # Determine the file extension
-  #   file_extension <- input$file1['name'] %>%
-  #     str_split("\\.") %>%
-  #     unlist()
-  #   file_extension <- file_extension[[length(file_extension)]]
-  #   
-  #   # If the file is a CSV, read it into the.table
-  #   if (file_extension == 'csv') {
-  #     the.sep <- switch(input$sep, "Comma" = ",", "Semicolon" = ";", "Tab" = "\t", "Space" = "")
-  #     the.table <- na.omit(read.csv(input$file1$datapath, header = input$header, sep = the.sep))
-  #     
-  #     # Store the.table in a reactiveValues object for use in other observers
-  #     uploaded_data_values$the_table <- the.table
-  #   } else {
-  #     uploaded_data_values$the_table <- NULL
-  #   }
-  # })
-  
-  
-  
-  
-  
   observe({
-    
-    # if (is.null(input$file1))
-    #   return(NULL)
-    # 
-    # ##### GET WHAT TYPE OF FILE IT IS, EG. EXCEL, CSV, ETC. 
-    # 
-    # file_extension <- input$file1['name'] %>% #TAKE THE FILEPATH
-    #   str_split("\\.") %>% #SPLIT IT ON THE DECIMAL POINT (EG. FOR .CSV)
-    #   unlist() #UNLIST TO TURN INTO A VECTOR
-    # 
-    # #GET THE FINAL ITEM IN THE VECTOR
-    # file_extension <- file_extension[[length(file_extension)]]
-    # 
-    # #WHERE THE FILE EXTENSION IS A CSV, PERFORM THIS OPERATION ---
-    # if(file_extension == 'csv'){
-    # 
-    # 
-    # 
-    #   the.sep <- switch(input$sep, "Comma"=",", "Semicolon"=";", "Tab"="\t",
-    #                     "Space"="")
-    # 
-    #   the.table <- na.omit(read.csv(input$file1$datapath, header=input$header,
-    #                                 sep=the.sep))
-    # 
-    # }
-    # 
-    
-    # the.sep <- switch(input$sep, "Comma"=",", "Semicolon"=";", "Tab"="\t",
-    #                   "Space"="")
-    # 
-    # 
-    # the.table <- na.omit(read.csv(input$file1$datapath, header=input$header,
-    #                               sep=the.sep))
-    
-    # browser()
     
     # Retrieve the.table from reactiveValues
     the.table <- uploaded_data_values$the_table
@@ -510,29 +438,6 @@ server <- function(input, output, session) {
   
   cluster_text <- gsub("\n", "<br>", cluster_text) 
   
-  # observe({
-  #   # Check if the tab "Using Sytems Mapping To Explore Cluster Variables" is selected
-  #   if (!is.null(input$tabs) && input$tabs == "cluster_cases" && !pop_ups$pop_up_clusters ) {
-  #     shinyalert(
-  #       title = "<u><b>Using the K-Means Clusters</b></u>",
-  #       text = cluster_text,
-  #       size = "l",
-  #       closeOnEsc = TRUE,
-  #       closeOnClickOutside = FALSE,
-  #       html = TRUE,
-  #       type = "info",
-  #       showConfirmButton = TRUE,
-  #       showCancelButton = FALSE,
-  #       confirmButtonText = "OK",
-  #       confirmButtonCol = "#bce7fa",
-  #       timer = 0,
-  #       imageUrl = "",
-  #       animation = TRUE
-  #     )
-  #     pop_ups$pop_up_clusters <- TRUE
-  #   }
-  # })
-  
   observeEvent(input$infoButton_kmean, {
     shinyalert(
       title = "<u><b>Using the K-Means Clusters</b></u>",
@@ -550,6 +455,46 @@ server <- function(input, output, session) {
       imageUrl = "",
       animation = TRUE
     )
+  })
+  
+  # Trigger the tour when the button is pressed
+  observeEvent(input$tour_kmeans, {
+    
+    # Start the tour
+    introjs(session,
+            options = list("nextLabel" = "Next",
+                           "prevLabel" = "Previous",
+                           "skipLabel" = "Quit",
+                           steps = list(
+                             list(
+                               element = "#init_kmeans",
+                               intro = "Click this button to compute your 
+                               K-means clusters."),
+                             
+                             list(
+                               element = "#infoButton_kmean",
+                               intro = "Clicking this button lets you read some 
+                               information about using the K-means clustering tab."),
+                             
+                             list(
+                               element = "#clusters",
+                               intro = "Adjusting this input lets you determine 
+                               how many K-means clusters you wish to calculate."),
+                             
+                             list(
+                               element = "#setrandseedkmean",
+                               intro = "This toggle enables you to set a seed 
+                               when producing your K-means clusters, allowing for 
+                               reproducible results."),
+                             
+                             list(
+                               element = "#kmeans_tabs_box",
+                               intro = "Under these tabs you will find statistics 
+                               and charts detailing the fit of your K-means clusters.")
+                             )
+                           ),
+            )
+    
   })
   
   kmeans_solution <- reactiveValues(current_kmeans_solution=NULL)
@@ -631,10 +576,6 @@ server <- function(input, output, session) {
         max() 
       
       plot_output_list <- list()
-      
-      # defined_clusters <- ifelse(input$k_means_cluster == "All",
-      #                            sort(unique(raw_silh_data$cluster)),
-      #                            input$k_means_cluster)
       
       if(input$k_means_cluster == "All"){
         
@@ -719,8 +660,6 @@ server <- function(input, output, session) {
         
         if(input$k_means_plot == "Silhouette"){
           
-          # browser()
-          
           data_to_graph <- data_to_graph %>%
             arrange(sil_width)
           
@@ -747,9 +686,6 @@ server <- function(input, output, session) {
       }
       
       
-      
-      # browser()
-      
       if(input$k_means_cluster == "All"){
         
         return(patchwork::wrap_plots(plot_output_list,
@@ -768,173 +704,7 @@ server <- function(input, output, session) {
       
       kmeans_plot_output()
       
-      # browser()
-      
-      # raw_silh_data <- as.data.frame(silhouette(kmeans_solution$current_kmeans_solution@uclusters,
-      #                                           daisy(uploaded_data_values$current_data_file)))
-      # 
-      # min_silh_width <- ifelse(min(raw_silh_data$sil_width) > 0,
-      #                          0,
-      #                          min(raw_silh_data$sil_width))
-      # 
-      # max_count_df <- raw_silh_data %>%
-      #   mutate(sil_width_bin = trunc(sil_width / 0.01) * 0.01) %>%
-      #   group_by(cluster, sil_width_bin) %>%
-      #   tally(name = "count") %>%
-      #   ungroup() 
-      # 
-      # max_count <- max(max_count_df$count)
-      # 
-      # max_count_perc <- max_count_df %>%
-      #   group_by(cluster) %>%
-      #   reframe(count_as_cluster_perc = count/sum(count)) %>%
-      #   select(count_as_cluster_perc) %>%
-      #   max() 
-      # 
-      # plot_output_list <- list()
-      # 
-      # # defined_clusters <- ifelse(input$k_means_cluster == "All",
-      # #                            sort(unique(raw_silh_data$cluster)),
-      # #                            input$k_means_cluster)
-      # 
-      # if(input$k_means_cluster == "All"){
-      #   
-      #   defined_clusters <- sort(unique(raw_silh_data$cluster))
-      #   
-      # }else{
-      #   
-      #   defined_clusters <- input$k_means_cluster
-      #   
-      # }
-      # 
-      # 
-      # for(cluster in defined_clusters){
-      #   
-      #   ## Filter for data we need
-      #   data_to_graph <- raw_silh_data %>%
-      #     filter(cluster == !!cluster)
-      #   
-      #   if(input$k_means_plot == "Jitter"){
-      #     
-      #     ## Create Jitter
-      #     jitter_plot <- ggplot(data_to_graph, aes(x = 0, y = sil_width)) +
-      #       geom_jitter(height = 0, width = 0.01) + # Adjust 'height' for vertical spread
-      #       scale_x_continuous(breaks = NULL, labels = NULL) +
-      #       labs(x = NULL) +
-      #       expand_limits(y=c(min_silh_width, 1)) +
-      #       geom_hline(yintercept = 0, linetype="dotted") +
-      #       ylab("Silhouette width")+
-      #       theme_minimal()+
-      #       ggtitle(paste0("Cluster: ", cluster),
-      #               subtitle = paste0("Average silhouette width: ", round(mean(data_to_graph$sil_width), 2), "\n",
-      #                                 "n = ", paste(nrow(data_to_graph))))+
-      #       theme_minimal()+
-      #       theme(plot.title = element_text(hjust = 0.5),
-      #             plot.subtitle = element_text(hjust = 0.5))
-      #     
-      #     plot_output_list[[cluster]] <- jitter_plot
-      #     
-      #   }
-      #   
-      #   if(input$k_means_plot == "Violin"){
-      #     
-      #     ## Create Violin
-      #     violin_plot <- ggplot(data_to_graph, aes(x = "", y=sil_width)) +
-      #       geom_violin(color = "black", fill="steelblue") +
-      #       expand_limits(y=c(min_silh_width, 1)) +
-      #       geom_hline(yintercept = 0, linetype="dotted") +
-      #       ylab("Silhouette width")+
-      #       theme_minimal()+
-      #       ggtitle(paste0("Cluster: ", cluster),
-      #               subtitle = paste0("Average silhouette width: ", round(mean(data_to_graph$sil_width), 2), "\n",
-      #                                 "n = ", paste(nrow(data_to_graph))))+
-      #       theme(plot.title = element_text(hjust = 0.5),
-      #             plot.subtitle = element_text(hjust = 0.5))+
-      #       labs(x = NULL)
-      #     
-      #     plot_output_list[[cluster]] <- violin_plot
-      #     
-      #   }
-      #   
-      #   if(input$k_means_plot == "Histogram"){
-      #     
-      #     ## Create histogram
-      #     histogram_plot <- ggplot(data_to_graph, aes(x=sil_width, y = after_stat(count) /nrow(data_to_graph))) + 
-      #       geom_histogram(fill = "steelblue", binwidth = 0.01) + 
-      #       expand_limits(x=c(min_silh_width, 1), y = max_count_perc) +
-      #       geom_vline(xintercept = 0, linetype="dotted") +
-      #       ylab("Percentage of cases")+
-      #       xlab("Silhouette width")+
-      #       # coord_flip() +
-      #       theme_minimal()+
-      #       ggtitle(paste0("Cluster: ", cluster),
-      #               subtitle = paste0("Average silhouette width: ", round(mean(data_to_graph$sil_width), 2), "\n",
-      #                                 "n = ", paste(nrow(data_to_graph))))+
-      #       theme(plot.title = element_text(hjust = 0.5),
-      #             plot.subtitle = element_text(hjust = 0.5))+
-      #       scale_y_continuous(labels = scales::percent)
-      #     
-      #     plot_output_list[[cluster]] <- histogram_plot
-      #     
-      #   }
-      #   
-      #   if(input$k_means_plot == "Silhouette"){
-      #     
-      #     ## Create silhouette
-      #     silhouette_plot <- ggplot(test_data, aes(x = desc(reorder(factor(row.names(test_data)), -sil_width)), y = sil_width)) +
-      #       geom_bar(stat = "identity", fill = "steelblue")  + # This makes it a horizontal bar chart
-      #       labs(x = "Individual Cases", y = "Silhouette width") +
-      #       scale_x_continuous(breaks = NULL, labels = NULL)+
-      #       expand_limits(y=c(min_silh_width, 1)) +
-      #       theme_minimal()+
-      #       coord_flip()+
-      #       ggtitle(paste0("Cluster: ", cluster),
-      #               subtitle = paste0("Average silhouette width: ", round(mean(data_to_graph$sil_width), 2), "\n",
-      #                                 "n = ", paste(nrow(data_to_graph))))+
-      #       theme(plot.title = element_text(hjust = 0.5),
-      #             plot.subtitle = element_text(hjust = 0.5))
-      #     
-      #     plot_output_list[[cluster]] <- silhouette_plot
-      #     
-      #   }
-      #   
-      #   # browser()
-      #   
-      #   if(input$k_means_cluster == "All"){
-      #     
-      #     patchwork::wrap_plots(plot_output_list,
-      #                           ncol = floor(sqrt(length(plot_output_list)))+1)
-      #     
-      #   }else{
-      #     
-      #     plot_output_list[[1]]
-      #     
-      #   }
-      #   
-      # }
-      
     })
-    
-    
-    # output$kmeans_silh <- renderPlot({
-    #   
-    #   plot_silhouette(uploaded_data_values$current_data_file, kmeans_solution$current_kmeans_solution) 
-    #   
-    # }, width = 500, height = graph_dimension(uploaded_data_values$current_data_file))
-    
-    # browser()
-    
-    # #displays the pseudoF
-    # if (input$pseudo_f == TRUE) {
-    #   FSTAT <- pseudoF(current_data_file, current_kmeans_solution,input$clusters)
-    #   output$pseudoF <- renderText({
-    #     paste("Pseudo F: ", FSTAT)
-    #   })}
-    # if (input$silhouette == TRUE){
-    #   output$kmeans_silh <- renderPlot({
-    #     plot_silhouette(current_data_file, current_kmeans_solution)
-    #   }, width = 500, height = graph_dimension(current_data_file))
-    # }
     
   })
   
@@ -954,28 +724,6 @@ server <- function(input, output, session) {
   
   train_SOM_text <- gsub("\n", "<br>", train_SOM_text) # Convert newline characters to HTML line breaks
   
-  # observe({
-  #   if (!is.null(input$tabs) && input$tabs == "AI_clusters" && !pop_ups$pop_up_SOM ) {
-  #     shinyalert(
-  #       title = "<u><b>Using the SOM AI</b></u>",
-  #       text = train_SOM_text,
-  #       size = "m",
-  #       closeOnEsc = TRUE,
-  #       closeOnClickOutside = FALSE,
-  #       html = TRUE,
-  #       type = "info",
-  #       showConfirmButton = TRUE,
-  #       showCancelButton = FALSE,
-  #       confirmButtonText = "OK",
-  #       confirmButtonCol = "#bce7fa",
-  #       timer = 0,
-  #       imageUrl = "",
-  #       animation = TRUE
-  #     )
-  #     pop_ups$pop_up_SOM <- TRUE
-  #   }
-  # })
-  
   observeEvent(input$infoButton_som, {
     shinyalert(
       title = "<u><b>Using the SOM AI</b></u>",
@@ -993,6 +741,48 @@ server <- function(input, output, session) {
       imageUrl = "",
       animation = TRUE
     )
+  })
+  
+  # Trigger the tour when the button is pressed
+  observeEvent(input$tour_som, {
+    
+    # Start the tour
+    introjs(session,
+            options = list("nextLabel" = "Next",
+                           "prevLabel" = "Previous",
+                           "skipLabel" = "Quit",
+                           
+                           steps = list(
+                             list(
+                               element = "#trainbutton",
+                               intro = "Click this button to compute your
+                               SOM AI solution."),
+
+                             list(
+                               element = "#som_dimensions",
+                               intro = "Here you can adjust the size of your 
+                               SOM AI grid. If unsure, the default size of 5x5 
+                               is sufficient."),
+
+                             list(
+                               element = "#advanced_options_intro",
+                               intro = "Here you can adjust various advanced options. 
+                               If unsure, the default options are sufficient."),
+                             
+                             list(
+                               element = "#setrandseed",
+                               intro = "This toggle enables you to set a seed 
+                               when producing your SOM AI grid, allowing for 
+                               reproducible results."),
+                             
+                             list(
+                               element = "#SOM_AI_tabset",
+                               intro = "Under these tabs you will find statistics 
+                               and charts detailing the fit of your SOM AI clusters solution.")
+                           )
+            ),
+    )
+    
   })
   
   
@@ -1143,10 +933,6 @@ server <- function(input, output, session) {
     
     output$trainnotice_advanced_info <- renderUI({
       
-      # browser()
-      
-      #useShinyjs()
-      
       ### post the quality control factors as well
       qual_measures <- quality(som_solution$current_som_solution)
       anova_results <- retrieve_ANOVA_results(som_solution$current_som_solution)
@@ -1195,26 +981,12 @@ server <- function(input, output, session) {
       
     })
     
-    
-    
-    
-    
-    #   output$trainnotice_advanced_table <- renderUI({
-    #
-    #     shinyjs::hidden(
-    #       div(id = "advanced_info_table",
-    #           renderTable("parsed_anova_results")
-    #       )
-    #     )
-    #
-    #   })
-    #
   })
-  #
-  #
-  #
-  #   #### Panel 'Plot Map'
-  #   #############################################################################
+
+
+
+    #### Panel 'Plot Map'
+    #############################################################################
   
   plot_map_text <- "<div style='line-height: 30px'><u><b>Reading the SOM Grid:</b></u>
                  1) To begin, we label each case with its CASE ID and K-MEANS ID.
@@ -1241,28 +1013,7 @@ server <- function(input, output, session) {
                  The visualisations tools used for this tab come from the SOMbrero R-Package. To understand how they work <a href='https://cran.r-project.org/web/packages/SOMbrero/vignettes/c-doc-numericSOM.html'>click here</a></div>"
   
   plot_map_text <- gsub("\n", "<br>", plot_map_text) # Convert newline characters to HTML line breaks
-  
-  # observe({
-  #   if (!is.null(input$tabs) && input$tabs == "compare_and_visualise" && !pop_ups$pop_up_plot_map ) {
-  #     shinyalert(
-  #       title = "<u><b>Using the SOM AI</b></u>",
-  #       text = plot_map_text,
-  #       size = "l",
-  #       closeOnEsc = TRUE,
-  #       closeOnClickOutside = FALSE,
-  #       html = TRUE,
-  #       type = "info",
-  #       showConfirmButton = TRUE,
-  #       showCancelButton = FALSE,
-  #       confirmButtonText = "OK",
-  #       confirmButtonCol = "#bce7fa",
-  #       timer = 0,
-  #       imageUrl = "",
-  #       animation = TRUE
-  #     )
-  #     pop_ups$pop_up_plot_map <- TRUE
-  #   }
-  # })
+
   
   observeEvent(input$infoButton_plot_map, {
     shinyalert(
@@ -1304,9 +1055,6 @@ server <- function(input, output, session) {
   # Plot the SOM
   somplot_output_plot <- reactive({
     
-    # browser()
-    
-    # browser
     
     tmp.view <- NULL
     if (input$somplottype =="boxplot") {
@@ -1515,17 +1263,56 @@ server <- function(input, output, session) {
   
   
   observeEvent(input$save_som, {
+    
+    if(is.null(som_solution$current_som_solution)){
+      
+      shinyalert(
+        title = "You must first train the SOM AI",
+        text = '',
+        size = "s",
+        closeOnEsc = TRUE,
+        closeOnClickOutside = FALSE,
+        html = TRUE,
+        type = "error",
+        showConfirmButton = TRUE,
+        showCancelButton = FALSE,
+        confirmButtonText = "OK",
+        confirmButtonCol = "#bce7fa",
+        timer = 0,
+        imageUrl = "",
+        animation = TRUE
+      )
+      
+      return()
+      
+    }
+    
     previous_som <- som_solution$current_som_solution #need to rename the object or it may overwrite later current_som objects
     save(previous_som, file = "./tmp/SavedSOMObject")})
   # Downloadable csv of selected dataset ----
   
-  output$save_som_notice <- renderUI({
-    if(input$save_som == 0){
-      return()
-    }
-    paste("Saved SOM ", format(Sys.time(),format="%Y-%m-%d-%H:%M:%S"),sep=" ")
+
+  save_som_notice_text <- reactiveVal("No SOM Solution saved yet.")
+  
+  observeEvent(input$save_som, {
     
-  })
+    if(input$save_som == 0){
+      save_som_notice_text("No SOM Solution saved yet.")
+      return()
+      }
+    
+    if(is.null(som_solution$current_som_solution)){
+      save_som_notice_text("No SOM Solution saved yet.")
+      return()
+      }
+    
+    save_som_notice_text(paste("Saved SOM:", format(Sys.time(),format="%Y-%m-%d-%H:%M:%S"),sep=" "))
+        
+      })
+  
+  output$save_som_notice <- renderUI(save_som_notice_text())
+    
+
   
   #### Panel 'Case Prediction'
   #############################################################################
@@ -1550,27 +1337,6 @@ server <- function(input, output, session) {
   
   new_prediction_text <- gsub("\n", "<br>", new_prediction_text) # Convert newline characters to HTML line breaks
   
-  # observe({
-  #   if (!is.null(input$tabs) && input$tabs == "forecasting" && !pop_ups$pop_up_new_prediction ) {
-  #     shinyalert(
-  #       title = "<u><b>Using the Case Prediction Tab</b></u>",
-  #       text = new_prediction_text,
-  #       size = "l",
-  #       closeOnEsc = TRUE,
-  #       closeOnClickOutside = FALSE,
-  #       html = TRUE,
-  #       type = "info",
-  #       showConfirmButton = TRUE,
-  #       showCancelButton = FALSE,
-  #       confirmButtonText = "OK",
-  #       confirmButtonCol = "#bce7fa",
-  #       timer = 0,
-  #       imageUrl = "",
-  #       animation = TRUE
-  #     )
-  #     pop_ups$pop_up_new_prediction <- TRUE
-  #   }
-  # })
   
   observeEvent(input$infoButton_new_prediction, {
     shinyalert(
@@ -1590,12 +1356,6 @@ server <- function(input, output, session) {
       animation = TRUE
     )
   })
-  
-  
-  
-  
-  
-  
   
   pInput <- reactive({
     in.file_pred <- input$file_pred
@@ -1674,10 +1434,7 @@ server <- function(input, output, session) {
       case_id = seq(from = 1, to = nrow(p.input), by = 1)
       
       pred_cases$predicted_cases <- cbind("Case id" = as.integer(case_id), 'Best Quadrant' = predicted, '2nd Best Quadrant' = as.integer(BMUS[,2]), p.input)
-      
-      # output$view_predict <- renderTable({
-      #   head(predicted_cases, n=input$nrow.result_pred)
-      # })
+
       
       output$view_predict <- renderDT(
         
@@ -1726,30 +1483,6 @@ server <- function(input, output, session) {
                  <u><b>Need Help?</b></u><br>
                  For TUTORIALS on using your model to run scenario simulations in COMPLEX-IT <a href='https://www.art-sciencefactory.com/tutorials.html'>click here</a><br>
                  To learn more about case-based scenario simulation <a href='https://www.art-sciencefactory.com/case-based%20microsimulation.pdf'>click here</a></div>  "
-  
-  
-  
-  # observe({
-  #   if (!is.null(input$tabs) && input$tabs == "scenarios" && !pop_ups$pop_up_scenarios ) {
-  #     shinyalert(
-  #       title = "<u><b>Using the Scenarios Tab</b></u>",
-  #       text = scenarios_text,
-  #       size = "l",
-  #       closeOnEsc = TRUE,
-  #       closeOnClickOutside = FALSE,
-  #       html = TRUE,
-  #       type = "info",
-  #       showConfirmButton = TRUE,
-  #       showCancelButton = FALSE,
-  #       confirmButtonText = "OK",
-  #       confirmButtonCol = "#bce7fa",
-  #       timer = 0,
-  #       imageUrl = "",
-  #       animation = TRUE
-  #     )
-  #     pop_ups$pop_up_scenarios <- TRUE
-  #   }
-  # })
   
   observeEvent(input$infoButton_scenarios, {
     shinyalert(
@@ -1826,14 +1559,7 @@ server <- function(input, output, session) {
         hot_col("Quadrant", readOnly = TRUE)
     })
     
-    #browser()
-    
     output$somplotagent <- renderPlot({
-      
-      # dim <- current_som_solution$parameters$the.grid$dim
-      # knum <<- length(current_kmeans_solution@usize)
-      # current_som_solution <<- som_solution$current_som_solution
-      # current_kmeans_solution <<- kmeans_solution$current_kmeans_solution
       
       agent_cluster_values$agent_grid_plot <- generate_grid_template(som_solution$current_som_solution$parameters$the.grid$dim, length(kmeans_solution$current_kmeans_solution@usize), som_solution$current_som_solution, kmeans_solution$current_kmeans_solution)[[1]]
       agent_cluster_values$agent_drawtools <- generate_grid_template(som_solution$current_som_solution$parameters$the.grid$dim, length(kmeans_solution$current_kmeans_solution@usize), som_solution$current_som_solution, kmeans_solution$current_kmeans_solution)[[2]]
@@ -1857,8 +1583,6 @@ server <- function(input, output, session) {
   })
   
   observeEvent(input$Agent_Run_Clusters, {
-    
-    #browser()
     
     if(is.null(agent_cluster_values$agent_cluster_tracker)){
       output$Agent_Warning <- renderText({"You must first Setup the Model"})
@@ -1886,15 +1610,7 @@ server <- function(input, output, session) {
     }
     else{new_data_state <-agent_cluster_ordinals[[agent_cluster_values$agent_cluster_tracker@current_state]]}
     
-    # current_som_solution <<- som_solution$current_som_solution
-    # agent_drawtools <<- agent_cluster_values$agent_drawtools
-    # agentdf <<- agent_cluster_values$agentdf
-    # agent_grid_plot <<- agent_cluster_values$agent_grid_plot
-    # new_data_state <<- new_data_state
-    
     agent_cluster_values$agentdf <- plot_agent_SOM(new_data_state, som_solution$current_som_solution, agent_cluster_values$agent_drawtools, agent_cluster_values$agentdf)[[1]]
-    
-    #agentdf <<- agent_cluster_values$agentdf
     
     agent_cluster_values$agent_drawtools <- plot_agent_SOM(new_data_state, som_solution$current_som_solution, agent_cluster_values$agent_drawtools, agent_cluster_values$agentdf)[[2]]
     
@@ -1925,8 +1641,6 @@ server <- function(input, output, session) {
   
   observeEvent(input$SensitivityAnalysis, {
     
-    #browser()
-    
     agent_cluster_values$handson_store <- reactiveValuesToList(agent_cluster_ordinals)
     eval_change <- evaluate_state_change(agent_cluster_values$handson_store, input$cluster_select, agent_cluster_values$agent_cluster_tracker, uploaded_data_values$current_data_file)
     if(is.character(eval_change)){
@@ -1951,10 +1665,6 @@ server <- function(input, output, session) {
   
   observeEvent(input$sa_ok, {
     
-    # browser()
-    
-    print(paste0("Line 1 printed at: ", Sys.time()))
-    
     agent_cluster_values$handson_store <- reactiveValuesToList(agent_cluster_ordinals)
     baseline <- agent_cluster_values$handson_store[['first']]
     baseline <- as.numeric(snip_state(baseline, input$cluster_select, uploaded_data_values$current_data_file))
@@ -1962,9 +1672,6 @@ server <- function(input, output, session) {
     agent_cluster_values$agent_cluster_tracker@checked_data <- change_state #for now this has to be here because it gets reassigned below
     change_state <- as.numeric(snip_state(change_state, input$cluster_select, uploaded_data_values$current_data_file))
     var_names <- names(uploaded_data_values$current_data_file)
-    
-    
-    print(paste0("Line 2 printed at: ", Sys.time()))
     
     monte_carlo_grid = list()
     input_var = 1
@@ -1986,9 +1693,7 @@ server <- function(input, output, session) {
         monte_carlo_grid[[var_names[i]]] = change_state[i]
       }
     }
-    
-    print(paste0("Line 3 printed at: ", Sys.time()))
-    
+
     removeModal()
     #populate the monte carlo state space
     permutations = c()
@@ -2007,9 +1712,7 @@ server <- function(input, output, session) {
         dev_cols <- c(dev_cols, i)
       }
     }
-    
-    print(paste0("Line 4 printed at: ", Sys.time()))
-    
+
     showModal(waitModal(input$cluster_select, dev_cols))
     
     
@@ -2017,77 +1720,40 @@ server <- function(input, output, session) {
     for(i in 1:length(permutations)){
       rule_list <- c(rule_list, permutations[i]^(length(permutations)-i))
     }
-    
-    print(paste0("Line 5 printed at: ", Sys.time()))
-    
-    # browser()
-    
+
     rule_list_rev <- rev(rule_list)
     permutation_states = prod(permutations)
     som_dim <- prod(som_solution$current_som_solution$parameters$the.grid$dim)
     
     permutation_space <- genmc_state_space(permutation_states, default_vector)
     solution_space <- genmc_state_space(som_dim, 0)
-    
-    print(paste0("Line 6 printed at: ", Sys.time()))
-    
-    # browser()
-    
-    # for(r in 1:length(rule_list)){
-    #   grid_vector <- monte_carlo_grid[[dev_cols[r]]]
-    #   state_index = 1
-    #   for(i in 1:rule_list_rev[r]){
-    #     for(j in 1:length(grid_vector)){
-    #       for(k in 1:rule_list[r]){ #this should not be the length of rule_list[r] but the element of rule_list[r]
-    #         permutation_space[[state_index]][dev_cols[r]] <- grid_vector[j]
-    #         state_index = state_index + 1
-    #       }
-    #     }
-    #   }
-    # }
-    
+
     test_expand_gird_df <- expand.grid(monte_carlo_grid)
     
     test_expand_gird_df <- test_expand_gird_df %>%
       arrange(across(all_of(names(test_expand_gird_df)[dev_cols])))
     
     permutation_space <- as.list(as.data.frame(t(test_expand_gird_df)))
-    
-    # browser()
-    
-    print(paste0("Line 7 printed at: ", Sys.time()))
-    
+
     # start with progress here
     withProgress(message = 'Running Simulation:', value = 0, { 
       
-      # browser()
-      
-      print(paste0("Line 8 printed at: ", Sys.time()))
-      
       state_to_test <- floor(runif((permutation_states*2), min= 1, max = (permutation_states + 1)))
       
-      print(paste0("Line 9 printed at: ", Sys.time()))
-      
       progress_steps <- length(state_to_test)+1
-      
-      print(paste0("Line 10 printed at: ", Sys.time()))
       
       # Combine all states at once into a matrix or dataframe
       temp_states <- do.call(rbind, permutation_space[state_to_test])
       
-      print(paste0("Line 11 printed at: ", Sys.time()))
-      
       # Predict on the whole batch
       quadrants <- predict(som_solution$current_som_solution, temp_states)
-      
-      print(paste0("Line 12 printed at: ", Sys.time()))
       
       # Count quadrant occurrences
       tab <- as.data.frame(table(quadrants))
       
       for(row in 1:nrow(tab)){
         
-        print(row)
+        # print(row)
         
         quadrant_number <- as.numeric(as.character(tab[[row, 1]]))
         
@@ -2095,32 +1761,17 @@ server <- function(input, output, session) {
         
       }
       
-      print(paste0("Line 13 printed at: ", Sys.time()))
-      
-      # for(s in 1:length(state_to_test)){
-      #   temp_state <- permutation_space[[state_to_test[s]]]
-      #   quadrant <- predict(som_solution$current_som_solution, temp_state)
-      #   solution_space[[quadrant]] <- solution_space[[quadrant]] + 1
-      #   incProgress(1/progress_steps)
-      # }
-      
       agent_cluster_values$agent_cluster_tracker@cluster_tested <- input$cluster_select
       agent_cluster_values$agent_cluster_tracker@sensitivity_result <- solution_space
       sub_sol_space <- c()
       sub_sol_names <- c()
-      
-      print(paste0("Line 14 printed at: ", Sys.time()))
-      
+
       for(i in 1:length(solution_space)) {
         
         if(solution_space[[i]]> 0){
           sub_sol_names <-c(sub_sol_names, i)
           sub_sol_space <- c(sub_sol_space, solution_space[[i]])
         }}
-      
-      # browser()
-      
-      print(paste0("Line 15 printed at: ", Sys.time()))
       
       incProgress(1/progress_steps)
       
@@ -2133,16 +1784,13 @@ server <- function(input, output, session) {
       barplot(sub_sol_space, names.arg = sub_sol_names, main = "Senstivity Analysis Results", xlab  = "Quadrant", col = "yellowgreen")
     })
   })
-  #
-  #
-  #  button_pressed <- reactiveVal(FALSE)
   
   kmeans_count <- reactiveValues(value = 0)
   
   observeEvent(input$init_kmeans, {
     kmeans_count$value <- kmeans_count$value + 1
     
-    print(kmeans_count$value)
+    # print(kmeans_count$value)
   })
   
   infoButton <- reactive({  input$infoButton  })
@@ -2162,29 +1810,7 @@ server <- function(input, output, session) {
   text <- gsub("Using the Map:", "<u><b>Using the Map:</b></u>", text) # Bold the "Using the Map:" heading
   
   systems_mapping_tab_button_pressed_tracker <- reactiveValues(pop_up_systems = FALSE, exportOptionsToggle=0, egoNetworkToggle=0, advancedOptionsToggle=0, shortestPathsToggle=0, weightsOptionsToggle=0)
-  
-  # observe({
-  #   # Check if the tab "Using Sytems Mapping To Explore Cluster Variables" is selected
-  #   if (!is.null(input$tabs) && input$tabs == "systems_mapping" && !systems_mapping_tab_button_pressed_tracker$pop_up_systems ) {
-  #     shinyalert(
-  #       title = "<u><b>Using the Map</b></u>",
-  #       text = text,
-  #       size = "m",
-  #       closeOnEsc = TRUE,
-  #       closeOnClickOutside = FALSE,
-  #       html = TRUE,
-  #       type = "info",
-  #       showConfirmButton = TRUE,
-  #       showCancelButton = FALSE,
-  #       confirmButtonText = "OK",
-  #       confirmButtonCol = "#bce7fa",
-  #       timer = 0,
-  #       imageUrl = "",
-  #       animation = TRUE
-  #     )
-  #     systems_mapping_tab_button_pressed_tracker$pop_up_systems <- TRUE
-  #   }
-  # })
+
   
   observeEvent(infoButton(), {
     shinyalert(
@@ -2282,42 +1908,8 @@ server <- function(input, output, session) {
       
     }
   })
-  #####  Observe statement for shortest paths first opening #####
+
   
-  # ##### Observe statements for weights sanity checks #####
-  # observe({
-  #   if (is.null(input$weights_values$datapath) == FALSE) {
-  #     testing_file <- read.csv(input$weights_values$datapath)
-  #
-  #     if(is.numeric(testing_file$weight) == FALSE){
-  #       shinyalert(
-  #         title = "You have a non-numeric character in your weight column",
-  #         size = "s",
-  #         type = "warning"
-  #       )
-  #     } else if (ncol(testing_file) != 3 ) {
-  #       shinyalert(
-  #         title = "You have the incorrect number of columns for your weights. You should have three: from, to, and weight.",
-  #         size = "s",
-  #         type = "warning"
-  #       )
-  #     } else if (names(testing_file)[3] != 'weight' || names(testing_file)[1] != 'from' || names(testing_file)[2] != 'to') {
-  #       shinyalert(
-  #         title = "You have an incorrect name in your columns. Ensure they are 'from', 'to', and 'weight' only.",
-  #         size = "s",
-  #         type = "warning"
-  #       )
-  #     } else {
-  #       NULL
-  #     }
-  #
-  #
-  #   } else {
-  #     NULL
-  #   }
-  # })
-  # ##### Observe statements for weights sanity checks #####
-  #
   observeEvent(input$exportOptions, {
     if(input$exportOptions == 0){
       systems_mapping_tab_button_pressed_tracker$exportOptionsToggle <- 0
@@ -2325,7 +1917,7 @@ server <- function(input, output, session) {
       systems_mapping_tab_button_pressed_tracker$exportOptionsToggle <- systems_mapping_tab_button_pressed_tracker$exportOptionsToggle + 1
     }
   })
-  #
+
   observeEvent(input$egoNetwork, {
     if(input$egoNetwork == 0){
       systems_mapping_tab_button_pressed_tracker$egoNetworkToggle <- 0
@@ -2333,7 +1925,7 @@ server <- function(input, output, session) {
       systems_mapping_tab_button_pressed_tracker$egoNetworkToggle <- systems_mapping_tab_button_pressed_tracker$egoNetworkToggle + 1
     }
   })
-  #
+
   observeEvent(input$advancedOptions, {
     if(input$advancedOptions == 0){
       systems_mapping_tab_button_pressed_tracker$advancedOptionsToggle <- 0
@@ -2341,7 +1933,7 @@ server <- function(input, output, session) {
       systems_mapping_tab_button_pressed_tracker$advancedOptionsToggle <- systems_mapping_tab_button_pressed_tracker$advancedOptionsToggle + 1
     }
   })
-  #
+
   observeEvent(input$shortestPaths, {
     if(input$shortestPaths == 0){
       systems_mapping_tab_button_pressed_tracker$shortestPathsToggle <- 0
@@ -2349,7 +1941,7 @@ server <- function(input, output, session) {
       systems_mapping_tab_button_pressed_tracker$shortestPathsToggle <- systems_mapping_tab_button_pressed_tracker$shortestPathsToggle + 1
     }
   })
-  #
+
   observeEvent(input$weightsOptions, {
     if(input$weightsOptions == 0){
       systems_mapping_tab_button_pressed_tracker$weightsOptionsToggle <- 0
@@ -2357,40 +1949,40 @@ server <- function(input, output, session) {
       systems_mapping_tab_button_pressed_tracker$weightsOptionsToggle <- systems_mapping_tab_button_pressed_tracker$weightsOptionsToggle + 1
     }
   })
-  #
-  #
-  # ########## OBSERVE STATEMENTS FOR MODAL BOXES ##########
-  #
-  # ########## OBSERVE STATEMENTS FOR INITIALLY CLOSING HIDE/SHOWS ##########
-  #
+
+
+  ########## OBSERVE STATEMENTS FOR MODAL BOXES ##########
+
+  ########## OBSERVE STATEMENTS FOR INITIALLY CLOSING HIDE/SHOWS ##########
+
   # Observe statement for show/hide export options box
   observe(if (systems_mapping_tab_button_pressed_tracker$exportOptionsToggle == 0) {
     shinyjs::hide(id = "exportOptionsBox")
   })
-  #
+
   # Observe statement for show/hide ego network box
   observe(if (systems_mapping_tab_button_pressed_tracker$egoNetworkToggle == 0) {
     shinyjs::hide(id = "egoNetworkBox")
   })
-  #
+
   # Observe statement for show/hide advanced options box
   observe(if (systems_mapping_tab_button_pressed_tracker$advancedOptionsToggle == 0) {
     shinyjs::hide(id = "advancedOptionsBox")
   })
-  #
+
   # Observe statement for show/hide shortest paths box
   observe(if (systems_mapping_tab_button_pressed_tracker$shortestPathsToggle == 0) {
     shinyjs::hide(id = "shortestPathsBox")
   })
-  #
+
   # Observe statement for show/hide weights box
   observe(if (systems_mapping_tab_button_pressed_tracker$weightsOptionsToggle == 0) {
     shinyjs::hide(id = "weightsBox")
   })
-  #
-  # ########## OBSERVE STATEMENTS FOR INITIALLY CLOSING HIDE/SHOWS ##########
-  #
-  # ########## OBSERVE EVENTS FOR OPENING/CLOSING HIDE/SHOWS ##########
+
+  ########## OBSERVE STATEMENTS FOR INITIALLY CLOSING HIDE/SHOWS ##########
+
+  ########## OBSERVE EVENTS FOR OPENING/CLOSING HIDE/SHOWS ##########
   # Observe statement for show/hide weights options box
   observeEvent(input$weightsOptions, {
     
@@ -2400,7 +1992,7 @@ server <- function(input, output, session) {
       shinyjs::hide(id = "weightsBox")
     }
   })
-  #
+
   # Observe statement for show/hide export options box
   observeEvent(input$exportOptions, {
     
@@ -2410,7 +2002,7 @@ server <- function(input, output, session) {
       shinyjs::hide(id = "exportOptionsBox")
     }
   })
-  #
+
   # Observe statement for show/hide ego network box
   observeEvent(input$egoNetwork, {
     
@@ -2420,7 +2012,7 @@ server <- function(input, output, session) {
       shinyjs::hide(id = "egoNetworkBox")
     }
   })
-  #
+
   # Observe statement for show/hide advanced options box
   observeEvent(input$advancedOptions, {
     
@@ -2430,7 +2022,7 @@ server <- function(input, output, session) {
       shinyjs::hide(id = "advancedOptionsBox")
     }
   })
-  #
+
   # Observe statement for show/hide shortest paths box
   observeEvent(input$shortestPaths, {
     
@@ -2440,7 +2032,7 @@ server <- function(input, output, session) {
       shinyjs::hide(id = "shortestPathsBox")
     }
   })
-  #
+
   ########## OBSERVE EVENTS FOR OPENING/CLOSING HIDE/SHOWS ##########
   
   # Trigger the tour when the button is pressed
@@ -2489,8 +2081,6 @@ server <- function(input, output, session) {
       
       dynamic_nodes_ids_values$dynamic_nodes_ids <- setNames(dynamic_nodes$id, dynamic_nodes$label)
       
-      print('Line 2963 printing')
-      
     }
     
   )
@@ -2517,81 +2107,25 @@ server <- function(input, output, session) {
       )
       return()}
     
-    print('Line 2991 printing')
-    
     systems_mapping_values$network_initialised <- TRUE
-    
-    #if (!button_pressed()){
     
     #### Systems Mapping Tab ####
     
     ##### Setting Up The Initial File, inc. if it has clustering #####
     
-    # rawcases <- reactive({
-    #   if (!is.null(input$file1) && !is.null(current_data_file)) {
-    #
-    #     if (kmeans_count$value > 0 && !is.null(current_kmeans_solution)) {
-    #       rawcases_data <- cbind(current_data_file, "Group" = current_kmeans_solution@uclusters)
-    #       print("rawcases has been updated with k-means clustering results")
-    #     } else {
-    #       rawcases_data <- data.frame(current_data_file, Group = NA)
-    #       print("raw cases is as user uploaded, with an added null group column")
-    #     }
-    #     return(rawcases_data)
-    #   }
-    # })
-    
-    #rawcases <- reactiveValues(value = NULL)
-    
-    #if(!is.null(current_data_file)){
-    
     observe({
-      
-      print('Line 3021 printing')
-      
-      #browser()
-      
-      #rawcases <-
-      #  if (!is.null(input$file1) && !is.null(current_data_file)) {
       
       if (kmeans_count$value > 0 && !is.null(kmeans_solution$current_kmeans_solution)) {
         rawcases_data <- cbind(uploaded_data_values$current_data_file, "Group" = kmeans_solution$current_kmeans_solution@uclusters)
         systems_mapping_values$rawcases <- rawcases_data
-        print("rawcases has been updated with k-means clustering results")
       } else {
         rawcases_data <- data.frame(uploaded_data_values$current_data_file, Group = NA)
         systems_mapping_values$rawcases <- rawcases_data
-        print("raw cases is as user uploaded, with an added null group column")
       }
-      #return(rawcases_data)
-      #  }
+      
     })
     
-    #}
-    
     ########## OBSERVE STATEMENTS FOR MODAL BOXES ##########
-    
-    ##### Observe statement for initial start up modal box #####
-    #observe({
-    #  shinyalert(
-    #    title = "<u><b>Using the Map</b></u>",
-    #    text = text,
-    #    size = "m",
-    #    closeOnEsc = TRUE,
-    #    closeOnClickOutside = FALSE,
-    #    html = TRUE,
-    #    type = "info",
-    #    showConfirmButton = TRUE,
-    #    showCancelButton = FALSE,
-    #    confirmButtonText = "OK",
-    #    confirmButtonCol = "#bce7fa",
-    #    timer = 0,
-    #    imageUrl = "",
-    #    animation = TRUE
-    #  )
-    #})
-    
-    #pop_up <- FALSE
     
     ##### Observe statement for initial start up modal box #####
     
@@ -2618,8 +2152,6 @@ server <- function(input, output, session) {
     chosen_node <- reactive({  input$chosen_node  })
     ########## SETTING UP INPUTS ##########
     
-    print('Line 3090 printing')
-    
     rawcases_filtered <- reactive({
       if (cluster() == 'All') {
         rawcases_filt <- systems_mapping_values$rawcases %>% select(-Group)
@@ -2631,20 +2163,6 @@ server <- function(input, output, session) {
         rawcases_filt
       }
     })
-    
-    
-    #rawcases_filtered <-  reactive({ current_data_file })
-    
-    # corrs_matrix <- tryCatch({
-    #
-    #   result = reactive({  rcorr(as.matrix(rawcases_filtered()[,1:ncol(rawcases_filtered())]))  })
-    #   return(result)
-    #   },
-    #   error=function(e) {
-    #     message('Loading Network')
-    #     print(e)
-    #   }
-    #   )
     
     corrs_matrix <- reactive({
       
@@ -2687,8 +2205,6 @@ server <- function(input, output, session) {
     nodes <- reactive({  rowid_to_column(pre_nodes_2(), "id")  }) # keep this one named as nodes
     
     corrs_filtered <- reactive({
-      
-      print('Line 3162 printing')
       
       corrs() %>%
         subset(select = c("row", "column", "cor")) %>%
@@ -2759,8 +2275,6 @@ server <- function(input, output, session) {
     
     nodes2 <- reactive({
       
-      print('Line 3232 printing')
-      
       if (ego_network() == TRUE) {
         distances <- distances(igraph())
         distances <- as.data.frame(distances[target_node(), ] )
@@ -2795,8 +2309,6 @@ server <- function(input, output, session) {
     })
     
     nodes_to_keep <- reactive({
-      
-      print('Line 3269 printing')
       
       if (shortest_paths_toggle() == TRUE) {
         
@@ -2842,8 +2354,6 @@ server <- function(input, output, session) {
     
     nodes4 <- reactive({
       
-      print('Line 3315 printing')
-      
       if (remove_unconnecteds() == "Yes" & ego_network() == FALSE & shortest_paths_toggle() == FALSE){
         
         igraph <- graph_from_data_frame(links5(), vertices = nodes3(), directed = F)
@@ -2858,7 +2368,6 @@ server <- function(input, output, session) {
         new_nodes <- nodes3()[!nodes3()$id %in% removes, ]
         
         systems_mapping_values$nodes4_download <- new_nodes
-        #examine_nodes_dropdown_ids <<- new_nodes
         systems_mapping_values$examine_nodes_dropdown_ids <- setNames(new_nodes$id, new_nodes$label)
         
         systems_mapping_values$user_set_seed <- seed()
@@ -2866,29 +2375,15 @@ server <- function(input, output, session) {
         new_nodes
       } else {
         systems_mapping_values$nodes4_download <- nodes3()
-        #examine_nodes_dropdown_ids <<- nodes3()
         systems_mapping_values$examine_nodes_dropdown_ids <- setNames(nodes3()$id, nodes3()$label)
         systems_mapping_values$user_set_seed <- seed()
         nodes3()
       }
     })
-    
-    # if(!(input$to_node %in% nodes4())){output$network_warning <- renderText({"Please make a valid selection!"})
-    # print("this is running renderText")
-    # return()}
+
     
     final_network <- reactive({
-      
-      if(is.null(nodes4())){print('nodes4() is NULL')}
-      else if (is.null(links5())){print('links5() is NULL')}
-      else{print('neither nodes4() or links5() is NULL')}
-      
-      print('Line 3351 printing')
-      
-      # validate(
-      #   need(is.null(links5()), "Have you made a valid selection?")
-      # )
-      
+
       set.seed(seed())
       
       visNetwork(nodes4(), links5(), width = "100%",
@@ -2943,8 +2438,6 @@ server <- function(input, output, session) {
     
     filtered_links_for_igraph <- reactive({ links5()[links5()$to %in% nodes4()$id & links5()$from %in% nodes4()$id, ] })
     
-    #filtered_nodes_for_igraph <- unique(c(filtered_links_for_igraph()$from, filtered_links_for_igraph()$to))
-    
     igraph_for_stats <- reactive({  graph_from_data_frame(filtered_links_for_igraph(), vertices = nodes4(), directed = F)  })
     
     igraph_for_stats2 <- reactive({
@@ -2971,18 +2464,6 @@ server <- function(input, output, session) {
     standardised_score <- reactive({ round(direct_connections()/(nrow(nodes4())-1), 2) })
     valid_nodes <- reactive ({ (nrow(nodes4())) - 1 - (sum(is.na(closeness()$chosen_node))) })
     node_average_distance <- reactive ({ round(sum(closeness()$chosen_node, na.rm = T)/valid_nodes(), 2) })
-    
-    # str1 <- reactive({
-    #
-    #   if(direct_connections() != 0){
-    #     str1 <- paste("Number of direct links:", direct_connections())
-    #     str1
-    #   } else {
-    #     str1 <- paste("This node is unconnected")
-    #     str1
-    #   }
-    #
-    # })
     
     
     str1 <- reactive({
@@ -3115,42 +2596,8 @@ server <- function(input, output, session) {
       
     })
     
-    # output$pngSave <- downloadHandler(
-    #   filename = function() {
-    #     paste('network-', Sys.Date(), '.png', sep='')
-    #   },
-    #   content = function(PNGfile) {
-    #     final_network() %>% visExport()
-    #   }
-    # )
-    
     output$networkPlot <- renderVisNetwork({final_network()})
-    
-    # output$networkPlot <- renderVisNetwork({
-    #   result <- tryCatch({
-    #     final_network()
-    #   }, error = function(e) {
-    #     # Print a general error message to the console for the developer
-    #     cat("Some error occurred, this is printing\n")
-    #     return(NULL)  # Return NULL to indicate an empty plot or do nothing
-    #   })
-    #
-    #   if (inherits(result, "visNetwork")) {
-    #     # If no error occurred, return the result
-    #     return(result)
-    #   } else {
-    #     # Handle the case when an error occurred
-    #     # You can return an empty plot, do nothing, or take other actions here
-    #     return(NULL)
-    #   }
-    # })
-    
-    
-    
-    #html_object <<- final_network()
-    
-    #output$text <- renderText({  HTML(paste(str1(), str2(), str3(), str4(), str5(), sep = '<br/>'))  })
-    
+
     output$text <- renderText({  HTML(paste(str1(), str2(), str3(), str4(), str5(), sep = '<br/>'))  }) #
     
     ########## MAKING THE WEIGHTS DOWNLOAD ##########
@@ -3183,12 +2630,9 @@ server <- function(input, output, session) {
     )
     ########## MAKING THE WEIGHTS DOWNLOAD ##########
     
-    #button_pressed(TRUE)
-    
     
   }
   
-  #    }
   )
   
   
@@ -3350,58 +2794,13 @@ server <- function(input, output, session) {
   )
   
   
-  
-  # observe({
-  #
-  #   if (kmeans_count$value > 0 && !is.null(current_kmeans_solution)) {
-  #     updateSelectInput(session = session, inputId = "cluster", choices = c("All", sort(unique(na.omit(rawcases$Group)))))
-  #     print("This has run!!!")
-  #   }})
-  
-  
   observe({
     
     if (kmeans_count$value > 0 && !is.null(kmeans_solution$current_kmeans_solution)) {
       systems_mapping_values$choices <- c("All", sort(unique(na.omit(kmeans_solution$current_kmeans_solution@uclusters))))
-      print("This has run!!!")
       
     }})
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  # dynamic_nodes <- reactive({
-  #   if(is.null(current_data_file)) {
-  #     return(NULL)
-  #   } else {
-  #     data.frame(id = seq_along(current_data_file[,1:ncol(current_data_file)]),
-  #                label = colnames(current_data_file[,1:ncol(current_data_file)]))
-  #   }
-  # })
-  #
-  # dynamic_nodes_ids <<- reactive({
-  #   if(is.null(dynamic_nodes())) {
-  #     return(NULL)
-  #   } else {
-  #     setNames(dynamic_nodes()$id, dynamic_nodes()$label)
-  #   }
-  # })
-  
-  
-  # # Create a reactive value that wraps the global variable
-  # reactive_current_data_file <- reactiveVal(current_data_file)
-  #
-  # # Update the reactive value when the global variable changes
-  # observe({
-  #   reactive_current_data_file(current_data_file)
-  # })
+
   
   dynamic_nodes <- reactive({
     if(is.null(uploaded_data_values$current_data_file)) {
@@ -3412,18 +2811,8 @@ server <- function(input, output, session) {
       
       dynamic_nodes_ids_values$dynamic_nodes_ids <-  setNames(dynamic_nodes$id, dynamic_nodes$label)
       
-      print('This dynamic nodes reactive has printed')
-      
     }
   })
-  
-  # dynamic_nodes_ids <- reactive({
-  #   if(is.null(dynamic_nodes())) {
-  #     return(NULL)
-  #   } else {
-  #     setNames(dynamic_nodes()$id, dynamic_nodes()$label)
-  #   }
-  # })
   
   ##############################################
   
@@ -3435,137 +2824,13 @@ server <- function(input, output, session) {
       data.frame(id = seq_along(uploaded_data_values$current_data_file[,1:ncol(uploaded_data_values$current_data_file)]),
                  label = colnames(uploaded_data_values$current_data_file[,1:ncol(uploaded_data_values$current_data_file)]))
       
-      #unique(c(filtered_links_for_igraph()$from, filtered_links_for_igraph()$to))
-      
     }
   })
   
-  # examine_nodes_dropdown_ids <<- reactive({
-  #   if(is.null(dynamic_nodes())) {
-  #     print('examine_nodes_dropdown_ids RUNNING!!')
-  #     return(NULL)
-  #   } else if(nrow(nodes4()) < length(dynamic_nodes())) {
-  #     setNames(nodes4()$id, nodes4()$label)
-  #     print('examine_nodes_dropdown_ids RUNNING!!')
-  #   } else {
-  #     setNames(dynamic_nodes()$id, dynamic_nodes()$label)
-  #     print('examine_nodes_dropdown_ids RUNNING!!')
-  #   }
-  # })
-  
-  # output$troubleshooting_text <- renderPrint({
-  #  filtered_nodes_for_igraph()
-  # })
-  
-  
-  
-  observeEvent(input$file1, {
-    
-    Sys.sleep(5)
-    
-    if (!is.null(uploaded_data_values$current_data_file)) {
-      
-      print("This is printing :)")
-      
-      #dynamic_nodes <- data.frame(
-      #id = seq_along(current_data_file[, 2:ncol(current_data_file)]),
-      #label = colnames(current_data_file[, 2:ncol(current_data_file)])
-      #)
-      
-      #dynamic_nodes_ids <- setNames(dynamic_nodes$id, dynamic_nodes$label)
-      
-      #print("This is printing :)")
-      
-      # Perform any other actions with dynamic_nodes or dynamic_nodes_ids here
-      
-    }
-  })
-  
-  
-  
-  #   observe({
-  #     updateSelectInput(session = session, inputId = "target_node", choices = dynamic_nodes_ids())
-  #   })
-  #
-  #   observe({
-  #     updateSelectInput(session = session, inputId = "from_node", choices = dynamic_nodes_ids())
-  #   })
-  #
-  #   observe({
-  #     updateSelectInput(session = session, inputId = "to_node", choices = dynamic_nodes_ids())
-  #   })
-  #
-  #   observe({
-  #     updateSelectInput(session = session, inputId = "chosen_node", choices = dynamic_nodes_ids())
-  #   })
-  
-  
-  
-  
-  # observeEvent(input$initialise_button, {
-  #
-  #   if (!button_pressed()){
-  #
-  # observe({
-  #
-  #   if (kmeans_count$value > 0 && !is.null(current_kmeans_solution)) {
-  #     #updateSelectInput(session = session, inputId = "cluster", choices = c("All", sort(unique(na.omit(rawcases$Group)))))
-  #     print("This is running")
-  #   }
-  #
-  #   #
-  #   # observe({
-  #   #
-  #   #   print("this has run")
-  #   #
-  #   #   #rawcases <-
-  #   #   #  if (!is.null(input$file1) && !is.null(current_data_file)) {
-  #   #
-  #   #   if (kmeans_count$value > 0 && !is.null(current_kmeans_solution)) {
-  #   #     rawcases_data <- cbind(current_data_file, "Group" = current_kmeans_solution@uclusters)
-  #   #     rawcases <<- rawcases_data
-  #   #     print("rawcases has been updated with k-means clustering results")
-  #   #   } else {
-  #   #     rawcases_data <- data.frame(current_data_file, Group = NA)
-  #   #     rawcases <<- rawcases_data
-  #   #     print("raw cases is as user uploaded, with an added null group column")
-  #   #   }
-  #   #   #return(rawcases_data)
-  #   #   #  }
-  #   # })
-  #
-  #
-  # })
-  #
-  # dynamic_nodes <- reactive({
-  #   if(is.null(current_data_file)) {
-  #     return(NULL)
-  #   } else {
-  #     data.frame(id = seq_along(current_data_file[,2:ncol(current_data_file)]),
-  #                label = colnames(current_data_file[,2:ncol(current_data_file)]))
-  #   }
-  # })
-  #
-  # dynamic_nodes_ids <<- reactive({
-  #   if(is.null(dynamic_nodes())) {
-  #     return(NULL)
-  #   } else {
-  #     setNames(dynamic_nodes()$id, dynamic_nodes()$label)
-  #   }
-  # })
-  #
-  
-  #reactive_examine_nodes_dropdown_ids <- reactiveVal(examine_nodes_dropdown_ids)
-  
-  # Update the reactive value when the global variable changes
-  # observe({
-  #   reactive_current_data_file(examine_nodes_dropdown_ids)
-  # })
   
   observeEvent(input$initialise_button, {
     
     if(is.null(uploaded_data_values$current_data_file)){output$network_warning <- renderText({"Please upload data first."})
-    print("this is running renderText")
     return()}
     
     observe({
@@ -3582,15 +2847,7 @@ server <- function(input, output, session) {
     
     observe({
       
-      #if ( nrow(nodes4_download) < length(dynamic_nodes_ids) ){
-      
       updateSelectInput(session = session, inputId = "chosen_node", choices = systems_mapping_values$examine_nodes_dropdown_ids)
-      
-      #} else {
-      
-      #updateSelectInput(session = session, inputId = "chosen_node", choices = dynamic_nodes_ids)
-      
-      #}
       
     })
     
@@ -3618,41 +2875,6 @@ server <- function(input, output, session) {
                  
                  
                })
-  
-  
-  
-  
-  # triggered <<- FALSE
-  #
-  # observeEvent(input$target_node,
-  #              {
-  #                observe({
-  #                  if( !(input$target_node %in% examine_nodes_dropdown_ids)){# | !(input$from_node %in% examine_nodes_dropdown_ids) | !(input$to_node %in% examine_nodes_dropdown_ids) ){
-  #                    triggered <<- TRUE
-  #                    cat('Triggered is ', triggered, sep='')
-  #
-  #                    if (triggered == TRUE) {
-  #                      shinyalert(
-  #                        title = "<u><b>Warning!</b></u>",
-  #                        text = 'Sample Text',
-  #                        size = "m",
-  #                        closeOnEsc = TRUE,
-  #                        closeOnClickOutside = FALSE,
-  #                        html = TRUE,
-  #                        type = "info",
-  #                        showConfirmButton = TRUE,
-  #                        showCancelButton = FALSE,
-  #                        confirmButtonText = "OK",
-  #                        confirmButtonCol = "#bce7fa",
-  #                        timer = 0,
-  #                        imageUrl = "",
-  #                        animation = TRUE
-  #                      )
-  #                    }
-  #                    triggered <<- FALSE
-  #                    }
-  #                })
-  #              })
   
   
   observeEvent(input$target_node, {
@@ -3717,36 +2939,7 @@ server <- function(input, output, session) {
       )
     }
   })
-  
-  
-  #
-  
-  # observeEvent(c(input$neg_corr, input$pos_corr, input$minor_threshold,
-  #                input$seed, input$layout, input$degree, input$target_node,
-  #                input$ego_network, input$ego_network, input$title,
-  #                input$subtitle, input$footer, input$shortest_paths_toggle,
-  #                input$from_node, input$to_node, input$include_weights,
-  #                input$remove_unconnecteds, input$LineThickness,
-  #                input$htmlSave),
-  #
-  #              {
-  #
-  #                observe({
-  #
-  #                  if(is.null(run_through)){
-  #                    NULL
-  #                  } else if(run_through == TRUE){
-  #                    NULL
-  #                  } else if(run_through == FALSE){
-  #                    output$network_warning <- renderText({"You've made an invalid network selection."})
-  #                  } else {
-  #                    NULL
-  #                  }
-  #
-  #                })
-  #
-  #
-  #              })
+
   
   
   observeEvent(input$init_kmeans,
@@ -3762,8 +2955,6 @@ server <- function(input, output, session) {
                      choices_filtered_values <- as.numeric(names(choices_value_counts[choices_value_counts > 4]))
                      systems_mapping_values$choices <- c("All", sort(choices_filtered_values))
                      
-                     print("This has run!!!")
-                     
                    }})
                  
                  observe({
@@ -3774,16 +2965,5 @@ server <- function(input, output, session) {
                  
                })
   
-  
-  
-  #
-  #   }
-  #
-  # })
-  
-  
-  observeEvent(input$egoNetwork, {
-    print(paste0("EgoNetwork Value: ", input$egoNetwork))
-  })
 }  
 
