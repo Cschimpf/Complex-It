@@ -988,6 +988,46 @@ server <- function(input, output, session) {
     #### Panel 'Plot Map'
     #############################################################################
   
+  # Trigger the tour when the button is pressed
+  observeEvent(input$tour_viz, {
+    
+    # Start the tour
+    introjs(session,
+            options = list("nextLabel" = "Next",
+                           "prevLabel" = "Previous",
+                           "skipLabel" = "Quit",
+                           
+                           steps = list(
+                             list(
+                               element = "#save_som_intro_box",
+                               intro = "Click this button to save your SOM 
+                               solution from te previous tab."),
+                             
+                             list(
+                               element = "#infoButton_plot_map",
+                               intro = "Clicking this button lets you read some 
+                               information about using the Compare and Visualise tab."),
+                             
+                             list(
+                               element = "#somplotwhat_introbox",
+                               intro = "Here you can choose whether to plot 
+                               your dataset's observations or prototypes."),
+                             
+                             list(
+                               element = "#somplottype_introbox",
+                               intro = "Here you can choose what type of chart 
+                               to display."),
+                             
+                             list(
+                               element = "#conditional_toggles_introbox",
+                               intro = "Some charts take additional toggles, 
+                               which you can adjust here if applicable.")
+                           )
+            ),
+    )
+    
+  })
+  
   plot_map_text <- "<div style='line-height: 30px'><u><b>Reading the SOM Grid:</b></u>
                  1) To begin, we label each case with its CASE ID and K-MEANS ID.
                  2) To see these IDs, for 'PLOT WHAT?' select observations; and for 'TYPE OF PLOT' select names.
@@ -1501,6 +1541,46 @@ server <- function(input, output, session) {
       imageUrl = "",
       animation = TRUE
     )
+  })
+  
+  # Trigger the tour when the button is pressed
+  observeEvent(input$tour_scenarios, {
+    
+    # Start the tour
+    introjs(session,
+            options = list("nextLabel" = "Next",
+                           "prevLabel" = "Previous",
+                           "skipLabel" = "Quit",
+                           
+                           steps = list(
+                             list(
+                               element = "#infoButton_scenarios",
+                               intro = "Clicking this button lets you read some 
+                               information about using the Compare and Visualise tab."),
+                             
+                             list(
+                               element = "#Agent_Setup_introbox",
+                               intro = "On first using the Simulations tab set up 
+                               the model by pressing this button. You only need 
+                               to do this once."),
+                             
+                             list(
+                               element = "#Agent_Run_Clusters_introbox",
+                               intro = "Here you can run your clusters, including 
+                               different scenarios you model."),
+                             
+                             list(
+                               element = "#SensitivityAnalysis_introbox",
+                               intro = "here you can put error bars around how 
+                               effective your interventions may be, and run a 
+                               Monte-Carlo analysis for how effective your 
+                               interventions are.")
+                             
+                             )
+                           
+                           )
+    )
+    
   })
   
   agent_cluster_ordinals <- reactiveValues(first = NA, second = NA, third = NA, fourth = NA, fifth = NA, sixth = NA)

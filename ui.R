@@ -1,5 +1,3 @@
-## First commit using Git command line
-
 library(shiny)
 library(shinyBS)
 library(shinythemes)
@@ -167,7 +165,19 @@ ui <- dashboardPage(
                                                          
                                                          box(width = 12, 
                                                              
-                                                             actionButton("show_modal", "Upload your data"),
+                                                             actionButton("show_modal",
+                                                                          "Upload your data",
+                                                                          style = "foreground-color:white;
+                                                                          background-color:darksalmon;
+                                                                          color:black;
+                                                                          float:center;
+                                                                          height: 50px;
+                                                                          text-align:center;
+                                                                          border-color:black;
+                                                                          border-radius: 5px;
+                                                                          border-width: 5px;
+                                                                          margin-bottom: 5px;
+                                                                          margin-top: 5px;"),
 
                                                              uiOutput("varchoice"),
 
@@ -531,33 +541,76 @@ ui <- dashboardPage(
                 column(3,
                        box(width=12,
                            
-                           selectInput(
-                             "somplotwhat",
-                             "Plot What?",
-                             choices = list("Observations"= "obs",
-                                            "Prototypes"= "prototypes")
-                                       ),
-                           
-                           selectInput(
-                             "somplottype",
-                             "Type of Plot:",
-                             choices = c('color',
-                                         'barplot',
-                                         'names',
-                                         'boxplot')
+                           introBox(
+                             actionButton(
+                               "save_som",
+                               "Save SOM Results",
+                               class = "full-width-button",
+                               style = "foreground-color:white;
+                                          background-color:darksalmon;
+                                          color:black;
+                                          float:center;
+                                          height: 50px;
+                                          text-align:center;
+                                          border-color:black;
+                                          border-radius: 5px;
+                                          border-width: 5px;
+                                          margin-bottom: 5px;
+                                          margin-top: 5px;"
                              ),
+                             
+                             uiOutput("save_som_notice"),
+                             
+                             id = "save_som_intro_box"
+                           ),
                            
-                           conditionalPanel(
-                             "input.somplottype == 'color' || input.somplottype == '3d'",
+                           actionButton(
+                             "infoButton_plot_map",
+                             "Info",
+                             class = "full-width-button",
+                             style = "margin-bottom: 5px; margin-top: 5px;"
+                           ),
+                           
+                           actionButton(
+                             "tour_viz",
+                             "Guided Tour of Inputs",
+                             class = "full-width-button",
+                             style = "margin-bottom: 20px; margin-top: 5px;"
+                           ),
+                           
+                           introBox(
+                             selectInput(
+                               "somplotwhat",
+                               "Plot What?",
+                               choices = list("Observations"= "obs",
+                                              "Prototypes"= "prototypes")
+                             ),
+                             
+                             id = "somplotwhat_introbox"
+                           ),
+                           
+                           
+                           
+                           introBox(
+                             selectInput(
+                               "somplottype",
+                               "Type of Plot:",
+                               choices = c('color',
+                                           'barplot',
+                                           'names',
+                                           'boxplot')
+                             ),
+                             
+                             id = "somplottype_introbox"
+                           ),
+                           
+                           introBox(
                              selectInput(
                                "somplotvar",
                                "Variable:",
                                choices = "(Not Available)"
-                               )
                              ),
-                           
-                           conditionalPanel(
-                             "input.somplottype == 'names'",
+                             
                              numericInput(
                                "names_SC_num",
                                "Number of Superclusters:",
@@ -565,27 +618,11 @@ ui <- dashboardPage(
                                min = 2,
                                max = 10,
                                step = 1
-                               )
                              ),
+                             
+                             id = "conditional_toggles_introbox"
+                           )
                            
-                           # conditionalPanel(
-                           #   "input.trainbutton > 0",
-                             actionButton(
-                               "save_som",
-                               "Save SOM Results",
-                               class = "full-width-button",
-                               style = "margin-bottom: 5px; margin-top: 5px;"
-                               ),
-                             # ),
-                           
-                           uiOutput("save_som_notice"),
-                           
-                           actionButton(
-                             "infoButton_plot_map",
-                             "Info",
-                             class = "full-width-button",
-                             style = "margin-bottom: 5px; margin-top: 5px;"
-                             )
                            )
                        ),
                 
@@ -702,10 +739,18 @@ ui <- dashboardPage(
                                         style = "margin-bottom: 5px;
                                                      margin-top: 5px;"),
                            
+                           actionButton(
+                             "tour_scenarios",
+                             "Guided Tour of Inputs",
+                             class = "full-width-button",
+                             style = "margin-bottom: 20px; margin-top: 5px;"
+                           ),
+                           
                            h4("Run Model", style = "text-align: center;"),
                            
-                           actionButton(inputId = "Agent_Setup", label="Model Setup", class = "full-width-button",
-                                        style = "foreground-color:white; 
+                           introBox(
+                             actionButton(inputId = "Agent_Setup", label="Model Setup", class = "full-width-button",
+                                          style = "foreground-color:white; 
                                                      background-color:khaki;
                                                      color:black;
                                                      float:center;
@@ -716,9 +761,13 @@ ui <- dashboardPage(
                                                      border-width: 5px;
                                                      margin-bottom: 5px;
                                                      margin-top: 5px;"),
+                             
+                             id = "Agent_Setup_introbox"
+                           ),
                            
-                           actionButton(inputId = "Agent_Run_Clusters", label="Run Clusters", class = "full-width-button",
-                                        style = "foreground-color:white;
+                           introBox(
+                             actionButton(inputId = "Agent_Run_Clusters", label="Run Clusters", class = "full-width-button",
+                                          style = "foreground-color:white;
                                                      background-color:lavender;
                                                      color:black;
                                                      height: 50px;
@@ -728,11 +777,15 @@ ui <- dashboardPage(
                                                      border-width: 5px;
                                                      margin-bottom: 20px;
                                                      margin-top: 5px;"),
+                             
+                             id = "Agent_Run_Clusters_introbox"
+                           ),
                            
                            h4("Sensitivity Analysis", style = "text-align: center;"),
                            
-                           actionButton(inputId = "SensitivityAnalysis", label="Sensitivity", class = "full-width-button",
-                                        style = "foreground-color:white; 
+                           introBox(
+                             actionButton(inputId = "SensitivityAnalysis", label="Sensitivity", class = "full-width-button",
+                                          style = "foreground-color:white; 
                                                     background-color:darksalmon; 
                                                     color:black;
                                                     float:center;
@@ -743,10 +796,13 @@ ui <- dashboardPage(
                                                     border-width: 5px;
                                                     margin-bottom: 5px;
                                                     margin-top: 5px;"),
+                             
+                             uiOutput('cluster_sensitivity'),
+                             
+                             id = "SensitivityAnalysis_introbox"
+                           )
                            
-                           uiOutput('cluster_sensitivity')
-                           
-                       ),
+                           ),
                        
                        
                 ),
