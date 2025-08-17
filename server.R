@@ -31,6 +31,9 @@ library(ggfittext)
 
 server <- function(input, output, session) {
   
+  # lengthChange = FALSE
+  # options(DT.options = list(dom = 'ftpi'))
+  
   output$complexit_logo <- renderImage({list(src="Complexit_LOGO3.png")}, deleteFile = FALSE)
   
   ########################### PANEL 'IMPORT DATA' ############################
@@ -407,7 +410,9 @@ server <- function(input, output, session) {
   output$view <- renderDT(
     
     uploaded_data_values$display_data,
-    options = list(scrollX = TRUE, searching = FALSE),
+    options = list(scrollX = TRUE,
+                   searching = FALSE,
+                   lengthChange = FALSE),
     rownames = FALSE
   )
   

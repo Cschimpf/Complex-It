@@ -29,21 +29,19 @@ library(shinycssloaders)
 library(ggfittext)
 
 mytheme <- create_theme(
-  adminlte_color(
-    light_blue = "#bce7fa"
-  ),
+  adminlte_color(light_blue = "#bce7fa"),
   adminlte_sidebar(
     width = "400px",
     dark_bg = "#FFFFFF",
     dark_hover_bg = "#EEEEEE",
-    dark_color = "#000000", 
-    dark_hover_color = "#000000", 
-    dark_submenu_color = "#000000", 
+    dark_color = "#000000",
+    dark_hover_color = "#000000",
+    dark_submenu_color = "#000000",
     dark_submenu_hover_color = "#000000"
   ),
   adminlte_global(
     content_bg = "#FAFAFA",
-    box_bg = "#FFFFFF", 
+    box_bg = "#FFFFFF",
     info_box_bg = "#FFFFFF"
   )
 )
@@ -71,66 +69,96 @@ ui <- dashboardPage(
       id = 'tabs',
       
       menuItem("Import Your Cases and Map Your Theory",
-               menuSubItem("Import Cases and Map Theory", tabName = "importing")
-      ), 
+               menuSubItem(
+                 "Import Cases and Map Theory",
+                 tabName = "importing"
+                 )
+               ), 
       
       menuItem("Build, Confirm and Explore Your Model",
-               menuSubItem("Cluster Your Cases", tabName = "cluster_cases"),
-               menuSubItem("Use AI to Confirm Clusters", tabName = "AI_clusters"),
-               menuSubItem("Compare and Visualise Your Results", tabName = "compare_and_visualise")
-      ), 
+               
+               menuSubItem(
+                 "Cluster Your Cases",
+                 tabName = "cluster_cases"
+                 ),
+               
+               menuSubItem(
+                 "Use AI to Confirm Clusters",
+                 tabName = "AI_clusters"
+                 ),
+               
+               menuSubItem(
+                 "Compare and Visualise Your Results",
+                 tabName = "compare_and_visualise"
+                 )
+               ), 
       
       menuItem("Run Scenario Simulations",
-               menuSubItem("Simulate Your Scenarios, Policies, or Interventions", tabName = "scenarios")
-      ), 
+               menuSubItem(
+                 "Simulate Your Scenarios, Policies, or Interventions",
+                 tabName = "scenarios"
+                 )
+               ), 
       
       menuItem("Forecast New Data",
-               menuSubItem("Use AI to Predict the Cluster Membership of New Cases", tabName = "forecasting")
-      ), 
+               menuSubItem(
+                 "Use AI to Predict the Cluster Membership of New Cases",
+                 tabName = "forecasting"
+                 )
+               ), 
       
       menuItem("Explore Systems Map",
-               menuSubItem("Use Systems Mapping to Explore Cluster Variables", tabName = "systems_mapping")
-      ), 
+               menuSubItem(
+                 "Use Systems Mapping to Explore Cluster Variables",
+                 tabName = "systems_mapping"
+                 )
+               ), 
       
       menuItem("Export Your Results",
-               menuSubItem("Generate Your Report", tabName = "generate_report")
-      ), 
+               menuSubItem(
+                 "Generate Your Report",
+                 tabName = "generate_report"
+                 )
+               ), 
       
       menuItem("Help",
-               menuSubItem("Help Using COMPLEX-IT", tabName = "help")
-      ) 
-    )
-  ),
+               menuSubItem(
+                 "Help Using COMPLEX-IT",
+                 tabName = "help"
+                 )
+               )
+      )
+    ),
+  
   dashboardBody(
     
     useShinyjs(),
     
     use_theme(mytheme),
     
-    tags$head(tags$style(HTML('
-.box {margin-top: 2px;margin-left: 0px; margin-right: 0px; margin-bottom:2px;padding:-10px}'
-    ))),
+    tags$head(
+      tags$style(
+        HTML('.box {margin-top: 2px;margin-left: 0px; margin-right: 0px; margin-bottom:2px;padding:-10px}')
+        )
+      ),
     
-    tags$head(tags$style(HTML('
-        .skin-blue .main-header .navbar .sidebar-toggle {
-          color: #000000;
-        }
-      '))),
+    tags$head(
+      tags$style(
+        HTML('.skin-blue .main-header .navbar .sidebar-toggle {color: #000000;}')
+        )
+      ),
     
-    tags$head(tags$style(HTML('
-        .skin-blue .main-header .logo {
-          color: #000000;
-        }
-      '))),
+    tags$head(
+      tags$style(
+        HTML('.skin-blue .main-header .logo {color: #000000;}')
+        )
+      ),
 
-    tags$style(HTML(".full-width-button { width: 100%; }")),
+    tags$style(
+      HTML(".full-width-button { width: 100%; }")
+      ),
     
-    tags$style("
-#varchoice ~ .selectize-control .selectize-input {
-  max-height: 100px;
-  overflow-y: auto;
-}
-"),
+    tags$style("#varchoice ~ .selectize-control .selectize-input {max-height: 100px; overflow-y: auto;}"),
     
     introjsUI(),
     
@@ -139,202 +167,225 @@ ui <- dashboardPage(
       ##### IMPORT TAB #####
       tabItem("importing",
               
-              tags$h2("STEP 1: IMPORT YOUR DATABASE AND MAP YOUR THEORY", style = "text-align: center;"),
+              tags$h2(
+                "STEP 1: IMPORT YOUR DATABASE AND MAP YOUR THEORY",
+                style = "text-align: center;"
+                ),
               
-              tags$h3(HTML("Here you will upload your data. <br> 
-                           You can also create a conceptual systems map with of your data using PRSM."), style = "text-align: center;"),
+              tags$h3(
+                HTML("Here you will upload your data. <br> You can also create a 
+                    conceptual systems map with of your data using PRSM."),
+                style = "text-align: center;"
+                ),
               
               
-              h4(HTML('For TUTORIALS on preparing and importing your data for COMPLEX-IT and using the PRSM conceptual map <a href= 
-                                                    "https://www.art-sciencefactory.com/tutorials.html"
-                                      target="_blank">CLICK HERE</a>'), style = "text-align: center;"),
+              h4(
+                HTML('For TUTORIALS on preparing and importing your data for 
+                COMPLEX-IT and using the PRSM conceptual map <a href=
+                "https://www.art-sciencefactory.com/tutorials.html"
+                     target="_blank">CLICK HERE</a>'),
+                style = "text-align: center;"
+                ),
 
               br(), 
               
               bsCollapse(open="Import Your Data",
-                              
-                              bsCollapsePanel("Import Your Data", 
-                                              
-                                              div(
-                                                
-                                                style = "height: 50vh",
-                                                
-                                                fluidRow(
-                                                  
-                                                  column(3, 
-                                                         
-                                                         box(width = 12, 
-                                                             
-                                                             actionButton("show_modal",
-                                                                          "Upload your data",
-                                                                          style = "foreground-color:white;
-                                                                          background-color:darksalmon;
-                                                                          color:black;
-                                                                          float:center;
-                                                                          height: 50px;
-                                                                          text-align:center;
-                                                                          border-color:black;
-                                                                          border-radius: 5px;
-                                                                          border-width: 5px;
-                                                                          margin-bottom: 5px;
-                                                                          margin-top: 5px;"),
-
-                                                             uiOutput("varchoice"),
-
-                                                             helpText("Note: Even if the preview only shows a restricted
-                                        number of observations, the map will be based on the full dataset.")
-                                                             
-                                                         )
-                                                         
-                                                         
-                                                         
-                                                  ), 
-                                                  
-                                                  column(9, 
-                                                         
-                                                         DTOutput("view")
-                                                         
-                                                  )
-                                                )
-                                                
-                                              )
-                                              
-                              ),
-                  
-                              
-                              bsCollapsePanel("Create a Conceptual Systems Map of Your Data", 
-                                              
-                                              tags$h4(HTML("PLEASE SAVE YOUR PRSM FILE BEFORE USING AND OPEN PRSM IN ANOTHER WEB-BROWSER TAB"), style = "text-align: center; color: red"),
-                                              
-                                              br(),
-                                              
-                                              div(
-                                                
-                                                style = "height: 65vh",
-                                                
-                                                fluidRow(
-                                                  column(width = 12,
-                                                         tags$iframe(style="border: none; width: 100%; height: 600px",
-                                                                     src = "https://prsm.uk/prsm.html")
-                                                  )
-                                                )
-                                                
-                                              )
-                                              
-                              )
-                              
-                              )
-              
-
-              
-              
-              
-              
-              
-              
-      ),
+                         
+                         bsCollapsePanel("Import Your Data",
+                                         
+                                         div(
+                                           style = "height: 50vh",
+                                           
+                                           fluidRow(
+                                             column(width = 3,
+                                                    box(width = 12,
+                                                        
+                                                        actionButton(
+                                                          "show_modal",
+                                                          "Upload your data",
+                                                          style = "foreground-color:white;
+                                                                  background-color:darksalmon;
+                                                                  color:black;
+                                                                  float:center;
+                                                                  height: 50px;
+                                                                  text-align:center;
+                                                                  border-color:black;
+                                                                  border-radius: 5px;
+                                                                  border-width: 5px;
+                                                                  margin-bottom: 5px;
+                                                                  margin-top: 5px;"
+                                                          ),
+                                                        
+                                                        uiOutput("varchoice")
+                                                        )
+                                                    ),
+                                             
+                                             column(width = 9,
+                                                    DTOutput("view")
+                                                    )
+                                             )
+                                           )
+                                         ),
+                         
+                         bsCollapsePanel("Create a Conceptual Systems Map of Your Data",
+                                         
+                                         tags$h4(
+                                           HTML("PLEASE SAVE YOUR PRSM FILE BEFORE USING AND 
+                                                OPEN PRSM IN ANOTHER WEB-BROWSER TAB"),
+                                           style = "text-align: center; color: red"
+                                           ),
+                                         
+                                         br(),
+                                         
+                                         div(
+                                           style = "height: 65vh",
+                                           
+                                           fluidRow(
+                                             column(width = 12,
+                                                    tags$iframe(
+                                                      style="border: none; width: 100%; height: 600px",
+                                                      src = "https://prsm.uk/prsm.html"
+                                                      )
+                                                    )
+                                             )
+                                           )
+                                         )
+                         )
+              ),
       
       ##### CLUSTER CASES TAB #####
       tabItem("cluster_cases",
               
-              tags$h2("STEP 2: CLUSTER YOUR CASES USING K-MEANS", style = "text-align: center;"), 
+              tags$h2(
+                "STEP 2: CLUSTER YOUR CASES USING K-MEANS",
+                style = "text-align: center;"
+                ), 
               
-              tags$h3(HTML("Here we will use cluster analysis to group your cases based on their different configurations of factors"), style = "text-align: center;"),
+              tags$h3(
+                HTML("Here we will use cluster analysis to group your cases based 
+                     on their different configurations of factors"),
+                style = "text-align: center;"
+                ),
               
               br(),
               
               fluidRow(
-                
-                column(3,
+                column(width = 3,
+                       
                        box(width = 12,
                            
                            introBox(
-                             actionButton(inputId = "init_kmeans",
-                                          label="Get Clusters",
-                                          class = "full-width-button",
-                                          style = "foreground-color:white;
-                                          background-color:darksalmon;
-                                          color:black;
-                                          float:center;
-                                          height: 50px;
-                                          text-align:center;
-                                          border-color:black;
-                                          border-radius: 5px;
-                                          border-width: 5px;
-                                          margin-bottom: 5px;
-                                          margin-top: 5px;")
+                             actionButton(
+                               inputId = "init_kmeans",
+                               label="Get Clusters",
+                               class = "full-width-button",
+                               style = "foreground-color:white;
+                                       background-color:darksalmon;
+                                       color:black;
+                                       float:center;
+                                       height: 50px;
+                                       text-align:center;
+                                       border-color:black;
+                                       border-radius: 5px;
+                                       border-width: 5px;
+                                       margin-bottom: 5px;
+                                       margin-top: 5px;"
+                               )
                              ),
                            
                            introBox(
-                             actionButton("infoButton_kmean",
-                                          "Info",
-                                          class = "full-width-button",
-                                          style = "margin-bottom: 5px;
-                                          margin-top: 5px;")
+                             actionButton(
+                               "infoButton_kmean",
+                               "Info",
+                               class = "full-width-button",
+                               style = "margin-bottom: 5px;
+                                       margin-top: 5px;"
+                               )
                              ),
                            
-                           actionButton("tour_kmeans",
-                                        "Guided Tour of Inputs",
-                                        class = "full-width-button",
-                                        style = "margin-bottom: 20px;
-                                        margin-top: 5px;"),
-                           
-                           introBox(
-                             numericInput(inputId = "clusters",
-                                          label = "Select the number of clusters",
-                                          value = 2,
-                                          min = 2)
+                           actionButton(
+                             "tour_kmeans",
+                             "Guided Tour of Inputs",
+                             class = "full-width-button",
+                             style = "margin-bottom: 20px;
+                                     margin-top: 5px;"
                              ),
                            
                            introBox(
-                             radioButtons("setrandseedkmean",
-                                          HTML("Do you want to set a seed for reproducible results?"),
-                                          c("Yes", "No"),
-                                          selected = "No")
+                             numericInput(
+                               inputId = "clusters",
+                               label = "Select the number of clusters",
+                               value = 2,
+                               min = 2
+                               )
                              ),
                            
-                           conditionalPanel("input.setrandseedkmean == 'Yes'",
-                                            numericInput("randseedkmean",
-                                                         HTML("Set a random seed."),
-                                                         sample(1:9999, size= 1), 
-                                                         min = 1, max = 9999)
-                                            )
+                           introBox(
+                             radioButtons(
+                               "setrandseedkmean",
+                               HTML("Do you want to set a seed for reproducible results?"),
+                               c("Yes", "No"),
+                               selected = "No"
+                               )
+                             ),
+                           
+                           conditionalPanel(
+                             "input.setrandseedkmean == 'Yes'",
+                             numericInput(
+                               "randseedkmean",
+                               HTML("Set a random seed."),
+                               sample(1:9999, size= 1),
+                               min = 1,
+                               max = 9999)
+                             )
                            )
                        ),
                 
-                column(9, align="center",
+                column(width = 9, align="center",
                        
                        introBox(
                          tabsetPanel(
                            type = 'tabs',
                            
-                           tabPanel('K-Means Clusters',
-                                    uiOutput("kmeans_title"), #title for the table
-                                    textOutput("pseudoF"),
-                                    DTOutput("kmeans_tab")),
+                           tabPanel(
+                             'K-Means Clusters',
+                             uiOutput("kmeans_title"),
+                             textOutput("pseudoF"),
+                             DTOutput("kmeans_tab")
+                             ),
                            
-                           tabPanel('Additional Charts',
-                                    
-                                    column(3, align="center",
-                                           selectInput("k_means_plot",
-                                                       "What chart?",
-                                                       choices= list("Jitter",
-                                                                     "Violin",
-                                                                     "Histogram",
-                                                                     "Silhouette")
-                                                       ),
-                                           
-                                           selectInput("k_means_cluster",
-                                                       "What cluster?",
-                                                       choices = NULL
-                                                       )
-                                           ),
-                                    
-                                    column(9, align="center",
-                                           plotOutput(outputId = "kmeans_silh",
-                                                      height = "600px")
-                                           )
-                                    )
+                           tabPanel(
+                             'Additional Charts',
+                             
+                             fluidRow(
+                               
+                               column(6,
+                                      
+                                      selectInput(
+                                        "k_means_plot",
+                                        "What chart?",
+                                        choices= list("Jitter",
+                                                      "Violin",
+                                                      "Histogram",
+                                                      "Silhouette")
+                                        )
+                                      ),
+                               
+                               column(6,
+                                      
+                                      selectInput(
+                                        "k_means_cluster",
+                                        "What cluster?",
+                                        choices = NULL
+                                        )
+                                      )
+                               ),
+                             
+                             plotOutput(
+                               outputId = "kmeans_silh",
+                               height = "600px"
+                               )
+                             )
                            ),
                          id = "kmeans_tabs_box"
                          )
@@ -342,33 +393,41 @@ ui <- dashboardPage(
                 )
               ),
       
-      
       ##### AI CLUSTERS TAB #####
       tabItem("AI_clusters",
-              tags$h2("STEP 3: USING 'AI' TO CONFIRM YOUR CLUSTER SOLUTION", style = "text-align: center;"),
               
-              tags$h3(HTML("Here we will use the Self-Organising Map AI to explore further your k-means cluster solution"), style = "text-align: center;"),
+              tags$h2(
+                "STEP 3: USING 'AI' TO CONFIRM YOUR CLUSTER SOLUTION",
+                style = "text-align: center;"
+                ),
+              
+              tags$h3(
+                HTML("Here we will use the Self-Organising Map AI to explore 
+                     further your k-means cluster solution"),
+                style = "text-align: center;"
+                ),
               
               br(),
               
               fluidRow(
-                column(3,
+                column(width = 3,
                        box(width = 12,
+                           
                            actionButton(
                              "trainbutton",
                              "Train SOM",
                              class = "full-width-button",
                              style = "foreground-color:white;
-                             background-color:darksalmon;
-                             color:black;
-                             float:center;
-                             height: 50px;
-                             text-align:center;
-                             border-color:black;
-                             border-radius: 5px;
-                             border-width: 5px;
-                             margin-bottom: 5px;
-                             margin-top: 5px;"
+                                     background-color:darksalmon;
+                                     color:black;
+                                     float:center;
+                                     height: 50px;
+                                     text-align:center;
+                                     border-color:black;
+                                     border-radius: 5px;
+                                     border-width: 5px;
+                                     margin-bottom: 5px;
+                                     margin-top: 5px;"
                              ),
                            
                            actionButton(
@@ -412,14 +471,13 @@ ui <- dashboardPage(
                              ),
                            
                            introBox(
+                             
                              h4(
                                "Advanced Options",
                                style = "text-align: center;"
                                ),
                              
-                             uiOutput(
-                               "initproto"
-                               ),
+                             uiOutput("initproto"),
                              
                              numericInput(
                                "maxit",
@@ -427,9 +485,7 @@ ui <- dashboardPage(
                                500
                                ),
                              
-                             uiOutput(
-                               "scaling"
-                               ), 
+                             uiOutput("scaling"), 
                              
                              numericInput(
                                "eps0",
@@ -463,82 +519,97 @@ ui <- dashboardPage(
                            )
                        ),
                 
-                column(9, align="center", 
+                column(9, align="center",
                        
                        br(),
                        
                        introBox(
                          tabsetPanel(type = 'tabs',
-                                     tabPanel("Advanced Information",
-                                              uiOutput("trainnotice_header"),
-                                              actionButton(inputId = "advancedSOMinfo",
-                                                           label = "Show / Hide Advanced Information"),
-                                              uiOutput("trainnotice_advanced_info")
+                                     tabPanel(
+                                       "Advanced Information",
+                                       uiOutput("trainnotice_header"),
+                                       actionButton(
+                                         inputId = "advancedSOMinfo",
+                                         label = "Show / Hide Advanced Information"),
+                                       uiOutput("trainnotice_advanced_info")
+                                       ),
+                                     
+                                     tabPanel(
+                                       "SOM Cluster Solution",
+                                       
+                                       h5(
+                                         "NOTE: The SOM Cluster Solution shown here is for its quadrant map 
+                                         (Default 5X5). This solution can be compared to the k-means solution 
+                                         for corroboration. It also shows how the SOM clusters are distributed 
+                                         across its map, which helps to decipher the data visualisation tab.",
+                                         style = "text-align: center;"
+                                         ),
+                                       
+                                       numericInput(
+                                         "som_3Dplot_superclusters",
+                                         "Number of superclusters:",
+                                         2,
+                                         min = 2,
+                                         max = 10
+                                         ),
+                                       
+                                       plotOutput(
+                                         outputId = "som_3Dplot",
+                                         width = "80%",
+                                         height = "500px"
+                                         )
+                                       ),
+                                     
+                                     tabPanel(
+                                       "Mapping SOM Cluster Solution",
+                                       
+                                       h5(
+                                         "NOTE: The SOM Cluster Solution shown here is for its quadrant map 
+                                         (Default 5X5). This solution can be compared to the k-means solution 
+                                         for corroboration. It also shows how the SOM clusters are distributed 
+                                         across its map, which helps to decipher the data visualisation tab.",
+                                         style = "text-align: center;"
+                                         ),
+                                     
+                                     numericInput(
+                                       "som_3DMap_superclusters",
+                                       "Number of superclusters:",
+                                       2,
+                                       min = 2,
+                                       max = 10
+                                       ),
+                                     
+                                     plotOutput(
+                                       outputId = "som_3DMap",
+                                       width = "80%",
+                                       height = "500px")
                                      ),
                                      
-                                     tabPanel("SOM Cluster Solution",
-                                     
-                                     h5("NOTE: The SOM Cluster Solution shown here is for its quadrant map
-                                     (Default 5X5). This solution can be compared to the k-means solution 
-                                     for corroboration. It also shows how the SOM clusters are distributed 
-                                     across its map, which helps to decipher the data visualisation tab.",
-                                        style = "text-align: center;"),
-                                     
-                                     numericInput("som_3Dplot_superclusters",
-                                                  "Number of superclusters:",
-                                                  2,
-                                                  min = 2,
-                                                  max = 10),
-                                     
-                                     plotOutput(outputId = "som_3Dplot",
-                                                width = "80%",
-                                                height = "500px")
-                                              
                                      ),
-                                     
-                                     tabPanel("Mapping SOM Cluster Solution",
-                                     
-                                     h5("NOTE: The SOM Cluster Solution shown here is for its quadrant map 
-                                     (Default 5X5). This solution can be compared to the k-means solution 
-                                     for corroboration. It also shows how the SOM clusters are distributed 
-                                     across its map, which helps to decipher the data visualisation tab.", 
-                                        style = "text-align: center;"),
-                                     
-                                     numericInput("som_3DMap_superclusters",
-                                                  "Number of superclusters:",
-                                                  2,
-                                                  min = 2,
-                                                  max = 10),
-                                     
-                                     plotOutput(outputId = "som_3DMap",
-                                                width = "80%",
-                                                height = "500px")
-                                              
-                                     ),
-                                     
-                         ),
                          id = "SOM_AI_tabset"
+                         )
                        )
-                       
-                       )
-                
-                
-              )
-              
-              
-      ),
+                )
+              ),
       
       
       ##### COMPARE AND VISUALISE TAB #####
       tabItem("compare_and_visualise",
-              tags$h2("STEP 4: VISUALISE AND EXPLORE YOUR CLUSTER AND AI SOLUTIONS", style = "text-align: center;"),
               
-              tags$h3(HTML("Here we visualize the results of both your k-means and SOM AI cluster solutions"), style = "text-align: center;"),
+              tags$h2(
+                "STEP 4: VISUALISE AND EXPLORE YOUR CLUSTER AND AI SOLUTIONS",
+                style = "text-align: center;"
+                ),
+              
+              tags$h3(
+                HTML("Here we visualize the results of both your k-means and SOM AI cluster solutions"),
+                style = "text-align: center;"
+                ),
               
               br(),
               
               fluidRow(
-                column(3,
+                column(width = 3,
                        box(width=12,
                            
                            introBox(
@@ -547,36 +618,36 @@ ui <- dashboardPage(
                                "Save SOM Results",
                                class = "full-width-button",
                                style = "foreground-color:white;
-                                          background-color:darksalmon;
-                                          color:black;
-                                          float:center;
-                                          height: 50px;
-                                          text-align:center;
-                                          border-color:black;
-                                          border-radius: 5px;
-                                          border-width: 5px;
-                                          margin-bottom: 5px;
-                                          margin-top: 5px;"
-                             ),
+                                        background-color:darksalmon;
+                                        color:black;
+                                        float:center;
+                                        height: 50px;
+                                        text-align:center;
+                                        border-color:black;
+                                        border-radius: 5px;
+                                        border-width: 5px;
+                                        margin-bottom: 5px;
+                                        margin-top: 5px;"
+                               ),
                              
                              uiOutput("save_som_notice"),
                              
                              id = "save_som_intro_box"
-                           ),
+                             ),
                            
                            actionButton(
                              "infoButton_plot_map",
                              "Info",
                              class = "full-width-button",
                              style = "margin-bottom: 5px; margin-top: 5px;"
-                           ),
+                             ),
                            
                            actionButton(
                              "tour_viz",
                              "Guided Tour of Inputs",
                              class = "full-width-button",
                              style = "margin-bottom: 20px; margin-top: 5px;"
-                           ),
+                             ),
                            
                            introBox(
                              selectInput(
@@ -584,12 +655,9 @@ ui <- dashboardPage(
                                "Plot What?",
                                choices = list("Observations"= "obs",
                                               "Prototypes"= "prototypes")
-                             ),
-                             
+                               ),
                              id = "somplotwhat_introbox"
-                           ),
-                           
-                           
+                             ),
                            
                            introBox(
                              selectInput(
@@ -599,8 +667,7 @@ ui <- dashboardPage(
                                            'barplot',
                                            'names',
                                            'boxplot')
-                             ),
-                             
+                               ),
                              id = "somplottype_introbox"
                            ),
                            
@@ -609,7 +676,7 @@ ui <- dashboardPage(
                                "somplotvar",
                                "Variable:",
                                choices = "(Not Available)"
-                             ),
+                               ),
                              
                              numericInput(
                                "names_SC_num",
@@ -618,15 +685,13 @@ ui <- dashboardPage(
                                min = 2,
                                max = 10,
                                step = 1
-                             ),
-                             
+                               ),
                              id = "conditional_toggles_introbox"
-                           )
-                           
+                             )
                            )
                        ),
                 
-                column(9, align="center",
+                column(width = 9, align="center",
                        
                        conditionalPanel(
                          condition = "input.somplottype == 'boxplot'",
@@ -721,189 +786,241 @@ ui <- dashboardPage(
       
       ##### SCENARIOS TAB #####
       tabItem("scenarios",
-              tags$h2("STEP 5: USING YOUR THEORY/MODEL TO RUN SCENARIO SIMULATIONS", style = "text-align: center;"), 
               
-              tags$h3(HTML("Here we will use your model to explore different scenarios, policies, and interventions. <br>
-                           
-                           To do that, we will be using your k-means clusters and your SOM AI solution and grid."), style = "text-align: center;"),                 
+              tags$h2(
+                "STEP 5: USING YOUR THEORY/MODEL TO RUN SCENARIO SIMULATIONS",
+                style = "text-align: center;"
+                ), 
+              
+              tags$h3(
+                HTML(
+                "Here we will use your model to explore different scenarios, policies, and interventions. <br>
+                To do that, we will be using your k-means clusters and your SOM AI solution and grid."),
+                style = "text-align: center;"
+                ),
               
               br(),
               
-              
               fluidRow(
-                column(3,
-                       
-                       box(width = 12, 
-                           
-                           actionButton("infoButton_scenarios", "Info", class = "full-width-button",
-                                        style = "margin-bottom: 5px;
-                                                     margin-top: 5px;"),
+                column(width = 3,
+                       box(width = 12,
+                           actionButton(
+                             "infoButton_scenarios",
+                             "Info",
+                             class = "full-width-button",
+                             style = "margin-bottom: 5px; margin-top: 5px;"
+                             ),
                            
                            actionButton(
                              "tour_scenarios",
                              "Guided Tour of Inputs",
                              class = "full-width-button",
                              style = "margin-bottom: 20px; margin-top: 5px;"
-                           ),
+                             ),
                            
-                           h4("Run Model", style = "text-align: center;"),
+                           h4(
+                             "Run Model",
+                             style = "text-align: center;"
+                             ),
                            
                            introBox(
-                             actionButton(inputId = "Agent_Setup", label="Model Setup", class = "full-width-button",
-                                          style = "foreground-color:white; 
-                                                     background-color:khaki;
-                                                     color:black;
-                                                     float:center;
-                                                     height: 50px;
-                                                     text-align:center;
-                                                     border-color:black;
-                                                     border-radius: 5px;
-                                                     border-width: 5px;
-                                                     margin-bottom: 5px;
-                                                     margin-top: 5px;"),
-                             
+                             actionButton(
+                               inputId = "Agent_Setup",
+                               label="Model Setup",
+                               class = "full-width-button",
+                               style = "foreground-color:white;
+                                       background-color:khaki;
+                                       color:black;
+                                       float:center;
+                                       height: 50px;
+                                       text-align:center;
+                                       border-color:black;
+                                       border-radius: 5px;
+                                       border-width: 5px;
+                                       margin-bottom: 5px;
+                                       margin-top: 5px;"
+                               ),
                              id = "Agent_Setup_introbox"
-                           ),
+                             ),
                            
                            introBox(
-                             actionButton(inputId = "Agent_Run_Clusters", label="Run Clusters", class = "full-width-button",
-                                          style = "foreground-color:white;
-                                                     background-color:lavender;
-                                                     color:black;
-                                                     height: 50px;
-                                                     text-align:center;
-                                                     border-color:black;
-                                                     border-radius: 5px;
-                                                     border-width: 5px;
-                                                     margin-bottom: 20px;
-                                                     margin-top: 5px;"),
-                             
+                             actionButton(
+                               inputId = "Agent_Run_Clusters",
+                               label="Run Clusters",
+                               class = "full-width-button",
+                               style = "foreground-color:white;
+                                       background-color:lavender;
+                                       color:black;
+                                       height: 50px;
+                                       text-align:center;
+                                       border-color:black;
+                                       border-radius: 5px;
+                                       border-width: 5px;
+                                       margin-bottom: 20px;
+                                       margin-top: 5px;"
+                               ),
                              id = "Agent_Run_Clusters_introbox"
-                           ),
+                             ),
                            
-                           h4("Sensitivity Analysis", style = "text-align: center;"),
+                           h4(
+                             "Sensitivity Analysis",
+                             style = "text-align: center;"
+                             ),
                            
                            introBox(
-                             actionButton(inputId = "SensitivityAnalysis", label="Sensitivity", class = "full-width-button",
-                                          style = "foreground-color:white; 
-                                                    background-color:darksalmon; 
-                                                    color:black;
-                                                    float:center;
-                                                    height: 50px;
-                                                    text-align:center;
-                                                    border-color:black;
-                                                    border-radius: 5px;
-                                                    border-width: 5px;
-                                                    margin-bottom: 5px;
-                                                    margin-top: 5px;"),
+                             actionButton(
+                               inputId = "SensitivityAnalysis",
+                               label="Sensitivity",
+                               class = "full-width-button",
+                               style = "foreground-color:white;
+                                       background-color:darksalmon;
+                                       color:black;
+                                       float:center;
+                                       height: 50px;
+                                       text-align:center;
+                                       border-color:black;
+                                       border-radius: 5px;
+                                       border-width: 5px;
+                                       margin-bottom: 5px;
+                                       margin-top: 5px;"
+                               ),
                              
                              uiOutput('cluster_sensitivity'),
                              
                              id = "SensitivityAnalysis_introbox"
-                           )
-                           
+                             )
                            ),
-                       
-                       
-                ),
-                column(9,
-                       conditionalPanel("input.Agent_Setup > 0",
-                                        
-                                        
-                                        tabsetPanel(type = 'tabs', 
-                                                    
-                                                    tabPanel('SOM Plot Grid', 
-                                                             plotOutput("somplotagent", width ="700px", height = "600px"),
-                                                             br(),
-                                                             rHandsontableOutput("clusters_editable_table"),
-                                                             actionButton("back_cluster", "<<"),
-                                                             actionButton("forward_cluster", ">>")), 
-                                                    
-                                                    tabPanel('Sensitivity Bar Plot', plotOutput("sensitivity_barplot")), 
-                                                    
-                                                    tabPanel('Agent SOM Plot', plotOutput("agent_somplot"))
-                                                    
-                                        )
-                       ) #Could comment this out so it by default shows the options
-                       
-                ))
-              
-      ),
+                       ),
+                
+                column(width = 9,
+                       conditionalPanel(
+                         "input.Agent_Setup > 0",
+                         
+                         tabsetPanel(
+                           type = 'tabs',
+                           
+                           tabPanel(
+                             'SOM Plot Grid',
+                             
+                             plotOutput(
+                               "somplotagent",
+                               width ="700px",
+                               height = "600px"
+                               ),
+                             
+                             br(),
+                             
+                             rHandsontableOutput("clusters_editable_table"),
+                             
+                             actionButton("back_cluster", "<<"),
+                             actionButton("forward_cluster", ">>")),
+                           
+                           tabPanel(
+                             'Sensitivity Bar Plot',
+                             plotOutput("sensitivity_barplot")
+                             ),
+                           
+                           tabPanel(
+                             'Agent SOM Plot',
+                             plotOutput("agent_somplot")
+                             )
+                           )
+                         )
+                       )
+                )
+              ),
       
       ##### FORECASTING TAB #####
       tabItem("forecasting",
-              tags$h2("STEP 6: USE YOUR RESULTS TO PREDICT THE CLUSTER MEMBERSHIP OF NEW CASES", style = "text-align: center;"), 
               
-              tags$h3(HTML("Here we will use your trained SOM GRID (TAB 4) to predict the cluster profile(s) that best represent a new set of cases"), style = "text-align: center;"),
+              tags$h2(
+                "STEP 6: USE YOUR RESULTS TO PREDICT THE CLUSTER MEMBERSHIP OF NEW CASES",
+                style = "text-align: center;"
+                ), 
               
-              #verbatimTextOutput("Predict_Warning"),
+              tags$h3(
+                HTML(
+                  "Here we will use your trained SOM GRID (TAB 4) to predict 
+                  the cluster profile(s) that best represent a new set of cases"),
+                style = "text-align: center;"
+                ),
               
               br(),
               
               fluidRow(
-                
-                column(3,
-                       
+                column(width = 3,
                        box(width = 12,
                            
-                           actionButton(inputId = "classify_prof", label="Classify Profiles", class = "full-width-button",
-                                        style = "foreground-color:white; 
-                                                    background-color:darksalmon; 
-                                                    color:black;
-                                                    float:center;
-                                                    height: 50px;
-                                                    text-align:center;
-                                                    border-color:black;
-                                                    border-radius: 5px;
-                                                    border-width: 5px;
-                                                    margin-bottom: 5px;
-                                                    margin-top: 5px;"),
+                           actionButton(
+                             inputId = "classify_prof",
+                             label="Classify Profiles",
+                             class = "full-width-button",
+                             style = "foreground-color:white; 
+                                     background-color:darksalmon; 
+                                     color:black;
+                                     float:center;
+                                     height: 50px;
+                                     text-align:center;
+                                     border-color:black;
+                                     border-radius: 5px;
+                                     border-width: 5px;
+                                     margin-bottom: 5px;
+                                     margin-top: 5px;"
+                             ),
                            
-                           actionButton("infoButton_new_prediction", "Info", class = "full-width-button",
-                                        style = "margin-bottom: 5px;
-                                                     margin-top: 5px;"),
+                           actionButton(
+                             "infoButton_new_prediction",
+                             "Info",
+                             class = "full-width-button",
+                             style = "margin-bottom: 5px; margin-top: 5px;"
+                             ),
                            
-                           fileInput('file_pred', 'Choose CSV File', accept = c(
-                             "text/csv",
-                             "text/comma-separated-values,text/plain",
-                             ".csv")),
+                           fileInput(
+                             'file_pred',
+                             'Choose CSV File',
+                             accept = c(
+                               "text/csv",
+                               "text/comma-separated-values,text/plain",
+                               ".csv")
+                             ),
                            
-                           selectInput('sep_pred', 'Separator:',
-                                       c("Comma","Semicolon","Tab","Space"), 'Comma'),
+                           selectInput(
+                             'sep_pred',
+                             'Separator:',
+                             c("Comma","Semicolon","Tab","Space"),
+                             'Comma'
+                             ),
                            
-                           checkboxInput('load_prev_som', 'Use Previous SOM Solution? If unchecked it will use SOM solution from this session.'),
-                           
-                       )
-                       
-                       
-                ), 
+                           checkboxInput(
+                             'load_prev_som',
+                             'Use Previous SOM Solution? If unchecked it will 
+                             use SOM solution from this session.'
+                             ),
+                           )
+                       ), 
                 
                 
-                column(9, 
+                column(width = 9,
                        
-                       
-                       tabsetPanel(type = 'tabs', 
-                                   
-                                   tabPanel('Table of Predictions', DTOutput("view_predict")), 
-                                   
-                                   tabPanel('Prediction SOM Plot', plotOutput("predict_somplot"))
-                                   
+                       tabsetPanel(
+                         type = 'tabs',
+                         
+                         tabPanel(
+                           'Table of Predictions',
+                           DTOutput("view_predict")
+                           ),
+                         
+                         tabPanel(
+                           'Prediction SOM Plot',
+                           plotOutput("predict_somplot")
+                           )
+                         )
                        )
-                       
-                       
                 )
-                
-                
-              )
-              
-              
-      ),
+              ),
       
       ##### SYSTEMS MAPPING TAB #####
       tabItem("systems_mapping",
-              
-              # App title ----
-              #titlePanel("STEP 8: USING SYSTEMS MAPPING TO EXPLORE CLUSTER VARIABLES"),
               
               tags$h2("STEP 7: USING SYSTEMS MAPPING TO EXPLORE CLUSTER VARIABLES", style = "text-align: center;"), 
               
