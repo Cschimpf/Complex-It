@@ -27,6 +27,7 @@ library(DT)
 library(plotly)
 library(shinycssloaders)
 library(ggfittext)
+library(shinyWidgets)
 
 mytheme <- create_theme(
   adminlte_color(light_blue = "#bce7fa"),
@@ -192,18 +193,18 @@ ui <- dashboardPage(
               bsCollapse(open="Import Your Data",
                          
                          bsCollapsePanel("Import Your Data",
-                                         
                                          div(
                                            style = "height: 50vh",
                                            
+                                           # Neatly aligned horizontal layout
                                            fluidRow(
-                                             column(width = 3,
-                                                    box(width = 12,
-                                                        
-                                                        actionButton(
-                                                          "show_modal",
-                                                          "Upload your data",
-                                                          style = "foreground-color:white;
+                                             box(
+                                             div(
+                                               style = "display: inline-block; vertical-align: top; margin-right: 20px; margin-left: 20px;",
+                                               actionButton(
+                                                 "show_modal",
+                                                 "Upload your data",
+                                                 style = "foreground-color:white;
                                                                   background-color:darksalmon;
                                                                   color:black;
                                                                   float:center;
@@ -214,18 +215,20 @@ ui <- dashboardPage(
                                                                   border-width: 5px;
                                                                   margin-bottom: 5px;
                                                                   margin-top: 5px;"
-                                                          ),
-                                                        
-                                                        uiOutput("varchoice")
-                                                        )
-                                                    ),
-                                             
-                                             column(width = 9,
-                                                    DTOutput("view")
-                                                    )
-                                             )
+                                               )
+                                             ),
+                                             div(
+                                               style = "display: inline-block; vertical-align: top;",
+                                               uiOutput("varchoice")
+                                             ))
+                                           ),
+                                           
+                                           # Data table output below
+                                           div(style = "margin-top: 20px;",
+                                               DTOutput("view")
                                            )
-                                         ),
+                                         )
+                         ),
                          
                          bsCollapsePanel("Create a Conceptual Systems Map of Your Data",
                                          
@@ -528,9 +531,9 @@ ui <- dashboardPage(
                                      tabPanel(
                                        "Advanced Information",
                                        uiOutput("trainnotice_header"),
-                                       actionButton(
-                                         inputId = "advancedSOMinfo",
-                                         label = "Show / Hide Advanced Information"),
+                                       # actionButton(
+                                       #   inputId = "advancedSOMinfo",
+                                       #   label = "Show / Hide Advanced Information"),
                                        uiOutput("trainnotice_advanced_info")
                                        ),
                                      
@@ -804,19 +807,6 @@ ui <- dashboardPage(
               fluidRow(
                 column(width = 3,
                        box(width = 12,
-                           actionButton(
-                             "infoButton_scenarios",
-                             "Info",
-                             class = "full-width-button",
-                             style = "margin-bottom: 5px; margin-top: 5px;"
-                             ),
-                           
-                           actionButton(
-                             "tour_scenarios",
-                             "Guided Tour of Inputs",
-                             class = "full-width-button",
-                             style = "margin-bottom: 20px; margin-top: 5px;"
-                             ),
                            
                            h4(
                              "Run Model",
@@ -829,7 +819,7 @@ ui <- dashboardPage(
                                label="Model Setup",
                                class = "full-width-button",
                                style = "foreground-color:white;
-                                       background-color:khaki;
+                                       background-color:darksalmon;
                                        color:black;
                                        float:center;
                                        height: 50px;
@@ -873,7 +863,7 @@ ui <- dashboardPage(
                                label="Sensitivity",
                                class = "full-width-button",
                                style = "foreground-color:white;
-                                       background-color:darksalmon;
+                                       background-color:khaki;
                                        color:black;
                                        float:center;
                                        height: 50px;
@@ -888,7 +878,22 @@ ui <- dashboardPage(
                              uiOutput('cluster_sensitivity'),
                              
                              id = "SensitivityAnalysis_introbox"
-                             )
+                             ),
+                           
+                           actionButton(
+                             "infoButton_scenarios",
+                             "Info",
+                             class = "full-width-button",
+                             style = "margin-bottom: 5px; margin-top: 5px;"
+                           ),
+                           
+                           actionButton(
+                             "tour_scenarios",
+                             "Guided Tour of Inputs",
+                             class = "full-width-button",
+                             style = "margin-bottom: 20px; margin-top: 5px;"
+                           ),
+                           
                            ),
                        ),
                 

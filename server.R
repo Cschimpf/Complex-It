@@ -27,6 +27,7 @@ library(DT)
 library(plotly)
 library(shinycssloaders)
 library(ggfittext)
+library(shinyWidgets)
 
 
 server <- function(input, output, session) {
@@ -381,17 +382,57 @@ server <- function(input, output, session) {
     if (is.null(the.table)) return(NULL)
     
     #right now this just deselects not numeric data columns
-    output$varchoice <- renderUI(div(
-      selectInput(inputId="varchoice", label="Input variables:", multiple = TRUE,
-                  choices=as.list(colnames(the.table)[
-                    sapply(the.table, class) %in%
-                      c("integer", "numeric")]),
-                  selected=as.list(colnames(the.table)[
-                    sapply(the.table, class) %in%
-                      c("integer", "numeric")])),
-      actionButton(inputId = "subset_data", label = "Subset Data")))
+    # output$varchoice <- renderUI(
+    #   div(
+    #     pickerInput(
+    #       inputId="varchoice",
+    #       label="Input variables:",
+    #       multiple = TRUE,
+    #       choices=as.list(colnames(the.table)[sapply(the.table, class) %in% c("integer", "numeric")]),
+    #       selected=as.list(colnames(the.table)[sapply(the.table, class) %in% c("integer", "numeric")]),
+    #       options = pickerOptions(
+    #         selectedTextFormat = "count > 2",
+    #         `actions-box` = TRUE
+    #         )
+    #       ),
+    #     actionButton(
+    #       inputId = "subset_data",
+    #       label = "Subset Data"
+    #       )
+    #     )
+    #   )
+    
+    output$varchoice <- renderUI({
+      fluidRow(
+        column(
+          width = 8,  # Adjust width as needed
+          pickerInput(
+            inputId = "varchoice",
+            label = "Input variables:",
+            multiple = TRUE,
+            choices = as.list(colnames(the.table)[sapply(the.table, class) %in% c("integer", "numeric")]),
+            selected = as.list(colnames(the.table)[sapply(the.table, class) %in% c("integer", "numeric")]),
+            options = pickerOptions(
+              selectedTextFormat = "count > 2",
+              countSelectedText = "Multiple columns selected",
+              `actions-box` = TRUE
+            )
+          )
+        ),
+        column(
+          width = 4,
+          br(),  # Adds a bit of vertical spacing to align with pickerInput label
+          actionButton(
+            inputId = "subset_data",
+            label = "Subset Data"
+          )
+        )
+      )
+    })
+    
     
     uploaded_data_values$display_data <- the.table 
+    uploaded_data_values$rendered_data <- the.table 
     
     numeric_only_columns <- column_type_identifier(the.table)
     current_data_file_to_assign <- the.table[numeric_only_columns]
@@ -403,13 +444,15 @@ server <- function(input, output, session) {
     
     if(length(ncol(uploaded_data_values$display_data) >= length(input$varchoice))){
       uploaded_data_values$current_data_file <- uploaded_data_values$display_data[input$varchoice]
+      uploaded_data_values$rendered_data <- uploaded_data_values$display_data %>%
+        select(-c(setdiff(as.vector(colnames(uploaded_data_values$the_table)[sapply(uploaded_data_values$the_table, class) %in% c("integer", "numeric")]),
+                          input$varchoice)))
     }
     
   })
   
   output$view <- renderDT(
-    
-    uploaded_data_values$display_data,
+    uploaded_data_values$rendered_data,
     options = list(scrollX = TRUE,
                    searching = FALSE,
                    lengthChange = FALSE),
@@ -818,19 +861,19 @@ server <- function(input, output, session) {
   })
   
   
-  observeEvent(input$advancedSOMinfo, {
-    
-    if(som_button_pressed_tracker$advancedInfoToggle %% 2 == 1){
-      shinyjs::show(id = "trainnotice_advanced_info")
-    }else{
-      shinyjs::hide(id = "trainnotice_advanced_info")
-    }
-  })
-  
-  # Observe statement for show/hide advanced info
-  observe(if (som_button_pressed_tracker$advancedInfoToggle == 0) {
-    shinyjs::hide(id = "trainnotice_advanced_info")
-  })
+  # observeEvent(input$advancedSOMinfo, {
+  #   
+  #   if(som_button_pressed_tracker$advancedInfoToggle %% 2 == 1){
+  #     shinyjs::show(id = "trainnotice_advanced_info")
+  #   }else{
+  #     shinyjs::hide(id = "trainnotice_advanced_info")
+  #   }
+  # })
+  # 
+  # # Observe statement for show/hide advanced info
+  # observe(if (som_button_pressed_tracker$advancedInfoToggle == 0) {
+  #   shinyjs::hide(id = "trainnotice_advanced_info")
+  # })
   
   # Observe statement for show/hide advanced info selector
   observe(if (is.null(som_solution$current_som_solution) == TRUE) {
@@ -883,25 +926,25 @@ server <- function(input, output, session) {
     
     updatePlotSomVar() # update variable choice for som plots
     
-    shinyjs::onclick("toggleAdvanced", shinyjs::toggle(id = "advanced_info", anim = TRUE))
+    # shinyjs::onclick("toggleAdvanced", shinyjs::toggle(id = "advanced_info", anim = TRUE))
     
     output$trainnotice_header <- renderUI({
       
-      tagList(h3(paste("SOM trained at:", format(Sys.time(),format="%Y-%m-%d-%H:%M:%S"),sep=" "), style = "text-align: center;"),
-              h4("Progress to the next tab to compare your clusters to the SOM AI", style = "text-align: center;"),
+      tagList(h3(paste("SOM trained", format(Sys.time(),format="%d %b %Y"), "at", format(Sys.time(),format="%T"), sep=" "), style = "text-align: center;"),
+              h4("You can examine your SOM AI statistics here, or progress to the next tab to compare your SOM AI result to your K-Mean clusters.", style = "text-align: center;"),
               # h4("If you like your SOM AI solution, you can save it in the next tab", style = "text-align: center;"),
-              h4("Users confident with the SOM AI may wish to examine the advanced statistics below or the SOM cluster solution", style = "text-align: center;")
+              # h4("Users confident with the SOM AI may wish to examine the advanced statistics below or the SOM cluster solution", style = "text-align: center;")
       )
       
     })
     
-    output$trainnotice_advanced_trigger <- renderUI({
-      
-      useShinyjs()
-      
-      a(id = "toggleAdvanced", "Show/hide advanced statistics")
-      
-    })
+    # output$trainnotice_advanced_trigger <- renderUI({
+    #   
+    #   useShinyjs()
+    #   
+    #   a(id = "toggleAdvanced", "Show/hide advanced statistics")
+    #   
+    # })
     
     # Create a reactive value to store the parsed dataframe
     parsed_anova_results <- reactive({
@@ -946,22 +989,35 @@ server <- function(input, output, session) {
       div(id = "advanced_info",
           #now print out the results
           tagList(
-            h3(paste("Advanced Information"), style = "text-align: center;"),
-            #p(paste("Trained SOM ", format(Sys.time(),format="%Y-%m-%d-%H:%M:%S"),sep=" ")),
-            h4(paste("Topo Error:  ", format(qual_measures$topographic,digits=4),sep=" ")),
-            # h5(paste("Topo Error is...")),
-            h4(paste("Quant Error: ", format(qual_measures$quantization,digits=4),sep=" ")),
-            # h5(paste("Quant Error is...")),
             br(),
-            h4(paste("ANOVA Results")),
+            h3(paste("SOM Solution Statistics"), style = "text-align: center;"),
+            #p(paste("Trained SOM ", format(Sys.time(),format="%Y-%m-%d-%H:%M:%S"),sep=" ")),
+            
+            h4(
+              paste("Topographic Error:  ", format(qual_measures$topographic,digits=4), "|",
+                    "Quantization Error: ", format(qual_measures$quantization,digits=4), "|",
+                    anova_results[length(anova_results)], sep=" ")
+              ),
+            
+            # h4(paste("Topographic Error:  ", format(qual_measures$topographic,digits=4),sep=" ")),
+            # h5(paste("Topo Error is...")),
+            # h4(paste("Quantization Error: ", format(qual_measures$quantization,digits=4),sep=" ")),
+            # h5(paste("Quant Error is...")),
+            # br(),
+            # h4(paste("ANOVA Results")),
             # h5(paste("ANOVA results are...")),
             #lapply(length(anova_results):1, function(i, y) { p(paste(y[i])) }, y=anova_results)
             
-            h4(paste(anova_results[length(anova_results)])),
+            # h4(paste(anova_results[length(anova_results)])),
             # paste(anova_results_df)
             #lapply(length(anova_results):1, function(i, y) { p(paste(y[i])) }, y=anova_results)
           ),
-          renderDT(parsed_anova_results())
+          renderDT(parsed_anova_results(),
+                   options = list(
+                     pageLength = 10,  # Show 10 rows per page
+                     dom = 'tip'  # Only show table (t), info (i), and pagination (p)
+                   )
+          )
       )
       #)
       
@@ -1351,7 +1407,7 @@ server <- function(input, output, session) {
       return()
       }
     
-    save_som_notice_text(paste("Saved SOM:", format(Sys.time(),format="%Y-%m-%d-%H:%M:%S"),sep=" "))
+    save_som_notice_text(paste("SOM saved", format(Sys.time(),format="%d %b %Y"), "at", format(Sys.time(),format="%T"), sep=" "))
         
       })
   
@@ -2724,7 +2780,6 @@ server <- function(input, output, session) {
   ##### 'Generate Report'
   #############################################################################
   output$downloadReport <- downloadHandler(
-    
     
     filename = 'report_docs.zip',
     content = function(fname) {
