@@ -40,13 +40,7 @@ server <- function(input, output, session) {
   ########################### PANEL 'IMPORT DATA' ############################
   ############################################################################
   
-  pop_ups <- reactiveValues(pop_up_intro=FALSE,
-                            pop_up_clusters=FALSE,
-                            pop_up_systems=FALSE,
-                            pop_up_SOM=FALSE,
-                            pop_up_plot_map=FALSE,
-                            pop_up_new_prediction=FALSE,
-                            pop_up_scenarios=FALSE)
+  pop_ups <- reactiveValues(pop_up_intro=FALSE)
   
   observe({
     # Check if the tab "Using Sytems Mapping To Explore Cluster Variables" is selected
@@ -74,8 +68,6 @@ server <- function(input, output, session) {
   uploaded_data_values <- reactiveValues(display_data=NULL,
                                          current_data_file=NULL,
                                          the_table=NULL)
-  
-  
   
   # Reactive value to track the current page
   current_page <- reactiveVal(1)
@@ -223,7 +215,7 @@ server <- function(input, output, session) {
       
       shinyalert(
         title = "Error!",
-        text = 'Something has gone wrong with your CSV upload.If unsure, try "start over" or consult the tutorial on getting your data into CSV format.',
+        text = 'Something has gone wrong with your CSV upload. If unsure, try "start over" or consult the tutorial on getting your data into CSV format.',
         size = "s",
         closeOnEsc = TRUE,
         closeOnClickOutside = TRUE,
@@ -381,27 +373,6 @@ server <- function(input, output, session) {
     the.table <- uploaded_data_values$the_table
     if (is.null(the.table)) return(NULL)
     
-    #right now this just deselects not numeric data columns
-    # output$varchoice <- renderUI(
-    #   div(
-    #     pickerInput(
-    #       inputId="varchoice",
-    #       label="Input variables:",
-    #       multiple = TRUE,
-    #       choices=as.list(colnames(the.table)[sapply(the.table, class) %in% c("integer", "numeric")]),
-    #       selected=as.list(colnames(the.table)[sapply(the.table, class) %in% c("integer", "numeric")]),
-    #       options = pickerOptions(
-    #         selectedTextFormat = "count > 2",
-    #         `actions-box` = TRUE
-    #         )
-    #       ),
-    #     actionButton(
-    #       inputId = "subset_data",
-    #       label = "Subset Data"
-    #       )
-    #     )
-    #   )
-    
     output$varchoice <- renderUI({
       fluidRow(
         column(
@@ -462,29 +433,6 @@ server <- function(input, output, session) {
   
   ########################### PANEL 'CLUSTER DATA' ###########################
   ############################################################################
-  
-  cluster_text <- "<div style='line-height: 30px'><u><b>1) Hypothesize Your Cluster Solution:</b></u>
-                 To begin, how many clusters do you think are in your database?
-                 What is your hypothesis based on -- the literature, a guess, expertise, experience, a hunch?
-                 How would you describe or name these different clusters?
-                 How do you think your case-based profile of variables account for these different clusters?
-
-                 <u><b>2) Run the K-Means Analysis:</b></u>
-                 Run your k-means several times to see if you can improve the Pseudo F
-                 How strong is the Pseudo F for your solution?
-                 Looking at the Silhouette, how well are the cases distributed for each cluster?
-                 Should you re-run k-means to look for more or less clsuters?
-
-                 <u><b>Do You Have a Good Statistical Fit?</b></u>
-                 The Pseudo F indicates the quality of the overall solution; the larger the number, the better the fit.
-                 The Silhouette displays how well each case fits within its respective cluster; where a score of 1 is a perfect fit.
-
-                 <u><b>Need Help?</b></u>
-                 For tutorials on using the SOM AI in COMPLEX-IT <a href='https://www.art-sciencefactory.com/tutorials.html'>click here</a>
-                 For a basic introduction to k-means <a href='https://en.wikipedia.org/wiki/K-means_clustering'>click here</a></div>"
-  
-  
-  cluster_text <- gsub("\n", "<br>", cluster_text) 
   
   observeEvent(input$infoButton_kmean, {
     shinyalert(
@@ -760,18 +708,6 @@ server <- function(input, output, session) {
   #### Panel 'Train the SOM'
   #############################################################################
   
-  train_SOM_text <- "<div style='line-height: 30px'><u><b>Advice For Using the SOM AI</b></u>
-                 For those new to the SOM, we recommend using all of the defaults. However, if you have over 25 clusters, you will need to make a bigger map, such as a 6x6 grid.
-                 For experienced users, the SOM algorithm we use comes from the <a href='https://cran.r-project.org/web/packages/SOMbrero/index.html'>SOMbrero R-Package</a>
-
-                 <u><b>Need Help?</b></u>
-                 For tutorials on using the SOM AI in COMPLEX-IT <a href='https://www.art-sciencefactory.com/tutorials.html'>click here</a>
-                 For a basic introduction to the Self-Organizing Map (SOM) <a href='https://en.wikipedia.org/wiki/Self-organizing_map'>click here</a></div>"
-  
-  
-  
-  train_SOM_text <- gsub("\n", "<br>", train_SOM_text) # Convert newline characters to HTML line breaks
-  
   observeEvent(input$infoButton_som, {
     shinyalert(
       title = "<u><b>Using the SOM AI</b></u>",
@@ -859,21 +795,7 @@ server <- function(input, output, session) {
       som_button_pressed_tracker$advancedInfoToggle <- som_button_pressed_tracker$advancedInfoToggle + 1
     }
   })
-  
-  
-  # observeEvent(input$advancedSOMinfo, {
-  #   
-  #   if(som_button_pressed_tracker$advancedInfoToggle %% 2 == 1){
-  #     shinyjs::show(id = "trainnotice_advanced_info")
-  #   }else{
-  #     shinyjs::hide(id = "trainnotice_advanced_info")
-  #   }
-  # })
-  # 
-  # # Observe statement for show/hide advanced info
-  # observe(if (som_button_pressed_tracker$advancedInfoToggle == 0) {
-  #   shinyjs::hide(id = "trainnotice_advanced_info")
-  # })
+
   
   # Observe statement for show/hide advanced info selector
   observe(if (is.null(som_solution$current_som_solution) == TRUE) {
@@ -926,26 +848,14 @@ server <- function(input, output, session) {
     
     updatePlotSomVar() # update variable choice for som plots
     
-    # shinyjs::onclick("toggleAdvanced", shinyjs::toggle(id = "advanced_info", anim = TRUE))
-    
     output$trainnotice_header <- renderUI({
       
       tagList(h3(paste("SOM trained", format(Sys.time(),format="%d %b %Y"), "at", format(Sys.time(),format="%T"), sep=" "), style = "text-align: center;"),
               h4("You can examine your SOM AI statistics here, or progress to the next tab to compare your SOM AI result to your K-Mean clusters.", style = "text-align: center;"),
-              # h4("If you like your SOM AI solution, you can save it in the next tab", style = "text-align: center;"),
-              # h4("Users confident with the SOM AI may wish to examine the advanced statistics below or the SOM cluster solution", style = "text-align: center;")
       )
       
     })
-    
-    # output$trainnotice_advanced_trigger <- renderUI({
-    #   
-    #   useShinyjs()
-    #   
-    #   a(id = "toggleAdvanced", "Show/hide advanced statistics")
-    #   
-    # })
-    
+
     # Create a reactive value to store the parsed dataframe
     parsed_anova_results <- reactive({
       anova_info$anova_results <- retrieve_ANOVA_results(som_solution$current_som_solution)
@@ -999,18 +909,6 @@ server <- function(input, output, session) {
                     anova_results[length(anova_results)], sep=" ")
               ),
             
-            # h4(paste("Topographic Error:  ", format(qual_measures$topographic,digits=4),sep=" ")),
-            # h5(paste("Topo Error is...")),
-            # h4(paste("Quantization Error: ", format(qual_measures$quantization,digits=4),sep=" ")),
-            # h5(paste("Quant Error is...")),
-            # br(),
-            # h4(paste("ANOVA Results")),
-            # h5(paste("ANOVA results are...")),
-            #lapply(length(anova_results):1, function(i, y) { p(paste(y[i])) }, y=anova_results)
-            
-            # h4(paste(anova_results[length(anova_results)])),
-            # paste(anova_results_df)
-            #lapply(length(anova_results):1, function(i, y) { p(paste(y[i])) }, y=anova_results)
           ),
           renderDT(parsed_anova_results(),
                    options = list(
@@ -1089,33 +987,6 @@ server <- function(input, output, session) {
     
   })
   
-  plot_map_text <- "<div style='line-height: 30px'><u><b>Reading the SOM Grid:</b></u>
-                 1) To begin, we label each case with its CASE ID and K-MEANS ID.
-                 2) To see these IDs, for 'PLOT WHAT?' select observations; and for 'TYPE OF PLOT' select names.
-                 3) The first ID on the grid is the k-means cluster number; the second ID is the case.
-                 4) The grid also places each case in a quadrant, based on the SOM AI solution.
-                 5) The more similar the profile, the closer the cases on the grid; the more profiles differ, the further away cases are.
-                 6) The PROTOTYPES option (i.e., variables) shows how your profile of variables influenced where cases are located.
-                 7) The BARPLOT option for both OBSERVATIONS and PROTOTYPES shows the profile of variables for each quadrant.
-                 8) The line in the BARPLOT is mean=0; above the line is more of a variable;below the line is less.
-                 9) NOTE: Several of the images created here are found in the GENERATE REPORT TAB.
-                 10) In addition, we recommend using SCREEN CAPTURE to save an image.
-
-                 <u><b>Interpreting Your Results:</b></u>
-                 1) Looking at the Names, are cases with similar k-means IDs located in similar quadrants?
-                 2) If yes, do you think the SOM and k-means are reasonably similar solutions? Or, should you re=run your k-means?
-                 3) How do the profiles account for the different cluster solutions and the quadrant locations of the cases?
-                 4) What factors (i.e., variables) seem to have the biggest impact on different clusters or the model as a whole?
-                 5) How does the data solution differ from your hypotheses back at the design phase of COMPLEX-IT?
-                 6) Are you satisfied with your solution?  If not, go back and run your k-means and SOM again.
-
-                 <u><b>Need Help?</b></u>
-                 For TUTORIALS on visualising your data in COMPLEX-IT <a href='https://www.art-sciencefactory.com/tutorials.html'>click here</a>
-                 The visualisations tools used for this tab come from the SOMbrero R-Package. To understand how they work <a href='https://cran.r-project.org/web/packages/SOMbrero/vignettes/c-doc-numericSOM.html'>click here</a></div>"
-  
-  plot_map_text <- gsub("\n", "<br>", plot_map_text) # Convert newline characters to HTML line breaks
-
-  
   observeEvent(input$infoButton_plot_map, {
     shinyalert(
       title = "<u><b>Using the SOM AI</b></u>",
@@ -1159,8 +1030,6 @@ server <- function(input, output, session) {
     
     tmp.view <- NULL
     if (input$somplottype =="boxplot") {
-      # tmp.var <- (1:ncol(current_som_solution$data))[colnames(current_som_solution$data) %in%
-      #                                                  input$somplotvar2]
       tmp.var <- seq(from = 1, to = ncol(uploaded_data_values$current_data_file), by = 1)
     }
     else {tmp.var <- input$somplotvar}
@@ -1187,11 +1056,8 @@ server <- function(input, output, session) {
       plot_obj <- remove_xaxis_labels(plot_obj)
       
       plot_obj %>%
-        layout(title = "Overview of Variables"#,
-               # yaxis = list(title = 'Mean of Scaled Values')
-        ) # %>%
-      # layout(legend = list(orientation = "h",
-      #                      yanchor = "bottom"))
+        layout(title = "Overview of Variables"
+        ) 
       
       
     }
@@ -1359,10 +1225,6 @@ server <- function(input, output, session) {
   })
   
   
-  
-  
-  
-  
   observeEvent(input$save_som, {
     
     if(is.null(som_solution$current_som_solution)){
@@ -1417,27 +1279,6 @@ server <- function(input, output, session) {
   
   #### Panel 'Case Prediction'
   #############################################################################
-  
-  new_prediction_text <- "<div style='line-height: 30px'><u><b>Running the Predict Tab:</b></u>
-                 1) To begin, you need to convert your new dataset into a CSV file
-                 2) This CSV file can be comprised of a single new case or a large dataset of new cases
-                 3) Decide to use the SOM solution from your current session or a previously saved SOM solution
-                 4) Click classify profiles
-                 5) NOTE: you can find your results saved in the GENERATE REPORT TAB
-                 6) <b>The programme will crash if the headers/format of your new dataset are not the same as the TAB 1 dataset</b>
-
-                 <u><b>Interpreting Your Results:</b></u>
-                 1) After you run the data, you get a list of each case
-                 2) For each case, you will see its variable profile
-                 3) For validity purposes, COMPLEX-IT also provides the second best grid quadrant fit
-                 4) NOTE: For advanced users, goodness-of-fit for classification is based on a numeric tolerance defined as 10^(-10)
-
-                 <u><b>Need Help?</b></u>
-                 For TUTORIALS on using your SOM GRID for data forcasting in COMPLEX-IT <a href='https://www.art-sciencefactory.com/tutorials.html'>click here</a>
-                 To learn more about AI (machine learning) for data forecasting and prediction <a href='https://en.wikipedia.org/wiki/Machine_learning'>click here</a></div>  "
-  
-  new_prediction_text <- gsub("\n", "<br>", new_prediction_text) # Convert newline characters to HTML line breaks
-  
   
   observeEvent(input$infoButton_new_prediction, {
     shinyalert(
@@ -1559,31 +1400,6 @@ server <- function(input, output, session) {
   
   #### Panel 'Scenario Simulation'
   #############################################################################
-  
-  
-  scenarios_text <- "<div style='line-height: 30px'><u><b>To Run Model</b></u><br>
-                 1) Start by clicking on MODEL SETUP, which creates the SOM grid created with TAB4<br>
-                 2) The grid you see is based on the SOM solution you arrived at using TAB3<br>
-                 3) Next, click the RUN CLUSTERS tab, which places your k-means solution on the SOM grid<br>
-                 4) These are the k-means clusters you settled on using TAB2<br>
-                 5) Next, make changes to the various profile of variables for each of the cases.<br>
-                 6) Once done, click on RUN CLUSTERS again, to see if and where on the grid the cluster moved<br>
-                 7) Next, look at the BARPLOT grid to see what profile of factors account for the new grid placement<br>
-                 8) Is this where you wanted your cluster to arrive?  If not, try changing something else<br>
-                 9) If satisfied with your solution, run SENSITIVITY ANALYSIS; if not, click MODEL SETUP to reset<br>
-                 <br>
-
-                 <u><b>To Run Sensitivity Analysis</b></u><br>
-                 1) Pick the CLUSTER you are testing from the options<br>
-                 2) Decide how much to dither your solution by in order to account for variance and error that go with any real-world estimation of change<br>
-                 3) Run the sensitivity analysis<br>
-                 4) NOTE: very complex solutions can several minutes or hours to finish<br>
-                 <br>
-
-
-                 <u><b>Need Help?</b></u><br>
-                 For TUTORIALS on using your model to run scenario simulations in COMPLEX-IT <a href='https://www.art-sciencefactory.com/tutorials.html'>click here</a><br>
-                 To learn more about case-based scenario simulation <a href='https://www.art-sciencefactory.com/case-based%20microsimulation.pdf'>click here</a></div>  "
   
   observeEvent(input$infoButton_scenarios, {
     shinyalert(
@@ -1930,25 +1746,9 @@ server <- function(input, output, session) {
   
   observeEvent(input$init_kmeans, {
     kmeans_count$value <- kmeans_count$value + 1
-    
-    # print(kmeans_count$value)
   })
   
   infoButton <- reactive({  input$infoButton  })
-  
-  text <- "Purpose of Map:
-             1) The tab is intended to help you visually think about the relationships amongst your variables as a network of connections and pathways of influence. \n
-             2) It shows the correlation of pairs of factor, and encourages you to evaluate them, add new nodes and connections which represent your beliefs about possible <a href='https://www.khanacademy.org/test-prep/praxis-math/praxis-math-lessons/gtp--praxis-math--lessons--statistics-and-probability/a/gtp--praxis-math--article--correlation-and-causation--lesson'>causal connections</a>, or pull out subsection of the map. \n
-             3) THINK, DON’T ACCEPT: Be careful not to interpret the map as causal connections. It is only showing you the correlation between pairs of nodes. \n
-             4) Keep in mind the correlations are not conditioned on other factors (i.e. they do not control for other variables), so we must keep a critical mindset – these maps are intended to prompt thinking and discussion, not offer definitive or ‘correct’ analysis. \n
-
-             Using the Map:
-             1) Along the left you will see various toggles to change your network. Changing these makes 'deep' changes to the network, as it influences the final dataframe informing the construction of the network. This means changes here can be combined and carried over between changes to these toggles. \n
-             2) The network itself is rendered using the visNetwork package. Using this you can add and remove nodes and edges, and change the position of nodes. Be aware: these are 'shallow' or aesthetic changes: changing any parameter on the left will erase any changes made. \n
-             3) Along the bottom you can examine node and network statistic information. \n"
-  text <- gsub("\n", "<br>", text) # Convert newline characters to HTML line breaks
-  text <- gsub("Purpose of Map:", "<u><b>Purpose of Map:</b></u>", text) # Bold the "Purpose of Map:" heading
-  text <- gsub("Using the Map:", "<u><b>Using the Map:</b></u>", text) # Bold the "Using the Map:" heading
   
   systems_mapping_tab_button_pressed_tracker <- reactiveValues(pop_up_systems = FALSE, exportOptionsToggle=0, egoNetworkToggle=0, advancedOptionsToggle=0, shortestPathsToggle=0, weightsOptionsToggle=0)
 
