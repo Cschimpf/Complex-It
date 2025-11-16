@@ -209,6 +209,10 @@ server <- function(input, output, session) {
     tryCatch({
       the.table <- na.omit(read.csv(input$file1$datapath, header = input$header, sep = the.sep))
       
+      rownames(the.table) <- NULL
+      
+      rownames(the.table) <- paste0("Case ", rownames(the.table))
+      
       uploaded_data_values$the_table <- the.table
       
     }, error = function(e) {
@@ -242,6 +246,10 @@ server <- function(input, output, session) {
                                               col_names = input$header,
                                               sheet = input$number_of_excel_sheet))
       
+      rownames(the.table) <- NULL
+      
+      rownames(the.table) <- paste0("Case ", rownames(the.table))
+      
       uploaded_data_values$the_table <- the.table
       
     }, error = function(e) {
@@ -272,6 +280,10 @@ server <- function(input, output, session) {
     # Attempt to read the file with the given sheet number
     tryCatch({
       the.table <- na.omit(haven::read_sav(input$file1$datapath))
+      
+      rownames(the.table) <- NULL
+      
+      rownames(the.table) <- paste0("Case ", rownames(the.table))
       
       uploaded_data_values$the_table <- the.table
       
@@ -304,6 +316,10 @@ server <- function(input, output, session) {
     tryCatch({
       the.table <- na.omit(haven::read_dta(input$file1$datapath))
       
+      rownames(the.table) <- NULL
+      
+      rownames(the.table) <- paste0("Case ", rownames(the.table))
+      
       uploaded_data_values$the_table <- the.table
       
     }, error = function(e) {
@@ -334,6 +350,10 @@ server <- function(input, output, session) {
     # Attempt to read the file with the given sheet number
     tryCatch({
       the.table <- na.omit(haven::read_sas(input$file1$datapath))
+      
+      rownames(the.table) <- NULL
+      
+      rownames(the.table) <- paste0("Case ", rownames(the.table))
       
       uploaded_data_values$the_table <- the.table
       
@@ -373,46 +393,97 @@ server <- function(input, output, session) {
     the.table <- uploaded_data_values$the_table
     if (is.null(the.table)) return(NULL)
     
-    output$varchoice <- renderUI({
-      fluidRow(
-        column(
-          width = 8,  # Adjust width as needed
-          pickerInput(
-            inputId = "varchoice",
-            label = "Input variables:",
-            multiple = TRUE,
-            choices = as.list(colnames(the.table)[sapply(the.table, class) %in% c("integer", "numeric")]),
-            selected = as.list(colnames(the.table)[sapply(the.table, class) %in% c("integer", "numeric")]),
-            options = pickerOptions(
-              selectedTextFormat = "count > 2",
-              countSelectedText = "Multiple columns selected",
-              `actions-box` = TRUE
-            )
-          )
-        ),
-        column(
-          width = 4,
-          br(),  # Adds a bit of vertical spacing to align with pickerInput label
-          actionButton(
-            inputId = "subset_data",
-            label = "Subset Data"
-          )
+    output$varchoice <- renderUI({div(
+      pickerInput(
+        inputId = "varchoice",
+        label = "Input variables:",
+        multiple = TRUE,
+        choices = as.list(colnames(the.table)[sapply(the.table, class) %in% c("integer", "numeric")]),
+        selected = as.list(colnames(the.table)[sapply(the.table, class) %in% c("integer", "numeric")]),
+        options = pickerOptions(
+          selectedTextFormat = "count > 2",
+          countSelectedText = "Multiple columns selected",
+          `actions-box` = TRUE
         )
+      ),
+      pickerInput(
+        inputId = "input_table_id_col",
+        label = "Does your data have a unique ID column?:",
+        multiple = FALSE,
+        choices = c("No ID Column", colnames(the.table)),
+        selected = "No ID Column"
+      ),
+      actionButton(
+        #height: 50px;
+        inputId = "subset_data",
+        class = "full-width-button",
+        style = "foreground-color:white;
+        background-color:darksalmon;
+        color:black;
+        float:center;
+        text-align:center;
+        border-color:black;
+        border-radius: 5px;
+        border-width: 5px;
+        margin-bottom: 5px;
+        margin-top: 5px;",
+        label = HTML("Subset Data and <br/> Define ID Column")
       )
-    })
+    )
+      })
     
-    
-    uploaded_data_values$display_data <- the.table 
-    uploaded_data_values$rendered_data <- the.table 
-    
-    numeric_only_columns <- column_type_identifier(the.table)
-    current_data_file_to_assign <- the.table[numeric_only_columns]
-    uploaded_data_values$current_data_file <- current_data_file_to_assign 
+      uploaded_data_values$display_data <- the.table
+      uploaded_data_values$rendered_data <- the.table
+
+      numeric_only_columns <- column_type_identifier(the.table)
+      current_data_file_to_assign <- the.table[numeric_only_columns]
+      uploaded_data_values$current_data_file <- current_data_file_to_assign
     
   })
   
+  
+  # observeEvent(input$input_table_id_col,{
+  #   
+  #   the.table <- uploaded_data_values$the_table
+  # 
+  #   if(input$input_table_id_col == "No ID Column"){
+  # 
+  #     rownames(the.table) <- NULL
+  # 
+  #     rownames(the.table) <- paste0("Case ", rownames(the.table))
+  # 
+  #   }else{
+  # 
+  #     rownames(the.table) <- NULL
+  # 
+  #     selected_col <- input$input_table_id_col
+  # 
+  #     rownames(the.table) <- paste0("Case ", rownames(the.table), ": ", the.table[[selected_col]])
+  # 
+  #   }
+  # 
+  #   uploaded_data_values$display_data <- the.table
+  #   uploaded_data_values$rendered_data <- the.table
+  # 
+  #   numeric_only_columns <- column_type_identifier(the.table)
+  #   current_data_file_to_assign <- the.table[numeric_only_columns]
+  #   uploaded_data_values$current_data_file <- current_data_file_to_assign
+  #   
+  # })
+  
+  
+  # observeEvent(input$varchoice,{
+  #   
+  #       uploaded_data_values$current_data_file <- uploaded_data_values$display_data[input$varchoice]
+  #       uploaded_data_values$rendered_data <- uploaded_data_values$display_data %>%
+  #         select(-c(setdiff(as.vector(colnames(uploaded_data_values$the_table)[sapply(uploaded_data_values$the_table, class) %in% c("integer", "numeric")]),
+  #                           input$varchoice)))
+  #   
+  # })
+  
+  
   observeEvent(input$subset_data,{
-    
+
     if(length(ncol(uploaded_data_values$display_data) >= length(input$varchoice))){
       uploaded_data_values$current_data_file <- uploaded_data_values$display_data[input$varchoice]
       uploaded_data_values$rendered_data <- uploaded_data_values$display_data %>%
@@ -420,6 +491,31 @@ server <- function(input, output, session) {
                           input$varchoice)))
     }
     
+    the.table <- uploaded_data_values$the_table
+    
+    if(input$input_table_id_col == "No ID Column"){
+      
+      rownames(the.table) <- NULL
+      
+      rownames(the.table) <- paste0("Case ", rownames(the.table))
+      
+    }else{
+      
+      rownames(the.table) <- NULL
+      
+      selected_col <- input$input_table_id_col
+      
+      rownames(the.table) <- paste0("Case ", rownames(the.table), ": ", the.table[[selected_col]])
+      
+    }
+    
+    uploaded_data_values$display_data <- the.table
+    uploaded_data_values$rendered_data <- the.table
+    
+    numeric_only_columns <- column_type_identifier(the.table)
+    current_data_file_to_assign <- the.table[numeric_only_columns]
+    uploaded_data_values$current_data_file <- current_data_file_to_assign
+
   })
   
   output$view <- renderDT(
@@ -494,6 +590,7 @@ server <- function(input, output, session) {
   })
   
   kmeans_solution <- reactiveValues(current_kmeans_solution=NULL)
+  kmeans_count <- reactiveValues(value = 0)
   
   observeEvent(input$init_kmeans, {
     if(is.null(uploaded_data_values$current_data_file)){
@@ -518,14 +615,17 @@ server <- function(input, output, session) {
     if(input$setrandseedkmean == "Yes") {set.seed(input$randseedkmean)}
     else {set.seed(sample(1:9999, size= 1))}
     
+    observeEvent(input$init_kmeans, {
+      kmeans_count$value <- kmeans_count$value + 1
+    })
+    
     kmeans_solution$current_kmeans_solution <- create_user_gen_kmeans_solution("default_name", kmeans(uploaded_data_values$current_data_file, isolate(input$clusters)))
     
+    updateSelectInput(session = session, inputId = "kmeans_table_to_show", choices = c('All Clusters Overview', sort(unique(kmeans_solution$current_kmeans_solution@uclusters))))
     
     output$kmeans_title <- renderUI({
       h4("Kmeans Cluster Centroids")
     })
-    
-    
     
     kmeans_table <- reactive({
       
@@ -537,27 +637,31 @@ server <- function(input, output, session) {
       
     })
     
-    output$kmeans_tab <- renderDT(
-      
-      kmeans_table(),
-      options = list(scrollX = TRUE, searching = FALSE),
-      rownames = FALSE
-    )
-    
     #displays the pseudoF
     FSTAT <- pseudoF(uploaded_data_values$current_data_file, kmeans_solution$current_kmeans_solution,input$clusters)
     output$pseudoF <- renderText({ paste("Pseudo F: ", FSTAT) })
     
+    raw_silh_data <- reactive({
+      return(
+        as.data.frame(
+          silhouette(
+            kmeans_solution$current_kmeans_solution@uclusters,
+            daisy(uploaded_data_values$current_data_file)
+            )
+          )
+        )
+    })
+    
     kmeans_plot_output <- reactive({
       
-      raw_silh_data <- as.data.frame(silhouette(kmeans_solution$current_kmeans_solution@uclusters,
-                                                daisy(uploaded_data_values$current_data_file)))
+      # raw_silh_data <- as.data.frame(silhouette(kmeans_solution$current_kmeans_solution@uclusters,
+      #                                           daisy(uploaded_data_values$current_data_file)))
       
-      min_silh_width <- ifelse(min(raw_silh_data$sil_width) > 0,
+      min_silh_width <- ifelse(min(raw_silh_data()$sil_width) > 0,
                                0,
-                               min(raw_silh_data$sil_width))
+                               min(raw_silh_data()$sil_width))
       
-      max_count_df <- raw_silh_data %>%
+      max_count_df <- raw_silh_data() %>%
         mutate(sil_width_bin = trunc(sil_width / 0.01) * 0.01) %>%
         group_by(cluster, sil_width_bin) %>%
         tally(name = "count") %>%
@@ -575,7 +679,7 @@ server <- function(input, output, session) {
       
       if(input$k_means_cluster == "All"){
         
-        defined_clusters <- sort(unique(raw_silh_data$cluster))
+        defined_clusters <- sort(unique(raw_silh_data()$cluster))
         
       }else{
         
@@ -587,72 +691,33 @@ server <- function(input, output, session) {
       for(cluster in defined_clusters){
         
         ## Filter for data we need
-        data_to_graph <- raw_silh_data %>%
+        data_to_graph <- raw_silh_data() %>%
           filter(cluster == !!cluster)
         
         if(input$k_means_plot == "Jitter"){
           
           ## Create Jitter
-          jitter_plot <- ggplot(data_to_graph, aes(x = 0, y = sil_width)) +
-            geom_jitter(height = 0, width = 0.01) + # Adjust 'height' for vertical spread
-            scale_x_continuous(breaks = NULL, labels = NULL) +
-            labs(x = NULL) +
-            expand_limits(y=c(min_silh_width, 1)) +
-            geom_hline(yintercept = 0, linetype="dotted") +
-            ylab("Silhouette width")+
-            theme_minimal()+
-            ggtitle(paste0("Cluster: ", cluster),
-                    subtitle = paste0("Average silhouette width: ", round(mean(data_to_graph$sil_width), 2), "\n",
-                                      "n = ", paste(nrow(data_to_graph))))+
-            theme_minimal()+
-            theme(plot.title = element_text(hjust = 0.5),
-                  plot.subtitle = element_text(hjust = 0.5))
-          
-          plot_output_list[[cluster]] <- jitter_plot
-          
-        }
+          plot_output_list[[cluster]] <- create_jitter_plot(data_to_graph,
+                                                            min_silh_width,
+                                                            cluster)
+          }
         
         if(input$k_means_plot == "Violin"){
           
           ## Create Violin
-          violin_plot <- ggplot(data_to_graph, aes(x = "", y=sil_width)) +
-            geom_violin(color = "black", fill="steelblue") +
-            expand_limits(y=c(min_silh_width, 1)) +
-            geom_hline(yintercept = 0, linetype="dotted") +
-            ylab("Silhouette width")+
-            theme_minimal()+
-            ggtitle(paste0("Cluster: ", cluster),
-                    subtitle = paste0("Average silhouette width: ", round(mean(data_to_graph$sil_width), 2), "\n",
-                                      "n = ", paste(nrow(data_to_graph))))+
-            theme(plot.title = element_text(hjust = 0.5),
-                  plot.subtitle = element_text(hjust = 0.5))+
-            labs(x = NULL)
-          
-          plot_output_list[[cluster]] <- violin_plot
-          
-        }
+          plot_output_list[[cluster]] <- create_violin_plot(data_to_graph,
+                                                            min_silh_width,
+                                                            cluster)
+          }
         
         if(input$k_means_plot == "Histogram"){
           
           ## Create histogram
-          histogram_plot <- ggplot(data_to_graph, aes(x=sil_width, y = after_stat(count) /nrow(data_to_graph))) + 
-            geom_histogram(fill = "steelblue", binwidth = 0.01) + 
-            expand_limits(x=c(min_silh_width, 1), y = c(0, max_count_perc)) +
-            geom_vline(xintercept = 0, linetype="dotted") +
-            ylab("Percentage of cases")+
-            xlab("Silhouette width")+
-            # coord_flip() +
-            theme_minimal()+
-            ggtitle(paste0("Cluster: ", cluster),
-                    subtitle = paste0("Average silhouette width: ", round(mean(data_to_graph$sil_width), 2), "\n",
-                                      "n = ", paste(nrow(data_to_graph))))+
-            theme(plot.title = element_text(hjust = 0.5),
-                  plot.subtitle = element_text(hjust = 0.5))+
-            scale_y_continuous(labels = scales::percent)
-          
-          plot_output_list[[cluster]] <- histogram_plot
-          
-        }
+          plot_output_list[[cluster]] <- create_histogram_plot(data_to_graph,
+                                                               min_silh_width,
+                                                               max_count_perc,
+                                                               cluster)
+          }
         
         if(input$k_means_plot == "Silhouette"){
           
@@ -662,22 +727,10 @@ server <- function(input, output, session) {
           data_to_graph$nrow <- 1:nrow(data_to_graph)
           
           ## Create silhouette
-          silhouette_plot <- ggplot(data_to_graph, aes(x = nrow, y = sil_width)) +
-            geom_bar(stat = "identity", fill = "steelblue")  + # This makes it a horizontal bar chart
-            labs(x = "Individual Cases", y = "Silhouette width") +
-            scale_x_continuous(breaks = NULL, labels = NULL)+
-            expand_limits(y=c(min_silh_width, 1)) +
-            theme_minimal()+
-            coord_flip()+
-            ggtitle(paste0("Cluster: ", cluster),
-                    subtitle = paste0("Average silhouette width: ", round(mean(data_to_graph$sil_width), 2), "\n",
-                                      "n = ", paste(nrow(data_to_graph))))+
-            theme(plot.title = element_text(hjust = 0.5),
-                  plot.subtitle = element_text(hjust = 0.5))
-          
-          plot_output_list[[cluster]] <- silhouette_plot
-          
-        }
+          plot_output_list[[cluster]] <- create_silhouette_plot(data_to_graph,
+                                                                min_silh_width,
+                                                                cluster)
+          }
         
       }
       
@@ -702,8 +755,94 @@ server <- function(input, output, session) {
       
     })
     
+    
+    distances_from_ucenters <- reactive({
+      
+      ## Grab raw silhouette data and make row names the ID col
+      raw_silh_data <- raw_silh_data()
+      rownames(raw_silh_data) <- names(kmeans_solution$current_kmeans_solution@uclusters)
+      raw_silh_data <- raw_silh_data %>%
+        select(-c(neighbor)) %>%
+        mutate(ID = rownames(raw_silh_data))
+      
+      ## Create ucenters data
+      ucenters <- as.data.frame(kmeans_solution$current_kmeans_solution@ucenters)
+      ucenters$cluster <- rownames(ucenters)
+      
+      ## Create blank df to append to
+      distances_from_ucenters <- data.frame()
+      
+      ## For each unique cluster
+      for(i in unique(ucenters$cluster)){
+        
+        ## Filter to get each cluster#s ucenters
+        cluster_ucenters <- ucenters %>%
+          filter(cluster == i) %>%
+          select(-cluster)
+        
+        ## Get the cluster membership (row names)
+        cluster_membership <- raw_silh_data %>%
+          filter(cluster == i) %>%
+          rownames()
+        
+        ## Get each row of data for each member
+        cluster_membership_data <- uploaded_data_values$current_data_file %>%
+          filter(rownames(uploaded_data_values$current_data_file) %in% cluster_membership)
+        
+        ## Get distance from ucenter by doing actual data less ucenter 
+        cluster_distance_from_ucenters <- sweep(cluster_membership_data, 2, as.numeric(cluster_ucenters[1, ]), FUN = "-")
+        
+        ## Set cluster to be what i is, add unique ID col
+        # cluster_distance_from_ucenters$cluster <- i
+        cluster_distance_from_ucenters$ID <- rownames(cluster_distance_from_ucenters)
+        
+        cluster_distance_from_ucenters <- cluster_distance_from_ucenters %>% 
+          left_join(raw_silh_data)
+        
+        ## Bind to the master distances_from_ucenters df
+        distances_from_ucenters <- rbind(distances_from_ucenters, cluster_distance_from_ucenters)
+        
+      }
+      
+      ## Clean up df
+      distances_from_ucenters <- distances_from_ucenters %>%
+        relocate(ID, sil_width, everything()) %>%
+        arrange(desc(sil_width)) %>%
+        mutate(across(where(is.numeric), round, 2))
+      
+      ## Return that master df
+      return(distances_from_ucenters)
+      
+    })
+    
+    kmeans_table_to_show <- reactive({
+      
+      if(input$kmeans_table_to_show == 'All Clusters Overview'){
+        return(kmeans_table())
+      }else{
+        return(
+          
+          distances_from_ucenters() %>%
+            filter(cluster == input$kmeans_table_to_show) %>%
+            select(-c(cluster))
+          
+        )
+      }
+      
+    })
+    
+    ## Let output be either the all clusters overview or individual clusters
+    output$kmeans_tab <- renderDT(
+      
+      kmeans_table_to_show(),
+      options = list(scrollX = TRUE,
+                     searching = FALSE,
+                     lengthChange = FALSE),
+      rownames = FALSE
+    )
+
+    
   })
-  
   
   #### Panel 'Train the SOM'
   #############################################################################
@@ -1616,6 +1755,7 @@ server <- function(input, output, session) {
           change_vector=c(change_vector, eval_change[i])
         }
       }
+      
       showModal(dataModal(current_var_names, change_vector))
     }
   })
@@ -1741,13 +1881,7 @@ server <- function(input, output, session) {
       barplot(sub_sol_space, names.arg = sub_sol_names, main = "Senstivity Analysis Results", xlab  = "Quadrant", col = "yellowgreen")
     })
   })
-  
-  kmeans_count <- reactiveValues(value = 0)
-  
-  observeEvent(input$init_kmeans, {
-    kmeans_count$value <- kmeans_count$value + 1
-  })
-  
+
   infoButton <- reactive({  input$infoButton  })
   
   systems_mapping_tab_button_pressed_tracker <- reactiveValues(pop_up_systems = FALSE, exportOptionsToggle=0, egoNetworkToggle=0, advancedOptionsToggle=0, shortestPathsToggle=0, weightsOptionsToggle=0)
@@ -2332,7 +2466,8 @@ server <- function(input, output, session) {
                  submain = subtitle(),
                  footer = footer()) %>%
         visPhysics(enabled = F) %>%
-        visOptions(manipulation = T, highlightNearest = T)  %>%
+        visOptions(highlightNearest = T, 
+                   manipulation = list(enabled = T, addNodeCols = c("label")))  %>%
         visIgraphLayout(layout = layout()) %>%
         visInteraction(zoomSpeed = 0.25) %>%
         visNodes(size = input$node_size)
@@ -2587,31 +2722,36 @@ server <- function(input, output, session) {
       setwd(tempdir())
       file_names <- c("info.txt")
       info_text = "This directory contains the following files:"
-      kmeans_files <- c("kmeans_profiles.csv", "clustered_data.csv","kmean_seed.txt", "silh_plot.pdf")
-      som_files <- c("som_options.csv", "summary_class.txt","som_seed.txt", "som_profiles.csv", "data_quadrants.csv", "som_barplot.pdf", "som_boxplot.pdf")
-      policy_files <- c("adjust_kmeans.csv", "tested_intervention.csv", "sensitivity.pdf")
-      predict_files <-c("predicted_quadrants.csv")
-      systems_mapping_files <- c("nodes_list.csv", 'edges_list.csv', 'set_network_seed.txt')
+      
+      # kmeans_files <- c("kmeans_profiles.csv",
+      #                   "clustered_data.csv",
+      #                   "kmean_seed.txt",
+      #                   "all_jitter_plots.pdf")
+      
+      # som_files <- c("som_options.csv", "summary_class.txt","som_seed.txt", "som_profiles.csv", "data_quadrants.csv", "som_barplot.pdf", "som_boxplot.pdf")
+      # policy_files <- c("adjust_kmeans.csv", "tested_intervention.csv", "sensitivity.pdf")
+      # predict_files <-c("predicted_quadrants.csv")
+      # systems_mapping_files <- c("nodes_list.csv", 'edges_list.csv', 'set_network_seed.txt')
       
       if(is.null(kmeans_solution$current_kmeans_solution) == FALSE) {
-        file_names <- c(file_names, kmeans_files)
-        info_text <- c(info_text, kmeans_files)
+        # file_names <- c(file_names, kmeans_files)
+        # info_text <- c(info_text, kmeans_files)
       }
       if(is.null(som_solution$current_som_solution) == FALSE){
-        file_names <- c(file_names, som_files)
-        info_text <- c(info_text, som_files)
+        # file_names <- c(file_names, som_files)
+        # info_text <- c(info_text, som_files)
       }
       if(is.null(agent_cluster_values$agent_cluster_tracker) == FALSE && agent_cluster_values$agent_cluster_tracker@cluster_tested != "None"){
-        file_names <- c(file_names, policy_files)
-        info_text <- c(info_text, policy_files)
+        # file_names <- c(file_names, policy_files)
+        # info_text <- c(info_text, policy_files)
       }
       if(is.null(pred_cases$predicted_cases)== FALSE){
-        file_names <- c(file_names, predict_files)
-        info_text <-c(info_text,predict_files)
+        # file_names <- c(file_names, predict_files)
+        # info_text <-c(info_text,predict_files)
       }
       if(is.null(systems_mapping_values$network_initialised) == FALSE){
-        file_names <- c(file_names, systems_mapping_files)
-        info_text <-c(info_text,systems_mapping_files)
+        # file_names <- c(file_names, systems_mapping_files)
+        # info_text <-c(info_text,systems_mapping_files)
         
       }
       
@@ -2621,58 +2761,180 @@ server <- function(input, output, session) {
       close(fileConn)
       
       if(is.null(kmeans_solution$current_kmeans_solution) == FALSE){
+        
+        kmeans_dir <- file.path(tmpdir, 'kmeans_clustering')
+        dir.create(kmeans_dir) 
+        
         fstat <- pseudoF(uploaded_data_values$current_data_file, kmeans_solution$current_kmeans_solution, nrow(kmeans_solution$current_kmeans_solution@ucenters))
         fstat_col <- rep(0, nrow(kmeans_solution$current_kmeans_solution@ucenters)-1)
         fstat_col <- c(fstat, fstat_col)
         kcenters <- cbind(kmeans_solution$current_kmeans_solution@ucenters, "size" = kmeans_solution$current_kmeans_solution@usize, "Pseudo_F" = fstat_col)
-        write.csv(kcenters, file = "kmeans_profiles.csv")
-        clustered_data <- cbind(uploaded_data_values$current_data_file, "clus" = kmeans_solution$current_kmeans_solution@uclusters)
-        write.csv(clustered_data, file = "clustered_data.csv")
+        write.csv(kcenters, file = file.path(kmeans_dir, "kmeans_profiles.csv"))
+        clustered_data <- cbind(uploaded_data_values$current_data_file,
+                                silhouette(kmeans_solution$current_kmeans_solution@uclusters, daisy(uploaded_data_values$current_data_file)))
+        clustered_data$neighbor <- NULL
+        write.csv(clustered_data, file = file.path(kmeans_dir, "clustered_data.csv"))
         if(input$setrandseedkmean == "Yes"){kseed = as.character(input$randseedkmean)}
         else{kseed = "NULL"}
-        fileConn<-file("kmean_seed.txt")
+        fileConn<-file(file.path(kmeans_dir, "kmean_seed.txt"))
         writeLines(kseed, fileConn)
         close(fileConn)
-        pdf("silh_plot.pdf")
-        plot_silhouette(uploaded_data_values$current_data_file, kmeans_solution$current_kmeans_solution)
+        
+        raw_silh_data <- as.data.frame(silhouette(kmeans_solution$current_kmeans_solution@uclusters,
+                                                  daisy(uploaded_data_values$current_data_file)))
+        
+        min_silh_width <- ifelse(min(raw_silh_data$sil_width) > 0,
+                                 0,
+                                 min(raw_silh_data$sil_width))
+        
+        max_count_df <- raw_silh_data %>%
+          mutate(sil_width_bin = trunc(sil_width / 0.01) * 0.01) %>%
+          group_by(cluster, sil_width_bin) %>%
+          tally(name = "count") %>%
+          ungroup() 
+        
+        max_count <- max(max_count_df$count)
+        
+        max_count_perc <- max_count_df %>%
+          group_by(cluster) %>%
+          reframe(count_as_cluster_perc = count/sum(count)) %>%
+          select(count_as_cluster_perc) %>%
+          max() 
+        
+        jitter_plot_output_list <- list()
+        violin_plot_output_list <- list()
+        histogram_plot_output_list <- list()
+        silhouette_plot_output_list <- list()
+        
+        defined_clusters <- sort(unique(raw_silh_data$cluster))
+        
+        for(cluster in defined_clusters){
+          
+          ## Filter for data we need
+          data_to_graph <- raw_silh_data %>%
+            filter(cluster == !!cluster)
+          
+          ## Create Jitter
+          jitter_plot_output_list[[cluster]] <- create_jitter_plot(data_to_graph,
+                                                                   min_silh_width,
+                                                                   cluster)
+          
+          ## Create Violin
+          violin_plot_output_list[[cluster]] <- create_violin_plot(data_to_graph,
+                                                                   min_silh_width,
+                                                                   cluster)
+          ## Create histogram
+          histogram_plot_output_list[[cluster]] <- create_histogram_plot(data_to_graph,
+                                                                         min_silh_width,
+                                                                         max_count_perc,
+                                                                         cluster)
+          ## Create silhouette
+          data_to_graph <- data_to_graph %>%
+            arrange(sil_width)
+          
+          data_to_graph$nrow <- 1:nrow(data_to_graph)
+          
+          silhouette_plot_output_list[[cluster]] <- create_silhouette_plot(data_to_graph,
+                                                                           min_silh_width,
+                                                                           cluster)
+          
+        }
+
+        ## WRITE JITTER PLOT TO PDF ##
+        pdf(file.path(kmeans_dir, "all_jitter_plots.pdf"))
+        print(patchwork::wrap_plots(jitter_plot_output_list,
+                                    ncol = floor(sqrt(length(jitter_plot_output_list)))+1))
         dev.off()
-      }
+        
+        ## WRITE VIOLIN PLOT TO PDF ##
+        pdf(file.path(kmeans_dir, "all_violin_plots.pdf"))
+        print(patchwork::wrap_plots(violin_plot_output_list,
+                                    ncol = floor(sqrt(length(violin_plot_output_list)))+1))
+        dev.off()
+        
+        ## WRITE HISTOGRAM PLOT TO PDF ##
+        pdf(file.path(kmeans_dir, "all_histogram_plots.pdf"))
+        print(patchwork::wrap_plots(histogram_plot_output_list,
+                                    ncol = floor(sqrt(length(histogram_plot_output_list)))+1))
+        dev.off()
+        
+        ## WRITE SILHOUETTE PLOT TO PDF ##
+        pdf(file.path(kmeans_dir, "all_silhouette_plots.pdf"))
+        print(patchwork::wrap_plots(silhouette_plot_output_list,
+                                    ncol = floor(sqrt(length(silhouette_plot_output_list)))+1))
+        dev.off()
+        
+        file_names <- c(file_names,
+                        paste0('kmeans_clustering/', list.files(kmeans_dir)))
+        
+        }
+      
+      
+      
+      
       if(is.null(som_solution$current_som_solution) == FALSE){
+        
+        SOM_AI_dir <- file.path(tmpdir, 'SOM_AI')
+        dir.create(SOM_AI_dir) 
+        
+        ## Create som_options file -- 
         som_options =list("x dim" = som_solution$current_som_solution$parameters$the.grid$dim[1], "y dim" = som_solution$current_som_solution$parameters$the.grid$dim[2],
                           "proto_init" = som_solution$current_som_solution$parameters$init.proto, "max_iter" = som_solution$current_som_solution$parameters$maxit,
                           "data_scaling" = som_solution$current_som_solution$parameters$scaling, "gradient_descent" = som_solution$current_som_solution$parameters$eps0)
         som_options_df <- as.data.frame(som_options)
-        write.csv(som_options_df, file = "som_options.csv")
+        write.csv(som_options_df, file = file.path(SOM_AI_dir, "som_options.csv")) 
+        
+        ## Create summary_class file -- 
         class_summary <- capture.output(summary(som_solution$current_som_solution))
         temp_qual <- quality(som_solution$current_som_solution)
         class_summary <- class_summary[12:length(class_summary)]
         class_summary <- append(class_summary, paste("      Quant Error:", format(temp_qual$quantization, digits = 6)), after=2)
-        fileConn<-file("summary_class.txt")
+        fileConn<-file(file.path(SOM_AI_dir, "summary_class.txt")) 
         writeLines(class_summary, fileConn)
         close(fileConn)
+        
+        ## Create som_seed file -- 
         if(input$setrandseed == "Yes"){somseed = as.character(input$randseed)}
         else{somseed = "NULL"}
-        fileConn<-file("som_seed.txt")
+        fileConn<-file(file.path(SOM_AI_dir, "som_seed.txt")) 
         writeLines(somseed, fileConn)
         close(fileConn)
-        som_profiles <- as.data.frame(som_solution$current_som_solution$prototypes)
-        write.csv(som_profiles, file = "som_profiles.csv")
-        data_quadrants <- cbind(uploaded_data_values$current_data_file, "quadrant" = som_solution$current_som_solution$clustering)
-        write.csv(data_quadrants, file = "data_quadrants.csv")
         
+        ## Create som_profiles file -- 
+        som_profiles <- as.data.frame(som_solution$current_som_solution$prototypes)
+        write.csv(som_profiles, file = file.path(SOM_AI_dir, "som_profiles.csv")) 
+        
+        ## Create data_quadrants file -- 
+        data_quadrants <- cbind(uploaded_data_values$current_data_file, "quadrant" = som_solution$current_som_solution$clustering)
+        write.csv(data_quadrants, file = file.path(SOM_AI_dir, "data_quadrants.csv")) 
+        
+        ## Create som_barplot file --
         temp.dim<-som_solution$current_som_solution[["parameters"]][["the.grid"]][["dim"]]
-        pdf("som_barplot.pdf")
-        plot(x=som_solution$current_som_solution, what="obs", type="barplot",
-             show.names = TRUE,names = paste("Quadrant ", 1:prod(temp.dim)))
+        pdf(file.path(SOM_AI_dir, "som_barplot.pdf")) 
+        print(plot(x=som_solution$current_som_solution, what="obs", type="barplot",
+             show.names = TRUE,names = paste("Quadrant ", 1:prod(temp.dim))))
         dev.off()
-        pdf("som_boxplot.pdf")
-        plot(x=som_solution$current_som_solution, what="obs", type="boxplot",
-             show.names = TRUE,names = paste("Quadrant ", 1:prod(temp.dim)))
+        
+        ## Create som_boxplot file --
+        pdf(file.path(SOM_AI_dir, "som_boxplot.pdf")) 
+        print(plot(x=som_solution$current_som_solution, what="obs", type="boxplot",
+             show.names = TRUE,names = paste("Quadrant ", 1:prod(temp.dim))))
         dev.off()
+        
+        file_names <- c(file_names,
+                        paste0('SOM_AI/', list.files(SOM_AI_dir)))
         
       }
+      
+      
+      
       if(is.null(agent_cluster_values$agent_cluster_tracker) == FALSE && agent_cluster_values$agent_cluster_tracker@cluster_tested != "None"){
-        write.csv(agent_cluster_values$agent_cluster_tracker@checked_data, file ="adjust_kmeans.csv")
+        
+        
+        policy_preds_dir <- file.path(tmpdir, 'scenario_simulations')
+        dir.create(policy_preds_dir) 
+        
+        write.csv(agent_cluster_values$agent_cluster_tracker@checked_data, file = file.path(policy_preds_dir, "adjust_kmeans.csv"))
         temp_names <- names(uploaded_data_values$current_data_file)
         intervention =c()
         deviation =c()
@@ -2690,7 +2952,7 @@ server <- function(input, output, session) {
         }
         tested_changes <- matrix(c(intervention, deviation), nrow = 2, ncol = length(deviation), byrow = TRUE,
                                  dimnames = list(c("Intervention", "Deviation"), c(temp_names)))
-        write.csv(tested_changes, file ="tested_intervention.csv")
+        write.csv(tested_changes, file = file.path(policy_preds_dir, "tested_intervention.csv"))
         
         sub_sol_space <- c()
         sub_sol_names <- c()
@@ -2701,34 +2963,53 @@ server <- function(input, output, session) {
             sub_sol_space <- c(sub_sol_space, agent_cluster_values$agent_cluster_tracker@sensitivity_result[[i]])
           }}
         
-        pdf("sensitivity.pdf")
-        barplot(sub_sol_space, names.arg = sub_sol_names, main = "Senstivity Analysis Results", xlab  = "Quadrant", col = "yellowgreen")
+        pdf(file.path(policy_preds_dir, "sensitivity.pdf"))
+        print(barplot(sub_sol_space, names.arg = sub_sol_names, main = "Senstivity Analysis Results", xlab  = "Quadrant", col = "yellowgreen"))
         dev.off()
+        
+        file_names <- c(file_names,
+                        paste0('scenario_simulations/', list.files(policy_preds_dir)))
+        
       }
+      
       if(is.null(pred_cases$predicted_cases) == FALSE){
-        write.csv(pred_cases$predicted_cases, file ="predicted_quadrants.csv")
+        
+        data_forecasting_dir <- file.path(tmpdir, 'data_forecasting')
+        dir.create(data_forecasting_dir) 
+        
+        write.csv(pred_cases$predicted_cases, file = file.path(data_forecasting_dir, "predicted_quadrants.csv"))
+        
+        file_names <- c(file_names,
+                        paste0('data_forecasting/', list.files(data_forecasting_dir)))
         
       }
       
       if(is.null(systems_mapping_values$network_initialised) == FALSE){
-        
-        write.csv(systems_mapping_values$nodes4_download, file ="nodes_list.csv")
-        
+
+        systems_mapping_dir <- file.path(tmpdir, 'systems_mapping')
+        dir.create(systems_mapping_dir)
+
+        write.csv(systems_mapping_values$nodes4_download, file = file.path(systems_mapping_dir, "nodes_list.csv"))
+
         systems_mapping_values$links5_download <- systems_mapping_values$links5_download[, !(names(systems_mapping_values$links5_download) %in% c("color", "width"))]
-        
+
         systems_mapping_values$links5_download$to <- names(dynamic_nodes_ids_values$dynamic_nodes_ids)[match(systems_mapping_values$links5_download$to, dynamic_nodes_ids_values$dynamic_nodes_ids)]
         systems_mapping_values$links5_download$from <- names(dynamic_nodes_ids_values$dynamic_nodes_ids)[match(systems_mapping_values$links5_download$from, dynamic_nodes_ids_values$dynamic_nodes_ids)]
-        
-        write.csv(systems_mapping_values$links5_download, file ="edges_list.csv")
-        
-        fileConn<-file("set_network_seed.txt")
+
+        write.csv(systems_mapping_values$links5_download, file = file.path(systems_mapping_dir, "edges_list.csv"))
+
+        fileConn<-file(file.path(systems_mapping_dir, "set_network_seed.txt"))
         set_seed_info <- paste('Seed set for network visualisation is: ', systems_mapping_values$user_set_seed, sep = '')
         writeLines(set_seed_info, fileConn)
         close(fileConn)
-        
+
+        file_names <- c(file_names,
+                        paste0('systems_mapping/', list.files(systems_mapping_dir)))
+
       }
       
-      zip(zipfile=fname, files=fs)
+      zip(zipfile=fname, files=file_names)
+      
     },
     contentType = "application/zip"
   )
@@ -2904,6 +3185,7 @@ server <- function(input, output, session) {
                  
                  
                })
+
   
 }  
 

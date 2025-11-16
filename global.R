@@ -828,6 +828,86 @@ text <- gsub("\n", "<br>", text) # Convert newline characters to HTML line break
 text <- gsub("Purpose of Map:", "<u><b>Purpose of Map:</b></u>", text) # Bold the "Purpose of Map:" heading
 text <- gsub("Using the Map:", "<u><b>Using the Map:</b></u>", text) # Bold the "Using the Map:" heading
 
+## MAKING THE DIFFERENT K MEANS CHARTS ##
+create_jitter_plot <- function(data_to_graph, min_silh_width, cluster){
+  
+  jitter_plot <- ggplot(data_to_graph, aes(x = 0, y = sil_width)) +
+    geom_jitter(height = 0, width = 0.01) + # Adjust 'height' for vertical spread
+    scale_x_continuous(breaks = NULL, labels = NULL) +
+    labs(x = NULL) +
+    expand_limits(y=c(min_silh_width, 1)) +
+    geom_hline(yintercept = 0, linetype="dotted") +
+    ylab("Silhouette width")+
+    theme_minimal()+
+    ggtitle(paste0("Cluster: ", cluster),
+            subtitle = paste0("Average silhouette width: ", round(mean(data_to_graph$sil_width), 2), "\n",
+                              "n = ", paste(nrow(data_to_graph))))+
+    theme_minimal()+
+    theme(plot.title = element_text(hjust = 0.5),
+          plot.subtitle = element_text(hjust = 0.5))
+  
+  return(jitter_plot)
+  
+}
+
+create_violin_plot <- function(data_to_graph, min_silh_width, cluster){
+  
+  violin_plot <- ggplot(data_to_graph, aes(x = "", y=sil_width)) +
+    geom_violin(color = "black", fill="steelblue") +
+    expand_limits(y=c(min_silh_width, 1)) +
+    geom_hline(yintercept = 0, linetype="dotted") +
+    ylab("Silhouette width")+
+    theme_minimal()+
+    ggtitle(paste0("Cluster: ", cluster),
+            subtitle = paste0("Average silhouette width: ", round(mean(data_to_graph$sil_width), 2), "\n",
+                              "n = ", paste(nrow(data_to_graph))))+
+    theme(plot.title = element_text(hjust = 0.5),
+          plot.subtitle = element_text(hjust = 0.5))+
+    labs(x = NULL)
+  
+  return(violin_plot)
+  
+}
+
+create_histogram_plot <- function(data_to_graph, min_silh_width, max_count_perc, cluster){
+  
+  histogram_plot <- ggplot(data_to_graph, aes(x=sil_width, y = after_stat(count)/nrow(data_to_graph))) + 
+    geom_histogram(fill = "steelblue", binwidth = 0.01) + 
+    expand_limits(x=c(min_silh_width, 1), y = c(0, max_count_perc)) +
+    geom_vline(xintercept = 0, linetype="dotted") +
+    ylab("Percentage of cases")+
+    xlab("Silhouette width")+
+    theme_minimal()+
+    ggtitle(paste0("Cluster: ", cluster),
+            subtitle = paste0("Average silhouette width: ", round(mean(data_to_graph$sil_width), 2), "\n",
+                              "n = ", paste(nrow(data_to_graph))))+
+    theme(plot.title = element_text(hjust = 0.5),
+          plot.subtitle = element_text(hjust = 0.5))+
+    scale_y_continuous(labels = scales::percent)
+  
+  return(histogram_plot)
+  
+}
+
+create_silhouette_plot <- function(data_to_graph, min_silh_width, cluster){
+  
+  silhouette_plot <- ggplot(data_to_graph, aes(x = nrow, y = sil_width)) +
+    geom_bar(stat = "identity", fill = "steelblue")  + # This makes it a horizontal bar chart
+    labs(x = "Individual Cases", y = "Silhouette width") +
+    scale_x_continuous(breaks = NULL, labels = NULL)+
+    expand_limits(y=c(min_silh_width, 1)) +
+    theme_minimal()+
+    coord_flip()+
+    ggtitle(paste0("Cluster: ", cluster),
+            subtitle = paste0("Average silhouette width: ", round(mean(data_to_graph$sil_width), 2), "\n",
+                              "n = ", paste(nrow(data_to_graph))))+
+    theme(plot.title = element_text(hjust = 0.5),
+          plot.subtitle = element_text(hjust = 0.5))
+  
+  return(silhouette_plot)
+  
+}
+
 
 
 

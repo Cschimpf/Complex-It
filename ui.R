@@ -198,13 +198,16 @@ ui <- dashboardPage(
                                            
                                            # Neatly aligned horizontal layout
                                            fluidRow(
-                                             box(
-                                             div(
-                                               style = "display: inline-block; vertical-align: top; margin-right: 20px; margin-left: 20px;",
-                                               actionButton(
-                                                 "show_modal",
-                                                 "Upload your data",
-                                                 style = "foreground-color:white;
+                                             
+                                             column(width=3,
+                                                    
+                                                    box(width=12,
+                                                        
+                                                          actionButton(
+                                                            "show_modal",
+                                                            "Upload your data",
+                                                            class = "full-width-button",
+                                                            style = "foreground-color:white;
                                                                   background-color:darksalmon;
                                                                   color:black;
                                                                   float:center;
@@ -215,17 +218,22 @@ ui <- dashboardPage(
                                                                   border-width: 5px;
                                                                   margin-bottom: 5px;
                                                                   margin-top: 5px;"
-                                               )
-                                             ),
-                                             div(
-                                               style = "display: inline-block; vertical-align: top;",
-                                               uiOutput("varchoice")
-                                             ))
-                                           ),
+                                                          ),
+                                                        uiOutput("varchoice")
+                                                        )
+                                                    
+                                                    ),
+                                             
+                                             column(width = 9,
+                                                    
+                                                    # Data table output below
+                                                    div(style = "margin-top: 20px;",
+                                                        DTOutput("view")
+                                                    
+                                                    )
+                                                    
+                                                    )
                                            
-                                           # Data table output below
-                                           div(style = "margin-top: 20px;",
-                                               DTOutput("view")
                                            )
                                          )
                          ),
@@ -354,6 +362,11 @@ ui <- dashboardPage(
                              'K-Means Clusters',
                              uiOutput("kmeans_title"),
                              textOutput("pseudoF"),
+                             selectInput(inputId = "kmeans_table_to_show",
+                                         label = "What cluster would you like to analyse?",
+                                         choices = NULL, 
+                                         selected = 'All Clusters Overview', 
+                                         multiple = FALSE),
                              DTOutput("kmeans_tab")
                              ),
                            
@@ -681,14 +694,18 @@ ui <- dashboardPage(
                                choices = "(Not Available)"
                                ),
                              
-                             numericInput(
-                               "names_SC_num",
-                               "Number of Superclusters:",
-                               2,
-                               min = 2,
-                               max = 10,
-                               step = 1
-                               ),
+                             conditionalPanel(
+                               condition = "input.somplottype == 'names'",
+                               numericInput(
+                                 "names_SC_num",
+                                 "Number of Superclusters:",
+                                 2,
+                                 min = 2,
+                                 max = 10,
+                                 step = 1
+                               )
+                             ),
+                             
                              id = "conditional_toggles_introbox"
                              )
                            )
@@ -700,9 +717,9 @@ ui <- dashboardPage(
                          condition = "input.somplottype == 'boxplot'",
                          withSpinner(
                            plotlyOutput(
-                             "somplot_box",
-                             height = "80vh",
-                             width = "65vw"
+                             "somplot_box"#,
+                             # height = "80vh",
+                             # width = "65vw"
                              )
                            )
                          ),
@@ -711,9 +728,9 @@ ui <- dashboardPage(
                          condition = "input.somplottype == 'names'",
                          withSpinner(
                            plotOutput(
-                             "somplot_names",
-                             height = "80vh",
-                             width = "65vw"
+                             "somplot_names"#,
+                             # height = "80vh",
+                             # width = "65vw"
                              )
                            )
                          ),
@@ -722,9 +739,9 @@ ui <- dashboardPage(
                          condition = "input.somplottype == 'color'",
                          withSpinner(
                            plotOutput(
-                             "somplot_color",
-                             height = "80vh",
-                             width = "65vw"
+                             "somplot_color"#,
+                             # height = "80vh",
+                             # width = "65vw"
                              )
                            )
                          ),
@@ -733,9 +750,9 @@ ui <- dashboardPage(
                          condition = "input.somplotwhat == 'obs' && input.somplottype == 'barplot'",
                          withSpinner(
                            plotlyOutput(
-                             "somplot_obs_bar",
-                             height = "80vh",
-                             width = "65vw"
+                             "somplot_obs_bar"#,
+                             # height = "80vh",
+                             # width = "65vw"
                              )
                            )
                          ),
@@ -744,9 +761,9 @@ ui <- dashboardPage(
                          condition = "input.somplotwhat == 'prototypes' && input.somplottype == '3d'",
                          withSpinner(
                            plotlyOutput(
-                             "somplot_3d",
-                             height = "80vh",
-                             width = "65vw"
+                             "somplot_3d"#,
+                             # height = "80vh",
+                             # width = "65vw"
                              )
                            )
                          ),
@@ -755,9 +772,9 @@ ui <- dashboardPage(
                          condition = "input.somplotwhat == 'prototypes' && input.somplottype == 'smooth.dist'",
                          withSpinner(
                            plotlyOutput(
-                             "somplot_smooth_dist",
-                             height = "80vh",
-                             width = "65vw"
+                             "somplot_smooth_dist"#,
+                             # height = "80vh",
+                             # width = "65vw"
                              )
                            )
                          ),
@@ -766,9 +783,9 @@ ui <- dashboardPage(
                          condition = "input.somplotwhat == 'prototypes' && input.somplottype == 'barplot'",
                          withSpinner(
                            plotlyOutput(
-                             "somplot_prototypes_bar",
-                             height = "80vh",
-                             width = "65vw"
+                             "somplot_prototypes_bar"#,
+                             # height = "80vh",
+                             # width = "65vw"
                              )
                            )
                          ),
@@ -777,9 +794,9 @@ ui <- dashboardPage(
                          condition = "input.somplotwhat == 'prototypes' && input.somplottype == 'umatrix'",
                          withSpinner(
                            plotOutput(
-                             "somplot_umatrix",
-                             height = "80vh",
-                             width = "65vw"
+                             "somplot_umatrix"#,
+                             # height = "80vh",
+                             # width = "65vw"
                              )
                            )
                          )
