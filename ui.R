@@ -1475,7 +1475,43 @@ ui <- dashboardPage(
                                and downloaded to your default download directory. Please also note, you will
                                only receive results from the sections you have used in this session. And, finally, only your
                                most recent analysis -- kmeans, SOM or policy prediction, etc -- will be downloaded.", style = "color:green"),
-              downloadButton('downloadReport', 'Download Report')
+              downloadButton('downloadReport', 'Download Report'),
+              
+              
+              fluidRow(
+                column(
+                  width = 8,
+                  textInput("title", "Report title", placeholder = "Enter report title"),
+                  textInput("subtitle", "Report subtitle", placeholder = "Enter subtitle (optional)"),
+                  textAreaInput(
+                    "intro", "Report introduction",
+                    placeholder = "Short intro or abstract (Markdown supported)",
+                    rows = 6
+                  ),
+                  tags$hr(),
+                  
+                  # Section 1 toggle + dynamic inputs
+                  checkboxInput("include_s1", "Include Section 1", value = FALSE),
+                  uiOutput("s1_inputs"),
+                  
+                  # ---- Section 2 ----
+                  checkboxInput("include_s2", "Include Section 2", value = FALSE),
+                  uiOutput("s2_inputs"),
+                  
+                  # ---- Section 3 ----
+                  checkboxInput("include_s3", "Include Section 3", value = FALSE),
+                  uiOutput("s3_inputs"),
+                  
+                  # ---- Section 4 ----
+                  checkboxInput("include_s4", "Include Section 4", value = FALSE),
+                  uiOutput("s4_inputs"),
+                  
+                  br(),
+                  downloadButton("download_report", "Download HTML report")
+                )
+              )
+              
+              
               
       ),
       

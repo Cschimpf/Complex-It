@@ -442,46 +442,6 @@ server <- function(input, output, session) {
   })
   
   
-  # observeEvent(input$input_table_id_col,{
-  #   
-  #   the.table <- uploaded_data_values$the_table
-  # 
-  #   if(input$input_table_id_col == "No ID Column"){
-  # 
-  #     rownames(the.table) <- NULL
-  # 
-  #     rownames(the.table) <- paste0("Case ", rownames(the.table))
-  # 
-  #   }else{
-  # 
-  #     rownames(the.table) <- NULL
-  # 
-  #     selected_col <- input$input_table_id_col
-  # 
-  #     rownames(the.table) <- paste0("Case ", rownames(the.table), ": ", the.table[[selected_col]])
-  # 
-  #   }
-  # 
-  #   uploaded_data_values$display_data <- the.table
-  #   uploaded_data_values$rendered_data <- the.table
-  # 
-  #   numeric_only_columns <- column_type_identifier(the.table)
-  #   current_data_file_to_assign <- the.table[numeric_only_columns]
-  #   uploaded_data_values$current_data_file <- current_data_file_to_assign
-  #   
-  # })
-  
-  
-  # observeEvent(input$varchoice,{
-  #   
-  #       uploaded_data_values$current_data_file <- uploaded_data_values$display_data[input$varchoice]
-  #       uploaded_data_values$rendered_data <- uploaded_data_values$display_data %>%
-  #         select(-c(setdiff(as.vector(colnames(uploaded_data_values$the_table)[sapply(uploaded_data_values$the_table, class) %in% c("integer", "numeric")]),
-  #                           input$varchoice)))
-  #   
-  # })
-  
-  
   observeEvent(input$subset_data,{
 
     if(length(ncol(uploaded_data_values$display_data) >= length(input$varchoice))){
@@ -997,6 +957,7 @@ server <- function(input, output, session) {
 
     # Create a reactive value to store the parsed dataframe
     parsed_anova_results <- reactive({
+      
       anova_info$anova_results <- retrieve_ANOVA_results(som_solution$current_som_solution)
       
       # Function to process the list and create a dataframe
@@ -1025,7 +986,8 @@ server <- function(input, output, session) {
       # Call the function with your list
       my_list <- anova_info$anova_results[(length(anova_info$anova_results)-3):2]
       
-      anova_info$anova_results_df <- parse_list_to_dataframe( my_list )
+      anova_info$anova_results_df <- parse_list_to_dataframe(my_list)
+      
     })
     
     output$trainnotice_advanced_info <- renderUI({
@@ -1099,7 +1061,7 @@ server <- function(input, output, session) {
                              list(
                                element = "#save_som_intro_box",
                                intro = "Click this button to save your SOM 
-                               solution from te previous tab."),
+                               solution from the previous tab."),
                              
                              list(
                                element = "#infoButton_plot_map",
@@ -2723,38 +2685,6 @@ server <- function(input, output, session) {
       file_names <- c("info.txt")
       info_text = "This directory contains the following files:"
       
-      # kmeans_files <- c("kmeans_profiles.csv",
-      #                   "clustered_data.csv",
-      #                   "kmean_seed.txt",
-      #                   "all_jitter_plots.pdf")
-      
-      # som_files <- c("som_options.csv", "summary_class.txt","som_seed.txt", "som_profiles.csv", "data_quadrants.csv", "som_barplot.pdf", "som_boxplot.pdf")
-      # policy_files <- c("adjust_kmeans.csv", "tested_intervention.csv", "sensitivity.pdf")
-      # predict_files <-c("predicted_quadrants.csv")
-      # systems_mapping_files <- c("nodes_list.csv", 'edges_list.csv', 'set_network_seed.txt')
-      
-      if(is.null(kmeans_solution$current_kmeans_solution) == FALSE) {
-        # file_names <- c(file_names, kmeans_files)
-        # info_text <- c(info_text, kmeans_files)
-      }
-      if(is.null(som_solution$current_som_solution) == FALSE){
-        # file_names <- c(file_names, som_files)
-        # info_text <- c(info_text, som_files)
-      }
-      if(is.null(agent_cluster_values$agent_cluster_tracker) == FALSE && agent_cluster_values$agent_cluster_tracker@cluster_tested != "None"){
-        # file_names <- c(file_names, policy_files)
-        # info_text <- c(info_text, policy_files)
-      }
-      if(is.null(pred_cases$predicted_cases)== FALSE){
-        # file_names <- c(file_names, predict_files)
-        # info_text <-c(info_text,predict_files)
-      }
-      if(is.null(systems_mapping_values$network_initialised) == FALSE){
-        # file_names <- c(file_names, systems_mapping_files)
-        # info_text <-c(info_text,systems_mapping_files)
-        
-      }
-      
       fs <-file_names
       fileConn<-file("info.txt")
       writeLines(info_text, fileConn)
@@ -3013,6 +2943,887 @@ server <- function(input, output, session) {
     },
     contentType = "application/zip"
   )
+  
+  # User generated report code
+  
+  # ---- Helper: scalar-safe coalescer ----
+  `%||s%` <- function(a, b) {
+    if (is.null(a)) return(b)
+    if (is.character(a) && length(a) == 1 && !nzchar(a)) return(b)
+    a
+  }
+  
+  # ---- Dynamic UI for Section 1 ----
+  output$s1_inputs <- renderUI({
+    if (!isTRUE(input$include_s1)) return(NULL)
+    tagList(
+      tags$div(
+        style = "margin-left: 8px; border-left: 3px solid #e1e1e1; padding-left: 12px;",
+        textInput("s1_title", "Section 1 title", placeholder = "e.g., Methods"),
+        textAreaInput(
+          "s1_body", "Section 1 prose",
+          placeholder = "Write content for Section 1 (Markdown supported)...",
+          rows = 8
+        )
+      )
+    )
+  })
+  
+  
+  # ---- Dynamic UI for Section 2 ----
+  output$s2_inputs <- renderUI({
+    if (!isTRUE(input$include_s2)) return(NULL)
+    tagList(
+      tags$div(
+        style = "margin-left: 8px; border-left: 3px solid #e1e1e1; padding-left: 12px;",
+        textInput("s2_title", "Section 2 title", placeholder = "e.g., Results"),
+        textAreaInput(
+          "s2_body", "Section 2 intro",
+          placeholder = "Write intro for Section 2 (Markdown supported)...",
+          rows = 6
+        )
+      )
+    )
+  })
+  
+  # ---- Dynamic UI for Section 3 ----
+  output$s3_inputs <- renderUI({
+    if (!isTRUE(input$include_s3)) return(NULL)
+    tagList(
+      tags$div(
+        style = "margin-left: 8px; border-left: 3px solid #e1e1e1; padding-left: 12px;",
+        textInput("s3_title", "Section 3 title", placeholder = "e.g., Results"),
+        textAreaInput(
+          "s3_body", "Section 3 intro",
+          placeholder = "Write intro for Section 3 (Markdown supported)...",
+          rows = 6
+        )
+      )
+    )
+  })
+  
+  # ---- Dynamic UI for Section 3 ----
+  output$s3_inputs <- renderUI({
+    if (!isTRUE(input$include_s4)) return(NULL)
+    tagList(
+      tags$div(
+        style = "margin-left: 8px; border-left: 3px solid #e1e1e1; padding-left: 12px;",
+        textInput("s4_title", "Section  title", placeholder = "e.g., Results"),
+        textAreaInput(
+          "s4_body", "Section 4 intro",
+          placeholder = "Write intro for Section 4 (Markdown supported)...",
+          rows = 6
+        )
+      )
+    )
+  })
+  
+  
+  # ---- Rmd template built on the fly (parameterized) ----
+  rmd_template_path <- reactive({
+    
+    rmd_lines <- c(
+      '---',
+      'title: "`r params$title`"',
+      'subtitle: "`r params$subtitle`"',
+      'author: ""',
+      'date: "`r format(Sys.Date(), \'%d %B %Y\')`"',
+      'output:',
+      '  html_document:',
+      '    toc: true',
+      '    toc_float: false',
+      '    number_sections: false',
+      '    theme: cosmo',
+      '    df_print: paged',
+      'params:',
+      '  title:',
+      '    value: "Untitled Report"',
+      '  subtitle:',
+      '    value: ""',
+      '  intro:',
+      '    value: ""',
+      
+      
+      # ---- Section 1 params ----
+      '  include_s1:',
+      '    value: false',
+      '  s1_title:',
+      '    value: "Section 1"',
+      '  s1_body:',
+      '    value: ""',
+      # your wider app passes this:
+      '  data_obj:',
+      '    value: !r NULL',
+      
+      # ---- Section 2 params ----
+      '  include_s2:',
+      '    value: false',
+      '  s2_title:',
+      '    value: "Section 2"',
+      '  s2_body:',
+      '    value: ""',
+      # Section 2 Tables 
+      '  all_clusters_tbl:',
+      '    value: !r NULL',
+      '  cluster_rows_tbl:',
+      '    value: !r NULL',
+      # Section 2 Charts
+      '  s2_jitters:',
+      '    value: !r NULL',
+      '  s2_violins:',
+      '    value: !r NULL',
+      '  s2_histograms:',
+      '    value: !r NULL',
+      '  s2_silhouettes:',
+      '    value: !r NULL',
+      
+      # ---- Section 3 params ----
+      '  include_s3:',
+      '    value: false',
+      '  s3_title:',
+      '    value: "Section 3"',
+      '  s3_body:',
+      '    value: ""',
+      # Section 3 Prose 
+      '  s3_topo_prose:',
+      '    value: !r NULL',
+      '  s3_quant_prose:',
+      '    value: !r NULL',
+      '  s3_deg_free_prose:',
+      '    value: !r NULL',
+      '  s3_dendro:',
+      '    value: !r NULL',
+      '  s3_map:',
+      '    value: !r NULL',
+      # Section 3 table 
+      '  s3_ANOVA_table:',
+      '    value: !r NULL',
+      
+      # ---- Section 4 params ----
+      '  include_s4:',
+      '    value: false',
+      '  s4_title:',
+      '    value: "Section 2"',
+      '  s4_body:',
+      '    value: ""',
+      # Section 4 charts
+      '  s4_obs_box:',
+      '    value: !r NULL',
+      '  s4_obs_bar:',
+      '    value: !r NULL',
+      '  s4_proto_bar:',
+      '    value: !r NULL',
+      
+      # Section 5 grid
+      '  s5_grid:',
+      '    value: !r NULL',
+      
+      '---',
+      '',
+      '```{r setup, include=FALSE}',
+      'knitr::opts_chunk$set(',
+      '  echo = FALSE,',
+      '  warning = FALSE,',
+      '  message = FALSE',
+      ')',
+      'library(DT)',
+      'library(ggplot2)',
+      '```',
+      '',
+      
+      # ---- Intro block ----
+      '```{r intro, results="asis"}',
+      'if (nzchar(params$intro)) {',
+      '  cat(params$intro, "\\n\\n")',
+      '} else {',
+      '  cat("This is the report intro. I want this to be populated by the `intro` user input/text.\\n\\n")',
+      '}',
+      '```',
+      '',
+      '___',
+      '',
+      
+      # =========================
+      # ---- Section 1 text ----
+      # =========================
+      '```{r section1_text, results="asis"}',
+      'if (isTRUE(params$include_s1)) {',
+      '  h <- if (nzchar(params$s1_title)) params$s1_title else "Section 1"',
+      '  cat(paste0("## ", h, "\\n\\n"))',
+      '  if (nzchar(params$s1_body)) {',
+      '    cat(params$s1_body, "\\n\\n")',
+      '  } else {',
+      '    cat("This is section 1 intro, I want it to be populated by `s1_body`.\\n\\n")',
+      '  }',
+      '}',
+      '```',
+      '',
+      
+      # ---- Section 1 data + table (ONLY if include_s1) ----
+      '```{r section1_data, eval=isTRUE(params$include_s1)}',
+      'if (!is.null(params$data_obj)) {',
+      '  data <- params$data_obj',
+      '  datatable(data)',
+      '} else {',
+      '  # fallback dummy if data_obj not provided',
+      '  data <- mtcars',
+      '  data$car <- rownames(mtcars)',
+      '  rownames(data) <- NULL',
+      '  datatable(data)',
+      '}',
+      '```',
+      '',
+      
+      # =========================
+      # ---- Section 2 (TABSET) ----
+      # =========================
+      
+      # ---- Section 2 header + intro + "Tables" tab heading (UNCHANGED) ----
+      '```{r section2_text_and_tables_header, results="asis"}',
+      'if (isTRUE(params$include_s2)) {',
+      '  h2 <- if (nzchar(params$s2_title)) params$s2_title else "Section 2"',
+      '  cat(paste0("## ", h2, "\\n\\n"))',
+      '  if (nzchar(params$s2_body)) {',
+      '    cat(params$s2_body, "\\n\\n")',
+      '  } else {',
+      '    cat("This is section 2 intro, populated by `s2_body`.\\n\\n")',
+      '  }',
+      '  cat(paste0("### ", "Tables", " {.tabset}\\n\\n"))',
+      '  cat("#### K-Means Profiles\\n\\n")',
+      '}',
+      '```',
+      '',
+      
+      # ---- K Means Profiles Tabset Panel Content (UNCHANGED; still a placeholder) ----
+      '```{r section2_k_means_profiles, eval=isTRUE(params$include_s2)}',
+      
+      'DT::datatable(params$all_clusters_tbl)',
+      
+      '```',
+      
+      # ---- Case-Level Data Tabset Panel Title (UNCHANGED) ---- 
+      '```{r section2_cluster_rows_header, results="asis"}',
+      'if (isTRUE(params$include_s2)) {',
+      '  cat("#### Individual Case Data\\n\\n")',
+      '}',
+      '```',
+      '',
+      
+      # ---- Case-Level Data Tabset Panel Content (UNCHANGED; still a placeholder) ----
+      '```{r section2_cluster_rows_tbl, eval=isTRUE(params$include_s2)}',
+      'library(crosstalk)',
+      
+      'shared_all_clusters <- SharedData$new(params$cluster_rows_tbl, group = "cluster")',
+      
+      'crosstalk::bscols(',
+        'widths = c(3, 9),',
+        'list(',
+          'filter_select(id = "species", label = "Cluster", sharedData = shared_all_clusters, group = ~cluster)',
+        '),',
+        'datatable(shared_all_clusters,',
+                  'rownames = FALSE,',
+                  'filter = "top",',
+                  'options = list(pageLength = 10, autoWidth = TRUE, dom = "tip", lengthChange = FALSE))',
+      ')',
+      '```',
+      
+      # ---- Section 2 header + intro + "Tables" tab heading (UNCHANGED) ----
+      # ---- Section 2 header + intro + "Tables" tab heading (UNCHANGED) ----
+      '```{r section2_setting_up_charts, results="asis"}',
+      'if (isTRUE(params$include_s2)) {',
+      
+      '  cat(paste0("### ", "Charts", " {.tabset}\\n\\n"))',
+      
+      '  cat("#### Jitter Plots\\n\\n")',
+      '}',
+      '```',
+      '',
+      
+      # ---- K Means Profiles Tabset Panel Content (UNCHANGED; still a placeholder) ----
+      '```{r section2_jitter_plots, eval=isTRUE(params$include_s2)}',
+      
+      'params$s2_jitters',
+      
+      '```',
+      
+      "",
+      
+      # ---- Case-Level Data Tabset Panel Title (UNCHANGED) ---- 
+      '```{r section2_violin_plots_header, results="asis"}',
+      'if (isTRUE(params$include_s2)) {',
+      '  cat("#### Violin Plots\\n\\n")',
+      '}',
+      '```',
+      '',
+      
+      # ---- K Means Profiles Tabset Panel Content (UNCHANGED; still a placeholder) ----
+      '```{r section2_violin_plots, eval=isTRUE(params$include_s2)}',
+      
+      'params$s2_violins',
+      
+      '```',
+      
+      "",
+      
+      # ---- Case-Level Data Tabset Panel Title (UNCHANGED) ---- 
+      '```{r section2_histogram_plots_header, results="asis"}',
+      'if (isTRUE(params$include_s2)) {',
+      '  cat("#### Histogram Plots\\n\\n")',
+      '}',
+      '```',
+      '',
+      
+      # ---- K Means Profiles Tabset Panel Content (UNCHANGED; still a placeholder) ----
+      '```{r section2_histogram_plots, eval=isTRUE(params$include_s2)}',
+      
+      'params$s2_histograms',
+      
+      '```',
+      
+      "",
+      
+      # ---- Case-Level Data Tabset Panel Title (UNCHANGED) ---- 
+      '```{r section2_silhouette_plots_header, results="asis"}',
+      'if (isTRUE(params$include_s2)) {',
+      '  cat("#### Silhouette Plots\\n\\n")',
+      '}',
+      '```',
+      '',
+      
+      # ---- K Means Profiles Tabset Panel Content (UNCHANGED; still a placeholder) ----
+      '```{r section2_silhouette_plots, eval=isTRUE(params$include_s2)}',
+      
+      'params$s2_silhouettes',
+      
+      '```',
+      
+      "",
+      
+      # =========================
+      # ---- Section 3 text ----
+      # =========================
+      '```{r section3_text, results="asis"}',
+      'if (isTRUE(params$include_s3)) {',
+      '  h <- if (nzchar(params$s3_title)) params$s3_title else "Section 3"',
+      '  cat(paste0("## ", h, "\\n\\n"))',
+      '  if (nzchar(params$s3_body)) {',
+      '    cat(params$s3_body, "\\n\\n")',
+      '  } else {',
+      '    cat("This is section 1 intro, I want it to be populated by `s1_body`.\\n\\n")',
+      '  }',
+      '}',
+      '```',
+      '',
+      
+      '```{r section3_errors_prose, results="asis"}',
+      'if (isTRUE(params$include_s3)) {',
+      
+      'cat(',
+        '"In the SOM analysis:\n\n",',
+        '"- ", params$s3_topo_prose, "\n",',
+        '"- ", params$s3_quant_prose, "\n",',
+        '"- ", params$s3_deg_free_prose, "\n\n",',
+        'sep = ""',
+      ')',
+      
+      'DT::datatable(params$s3_ANOVA_table)',
+      
+      'cat(paste0("### ", "SOM Super Cluster Charts", " {.tabset}\\n\\n"))',
+      
+      'cat("#### Dendrogram\\n\\n")',
+      '}',
+      '```',
+      
+      '',
+      
+      # ---- K Means Profiles Tabset Panel Content (UNCHANGED; still a placeholder) ----
+      '```{r section3_dendrogram, eval=isTRUE(params$include_s3)}',
+      'if (isTRUE(params$include_s3)) {',
+      
+      'plot(',
+        'params$s3_dendro,',
+        'what="prototypes",',
+        'type="dendrogram"',
+      ')',
+      '}',
+      
+      '```',
+      
+      '',
+      
+      # ---- Case-Level Data Tabset Panel Title (UNCHANGED) ---- 
+      '```{r section3_map, results="asis"}',
+      'if (isTRUE(params$include_s3)) {',
+      '  cat("#### Map\\n\\n")',
+      '}',
+      '```',
+      '',
+      
+      # ---- K Means Profiles Tabset Panel Content (UNCHANGED; still a placeholder) ----
+      '```{r section3_map_plot, eval=isTRUE(params$include_s3)}',
+      'if (isTRUE(params$include_s3)) {',
+      'plot(',
+      'params$s3_map,',
+      'what="prototypes",',
+      'type="grid"',
+      ')',
+      '}',
+      
+      '```',
+      
+      # =========================
+      # ---- Section 4 text ----
+      # =========================
+      '```{r section4_text, results="asis"}',
+      'if (isTRUE(params$include_s4)) {',
+      '  h <- if (nzchar(params$s4_title)) params$s4_title else "Section 4"',
+      '  cat(paste0("## ", h, "\\n\\n"))',
+      '  if (nzchar(params$s4_body)) {',
+      '    cat(params$s4_body, "\\n\\n")',
+      '  } else {',
+      '    cat("This is section 4 intro, I want it to be populated by `s4_body`.\\n\\n")',
+      '  }',
+      '}',
+      '```',
+      '',
+      
+      # ---- Section 4 "Barplots and Boxplots" tab heading (UNCHANGED) ----
+      '```{r section4_setting_tabset, results="asis"}',
+      'if (isTRUE(params$include_s4)) {',
+      
+      '  cat(paste0("### ", "Charts", " {.tabset}\\n\\n"))',
+      
+      '  cat("#### Observations Boxplot\\n\\n")',
+      '}',
+      '```',
+      '',
+      
+      # ---- Display obs boxplot witin tabset ----
+      '```{r section4_obs_box_plot, eval=isTRUE(params$include_s4)}',
+      'if (isTRUE(params$include_s4)) {',
+      'params$s4_obs_box',
+      '}',
+      
+      '```',
+      
+      # ---- Section 4 "Barplots and Boxplots" tab heading (UNCHANGED) ----
+      '```{r section4_obs_bar_plot, results="asis"}',
+      'if (isTRUE(params$include_s4)) {',
+      '  cat("#### Observations Barplot\\n\\n")',
+      'params$s4_obs_bar',
+      '}',
+      '```',
+      '',
+      
+      # ---- Section 4 "Barplots and Boxplots" tab heading (UNCHANGED) ----
+      '```{r section4_proto_bar_plot, results="asis"}',
+      'if (isTRUE(params$include_s4)) {',
+      '  cat("#### Prototypes Barplot\\n\\n")',
+      # 'params$s4_proto_bar',
+      'params$s5_grid', ## REMOVE AFTER TRYING
+      '}',
+      '```',
+      '',
+      
+      ""
+      
+      
+      
+      
+    )
+    
+    f <- file.path(tempdir(), "report_template.Rmd")
+    writeLines(rmd_lines, f, useBytes = TRUE)
+    f
+  })
+  
+  # ---- Download handler ----
+  output$download_report <- downloadHandler(
+    
+    filename = function() {
+      ttl <- input$title %||s% "report"
+      ttl <- gsub("[^A-Za-z0-9_-]+", "_", ttl)
+      paste0(ttl, ".html")
+    },
+    content = function(file) {
+      
+      if(is.null(kmeans_solution$current_kmeans_solution) == FALSE){
+        
+        fstat <- pseudoF(uploaded_data_values$current_data_file, kmeans_solution$current_kmeans_solution, nrow(kmeans_solution$current_kmeans_solution@ucenters))
+        fstat_col <- rep(0, nrow(kmeans_solution$current_kmeans_solution@ucenters)-1)
+        fstat_col <- c(fstat, fstat_col)
+        kcenters <- cbind(kmeans_solution$current_kmeans_solution@ucenters, "size" = kmeans_solution$current_kmeans_solution@usize, "Pseudo_F" = fstat_col)
+        clustered_data <- cbind(uploaded_data_values$current_data_file,
+                                silhouette(kmeans_solution$current_kmeans_solution@uclusters, daisy(uploaded_data_values$current_data_file)))
+        clustered_data$neighbor <- NULL
+
+        raw_silh_data <- as.data.frame(silhouette(kmeans_solution$current_kmeans_solution@uclusters,
+                                                  daisy(uploaded_data_values$current_data_file)))
+        
+        min_silh_width <- ifelse(min(raw_silh_data$sil_width) > 0,
+                                 0,
+                                 min(raw_silh_data$sil_width))
+        
+        max_count_df <- raw_silh_data %>%
+          mutate(sil_width_bin = trunc(sil_width / 0.01) * 0.01) %>%
+          group_by(cluster, sil_width_bin) %>%
+          tally(name = "count") %>%
+          ungroup() 
+        
+        max_count <- max(max_count_df$count)
+        
+        max_count_perc <- max_count_df %>%
+          group_by(cluster) %>%
+          reframe(count_as_cluster_perc = count/sum(count)) %>%
+          select(count_as_cluster_perc) %>%
+          max() 
+        
+        jitter_plot_output_list <- list()
+        violin_plot_output_list <- list()
+        histogram_plot_output_list <- list()
+        silhouette_plot_output_list <- list()
+        
+        defined_clusters <- sort(unique(raw_silh_data$cluster))
+        
+        for(cluster in defined_clusters){
+          
+          ## Filter for data we need
+          data_to_graph <- raw_silh_data %>%
+            filter(cluster == !!cluster)
+          
+          ## Create Jitter
+          jitter_plot_output_list[[cluster]] <- create_jitter_plot(data_to_graph,
+                                                                   min_silh_width,
+                                                                   cluster)
+          
+          ## Create Violin
+          violin_plot_output_list[[cluster]] <- create_violin_plot(data_to_graph,
+                                                                   min_silh_width,
+                                                                   cluster)
+          ## Create histogram
+          histogram_plot_output_list[[cluster]] <- create_histogram_plot(data_to_graph,
+                                                                         min_silh_width,
+                                                                         max_count_perc,
+                                                                         cluster)
+          ## Create silhouette
+          data_to_graph <- data_to_graph %>%
+            arrange(sil_width)
+          
+          data_to_graph$nrow <- 1:nrow(data_to_graph)
+          
+          silhouette_plot_output_list[[cluster]] <- create_silhouette_plot(data_to_graph,
+                                                                           min_silh_width,
+                                                                           cluster)
+          
+        }
+        
+        ## CREATE ALL JITTER PLOTS OBJ ##
+        all_jitter_plot <- patchwork::wrap_plots(
+          jitter_plot_output_list,
+          ncol = floor(sqrt(length(jitter_plot_output_list)))+1
+          )
+        
+        ## CREATE ALL VIOLIN PLOTS OBJ ##
+        all_violin_plot <- patchwork::wrap_plots(
+          violin_plot_output_list,
+          ncol = floor(sqrt(length(violin_plot_output_list)))+1
+          )
+        
+        ## CREATE ALL HISTOGRAM PLOTS OBJ ##
+        all_histogram_plot <- patchwork::wrap_plots(
+          histogram_plot_output_list,
+          ncol = floor(sqrt(length(histogram_plot_output_list)))+1
+          )
+        
+        ## CREATE ALL SILHOUETTE PLOTS OBJ ##
+        all_silhouette_plot <- patchwork::wrap_plots(
+          silhouette_plot_output_list,
+          ncol = floor(sqrt(length(silhouette_plot_output_list)))+1
+          )
+        
+      }
+      
+      if(is.null(som_solution$current_som_solution) == FALSE){
+        
+        print('current som solution is firing')
+        
+        ## Create the ANOVA results table for the Rmd report --
+        anova_results <- retrieve_ANOVA_results(som_solution$current_som_solution)
+        
+        # Function to process the list and create a dataframe
+        parse_list_to_dataframe <- function(my_list) {
+          # Use lapply to apply the regular expression split to each element in the list
+          split_list <- lapply(my_list, function(x) {
+            parts <- unlist(strsplit(x, "\\s+"))
+            if (length(parts) < 4) {
+              parts <- c(parts, "")
+            }
+            return(parts)
+          })
+          
+          # Create a dataframe from the split list
+          df <- as.data.frame(do.call(rbind, split_list))
+          
+          # Rename the columns
+          colnames(df) <- c("Variable", "F Value", "p Value", "Significance")
+          
+          df <- df %>%
+            mutate(`p Value` = ifelse(`p Value` == 0, 'Too small to represent', `p Value`))
+          
+          return(df)
+        }
+        
+        # Call the function with your list
+        my_list <- anova_results[(length(anova_results)-3):2]
+        
+        anova_results_df <- parse_list_to_dataframe(my_list)
+        
+        
+        ## Get the other stats
+        SOM_topo_prose <- paste(
+          'Topographical error:',
+          round(
+            as.numeric(
+              quality(som_solution$current_som_solution)[1]
+              ),
+            3
+            )
+          )
+        
+        SOM_quant_prose <- paste(
+          'Quantization error:',
+          round(
+            as.numeric(
+              quality(som_solution$current_som_solution)[2]
+              ),
+            3
+            )
+        )
+        
+        SOM_deg_free_prose <- paste(
+          as.character(unlist(
+            retrieve_ANOVA_results(som_solution$current_som_solution)[
+              length(retrieve_ANOVA_results(som_solution$current_som_solution))
+              ]
+            ))
+          )
+        
+        ## Create SOM dendroplot and map
+        
+        ## Dendrogram
+        SOM_SC_plot_data <- superClass(
+            sommap=som_solution$current_som_solution,
+            method='ward.D',
+            k=input$som_3Dplot_superclusters)
+        
+        ## Map
+        SOM_SC_map_data <- superClass(
+          sommap=som_solution$current_som_solution,
+          method='ward.D',
+          k=input$som_3DMap_superclusters)
+        
+        ## CREATE SECTION FOUR BARPLOT AND BOXPLOT
+        
+        # OBS BOXPLOT --
+        tmp.var <- seq(from = 1, to = ncol(uploaded_data_values$current_data_file), by = 1)
+        temp.dim <- som_solution$current_som_solution[["parameters"]][["the.grid"]][["dim"]] #gets the dimension of the grid
+          
+          obs_box <- ggplotly(
+            plot(
+              x=som_solution$current_som_solution,
+              what='obs',
+              type='boxplot',
+              variable = tmp.var,
+              show.names = TRUE,
+              names = paste("Quadrant ", 1:prod(temp.dim))
+              )
+            )
+          
+          obs_box <- remove_xaxis_labels(obs_box)
+          
+          obs_box <- obs_box %>%
+            layout(title = "Overview of Variables")
+          
+          # OBS BARPLOT
+          obs_bar <- ggplotly(
+              plot(
+                x=som_solution$current_som_solution,
+                what='obs',
+                type='barplot',
+                show.names = TRUE,
+                names = paste("Quadrant ", 1:prod(temp.dim))
+                )
+              )
+            
+          obs_bar <- remove_xaxis_labels(obs_bar)
+            
+          obs_bar <- obs_bar %>%
+            layout(title = "Overview of Variables") 
+          
+          # PROTOTYPES BAR
+          proto_bar <- ggplotly(
+              plot(
+                x=som_solution$current_som_solution,
+                what='prototypes',
+                type='barplot'
+                )
+              )
+          
+          proto_bar <- remove_xaxis_labels(proto_bar)
+          
+          proto_bar <- proto_bar %>%
+              layout(title = "Overview of Variables")
+          
+        
+      }
+      
+      if(is.null(agent_cluster_values$agent_cluster_tracker) == FALSE && agent_cluster_values$agent_cluster_tracker@cluster_tested != "None"){
+        
+        #need to add something here so it only plots the lower bound of data points
+        
+        agent_cluster_values_data <- agent_cluster_values
+        
+        # policy_pred_grid <- agent_cluster_values$agent_grid_plot +
+        #   geom_point(
+        #     aes(
+        #       x=agent_cluster_values$agentdf$x,
+        #       y=agent_cluster_values$agentdf$y,
+        #       color=agent_cluster_values$agentdf$groupnames),
+        #     size =4
+        #     )+
+        #   scale_color_manual(
+        #     values = agent_cluster_values$agent_drawtools@plot_colors,
+        #     name = "Clusters")+
+        #   theme(legend.key = element_blank())
+        
+        # policy_preds_dir <- file.path(tmpdir, 'scenario_simulations')
+        # dir.create(policy_preds_dir) 
+        # 
+        # write.csv(agent_cluster_values$agent_cluster_tracker@checked_data, file = file.path(policy_preds_dir, "adjust_kmeans.csv"))
+        # temp_names <- names(uploaded_data_values$current_data_file)
+        # intervention =c()
+        # deviation =c()
+        # input_var = 1
+        # for(i in 1:length(temp_names)){
+        #   if(agent_cluster_values$agent_cluster_tracker@sensitivity_test[i] != 0){
+        #     intervention =c(intervention, agent_cluster_values$agent_cluster_tracker@sensitivity_test[i])
+        #     deviation =c(deviation, input[[paste0("pont.dev", input_var)]])
+        #     input_var = input_var + 1
+        #   }
+        #   else{
+        #     intervention = c(intervention, 0)
+        #     deviation =c(deviation, 0)
+        #   }
+        # }
+        # tested_changes <- matrix(c(intervention, deviation), nrow = 2, ncol = length(deviation), byrow = TRUE,
+        #                          dimnames = list(c("Intervention", "Deviation"), c(temp_names)))
+        # write.csv(tested_changes, file = file.path(policy_preds_dir, "tested_intervention.csv"))
+        # 
+        # sub_sol_space <- c()
+        # sub_sol_names <- c()
+        # for(i in 1:length(agent_cluster_values$agent_cluster_tracker@sensitivity_result)) {
+        #   
+        #   if(agent_cluster_values$agent_cluster_tracker@sensitivity_result[[i]]> 0){
+        #     sub_sol_names <-c(sub_sol_names, i)
+        #     sub_sol_space <- c(sub_sol_space, agent_cluster_values$agent_cluster_tracker@sensitivity_result[[i]])
+        #   }}
+        # 
+        # pdf(file.path(policy_preds_dir, "sensitivity.pdf"))
+        # print(barplot(sub_sol_space, names.arg = sub_sol_names, main = "Senstivity Analysis Results", xlab  = "Quadrant", col = "yellowgreen"))
+        # dev.off()
+        # 
+        # file_names <- c(file_names,
+        #                 paste0('scenario_simulations/', list.files(policy_preds_dir)))
+        
+      }
+      
+      # Safely capture the current dataset at download time
+      data_obj <- uploaded_data_values$rendered_data
+      
+      params <- list(
+        title      = input$title    %||s% "Untitled Report",
+        subtitle   = input$subtitle %||s% "",
+        intro      = input$intro    %||s% "",
+        
+        # Section 1
+        include_s1 = isTRUE(input$include_s1),
+        s1_title   = input$s1_title %||s% "Section 1",
+        s1_body    = input$s1_body  %||s% "",
+        data_obj   = if(exists("data_obj")){data_obj}else{NULL},
+        
+        # Section 2
+        include_s2 = isTRUE(input$include_s2),
+        s2_title   = input$s2_title %||s% "Section 2",
+        s2_body    = input$s2_body  %||s% "",
+
+        # Section 2 Tables
+        all_clusters_tbl = if(exists("kcenters")){kcenters}else{NULL},
+        cluster_rows_tbl = if(exists("clustered_data")){clustered_data}else{NULL},
+
+        # Section 2 Charts
+        s2_jitters = if(exists("all_jitter_plot")){all_jitter_plot}else{NULL},
+        s2_violins = if(exists("all_violin_plot")){all_violin_plot}else{NULL},
+        s2_histograms = if(exists("all_histogram_plot")){all_histogram_plot}else{NULL},
+        s2_silhouettes = if(exists("all_silhouette_plot")){all_silhouette_plot}else{NULL},
+        
+        # Section 3
+        include_s3 = isTRUE(input$include_s3),
+        s3_title   = input$s3_title %||s% "Section 3",
+        s3_body    = input$s3_body  %||s% "",
+        
+        # Section 3 prose
+        s3_topo_prose = if(exists("SOM_topo_prose")){SOM_topo_prose}else{NULL},
+        s3_quant_prose = if(exists("SOM_quant_prose")){SOM_quant_prose}else{NULL},
+        s3_deg_free_prose = if(exists("SOM_deg_free_prose")){SOM_deg_free_prose}else{NULL},
+        
+        # Section 3 ANOVA table
+        s3_ANOVA_table = if(exists("anova_results_df")){anova_results_df}else{NULL},
+        
+        # Section 3 plots
+        s3_dendro = if(exists("SOM_SC_plot_data")){SOM_SC_plot_data}else{NULL},
+        s3_map = if(exists("SOM_SC_map_data")){SOM_SC_map_data}else{NULL},
+        
+        # Section 4
+        include_s4 = isTRUE(input$include_s4),
+        s4_title   = input$s4_title %||s% "Section 4",
+        s4_body    = input$s4_body  %||s% "",
+        
+        # Section 4 plots
+        s4_obs_box = if(exists("obs_box")){obs_box}else{NULL},
+        s4_obs_bar = if(exists("obs_bar")){obs_bar}else{NULL},
+        s4_proto_bar = if(exists("proto_bar")){proto_bar}else{NULL},
+        
+        # Section 5 grid
+        s5_grid = if(exists("policy_pred_grid")){policy_pred_grid}else{NULL}
+        
+      )
+      
+      out_dir <- tempdir()
+      rmarkdown::render(
+        input       = rmd_template_path(),
+        output_file = "report.html",
+        output_dir  = out_dir,
+        params      = params,
+        envir       = new.env(parent = globalenv()),
+        encoding    = "UTF-8"
+      )
+      file.copy(file.path(out_dir, "report.html"), file, overwrite = TRUE)
+    }
+  )
+  
+  
+  
+  
+  
+  
+  ############################################################
+  
+  
+  
+  
+  
+  
+  
   
   
   observe({
