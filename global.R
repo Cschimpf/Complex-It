@@ -71,7 +71,7 @@ create_kmeans_SOM_mapping <- function(current_kmeans_solution){
   if(is.null(current_kmeans_solution)){return()}
   label_merge = c()
   for(i in 1:length(current_kmeans_solution@uclusters)){
-    new_label <- paste(current_kmeans_solution@uclusters[i], ";", i, sep="")
+    new_label <- paste(current_kmeans_solution@uclusters[i], ";", names(current_kmeans_solution@uclusters[i]), sep="")
     label_merge =c(label_merge, new_label)
   }
   return(label_merge)
@@ -203,40 +203,88 @@ generate_logic_column <- function(df){
 
 
 
-generate_grid_template <-function(dims, knum, current_som_solution, current_kmeans_solution){
+# generate_grid_template <-function(dims, knum, current_som_solution, current_kmeans_solution){
+#   groupnames <- c("Cluster 1", "Cluster 2", "Cluster 3", "Cluster 4", "Cluster 5", "Cluster 6", "Cluster 7", "Cluster 8", "Cluster 9")
+#   if (knum <9) {groupnames <- groupnames[1:knum]}
+#   agent_drawtools <- create_SOMdrawtools(current_som_solution$parameters$the.grid$dim, length(current_kmeans_solution@usize))
+#   
+#   
+#   
+#   agentdf <- cbind(as.data.frame(cbind(x = rep(0, knum), y = rep(0,knum))), groupnames = groupnames)
+#   grid_template <- ggplot(agentdf, aes(x=agentdf$x, y=agentdf$y)) + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
+#                                                                           panel.background = element_blank(),axis.line = element_line(colour = "white"), 
+#                                                                           axis.title.x=element_blank(), axis.ticks.x=element_blank(), axis.text.x =element_blank(),
+#                                                                           axis.ticks.y=element_blank(), axis.text.y=element_blank(), axis.title.y=element_blank()) +
+#     scale_y_continuous(limits=c(0,100)) +scale_x_continuous(limits=c(0,100)) +
+#     geom_segment(aes(x = 0, y = 0, xend = 100, yend = 0), size=1) + 
+#     geom_segment(aes(x = 0, y = 100, xend = 100, yend = 100), size=1) + 
+#     geom_segment(aes(x = 0, y = 0, xend = 0, yend = 100), size=1) + 
+#     geom_segment(aes(x = 100, y = 0, xend = 100, yend = 100), size=1) 
+#   
+#   xincr <- 100/dims[1]
+#   yincr <-100/dims[2]
+#   
+#   tick <- 0
+#   
+#   for (i in 1:(dims[1]-1))
+#   {
+#     tick <- tick + xincr
+#     grid_template <- grid_template + geom_segment(aes_string(x = tick, y = 0, xend = tick, yend = 100), size=1)
+#   }
+#   tick <- 0 
+#   for (j in 1:(dims[2]-1))
+#   {
+#     tick <- tick + yincr
+#     grid_template <- grid_template + geom_segment(aes_string(x=0, y=tick, xend=100, yend = tick), size=1)
+#   }
+#   
+#   return(list(grid_template, agent_drawtools, agentdf))
+# }
+
+
+generate_grid_template <- function(dims, knum, current_som_solution, current_kmeans_solution){
   groupnames <- c("Cluster 1", "Cluster 2", "Cluster 3", "Cluster 4", "Cluster 5", "Cluster 6", "Cluster 7", "Cluster 8", "Cluster 9")
-  if (knum <9) {groupnames <- groupnames[1:knum]}
+  if (knum < 9) {groupnames <- groupnames[1:knum]}
   agent_drawtools <- create_SOMdrawtools(current_som_solution$parameters$the.grid$dim, length(current_kmeans_solution@usize))
   
-  
-  
-  agentdf <- cbind(as.data.frame(cbind(x = rep(0, knum), y = rep(0,knum))), groupnames = groupnames)
-  grid_template <- ggplot(agentdf, aes(x=agentdf$x, y=agentdf$y)) + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
-                                                                          panel.background = element_blank(),axis.line = element_line(colour = "white"), 
-                                                                          axis.title.x=element_blank(), axis.ticks.x=element_blank(), axis.text.x =element_blank(),
+  agentdf <- cbind(as.data.frame(cbind(x = rep(0, knum), y = rep(0, knum))), groupnames = groupnames)
+  grid_template <- ggplot(agentdf, aes(x=agentdf$x, y=agentdf$y)) + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+                                                                          panel.background = element_blank(), axis.line = element_line(colour = "white"),
+                                                                          axis.title.x=element_blank(), axis.ticks.x=element_blank(), axis.text.x=element_blank(),
                                                                           axis.ticks.y=element_blank(), axis.text.y=element_blank(), axis.title.y=element_blank()) +
-    scale_y_continuous(limits=c(0,100)) +scale_x_continuous(limits=c(0,100)) +
-    geom_segment(aes(x = 0, y = 0, xend = 100, yend = 0), size=1) + 
-    geom_segment(aes(x = 0, y = 100, xend = 100, yend = 100), size=1) + 
-    geom_segment(aes(x = 0, y = 0, xend = 0, yend = 100), size=1) + 
-    geom_segment(aes(x = 100, y = 0, xend = 100, yend = 100), size=1) 
+    scale_y_continuous(limits=c(0,100)) + scale_x_continuous(limits=c(0,100)) +
+    geom_segment(aes(x = 0, y = 0, xend = 100, yend = 0), size=1) +
+    geom_segment(aes(x = 0, y = 100, xend = 100, yend = 100), size=1) +
+    geom_segment(aes(x = 0, y = 0, xend = 0, yend = 100), size=1) +
+    geom_segment(aes(x = 100, y = 0, xend = 100, yend = 100), size=1)
   
   xincr <- 100/dims[1]
-  yincr <-100/dims[2]
+  yincr <- 100/dims[2]
   
   tick <- 0
-  
   for (i in 1:(dims[1]-1))
   {
     tick <- tick + xincr
     grid_template <- grid_template + geom_segment(aes_string(x = tick, y = 0, xend = tick, yend = 100), size=1)
   }
-  tick <- 0 
+  tick <- 0
   for (j in 1:(dims[2]-1))
   {
     tick <- tick + yincr
-    grid_template <- grid_template + geom_segment(aes_string(x=0, y=tick, xend=100, yend = tick), size=1)
+    grid_template <- grid_template + geom_segment(aes_string(x=0, y=tick, xend=100, yend=tick), size=1)
   }
+  
+  # Add quadrant number labels at the centre of each cell
+  centers_displace <- generate_neuron_centers(dims)
+  total_quadrants  <- dims[1] * dims[2]
+  label_df <- data.frame(
+    x     = sapply(1:total_quadrants, function(i) centers_displace$neurons[[as.character(i)]][1]),
+    y     = sapply(1:total_quadrants, function(i) centers_displace$neurons[[as.character(i)]][2] + (yincr / 2) - 2),
+    label = paste0("Quadrant ", 1:total_quadrants)
+  )
+  grid_template <- grid_template +
+    geom_text(data = label_df, aes(x = x, y = y, label = label),
+              inherit.aes = FALSE, size = 5, colour = "grey50", vjust = 1)
   
   return(list(grid_template, agent_drawtools, agentdf))
 }
@@ -463,14 +511,57 @@ detect_change_direction <- function(baseline, change_state){
 
 
 
-dataModal <- function(names, change, failed = FALSE) {
+# dataModal <- function(names, change, failed = FALSE) {
+#   modalDialog(
+#     p("Select a range in which each projected change may deviate"),
+#     
+#     lapply(1:length(names), function(y, n, i) 
+#     { sliderInput(paste0("pont.dev", i), paste0(n[i], " : Potential Deviation", " (User Change: ", y[i], "%)"), min =0, max=100, value=0, width="400px") }, y=change, n=names),
+#     
+#     
+#     
+#     if (failed)
+#       div(tags$b("Invalid name of data object", style = "color: red;")),
+#     
+#     footer = tagList(
+#       modalButton("Cancel"),
+#       actionButton("sa_ok", "OK")
+#     )
+#   )
+# }
+
+dataModal <- function(names, change, diffs, failed = FALSE) {
   modalDialog(
-    p("Select a range in which each projected change may deviate"),
+    h2("Select a range in which each projected change may deviate"),
     
-    lapply(1:length(names), function(y, n, i) 
-    { sliderInput(paste0("pont.dev", i), paste0(n[i], " : Potential Deviation", " (User Change: ", y[i], "%)"), min =0, max=100, value=0, width="400px") }, y=change, n=names),
+    # Explanatory text box at the top
+    tags$div(
+      style = "background-color: #f8f9fa; border-left: 4px solid #bce7fa; padding: 10px 15px; margin-bottom: 15px; font-size: 13px; color: #333; line-height: 1.4;",
+      HTML("<b>How deviation works:</b> For example, if the baseline was 10.0 and the new value is 8.0 and a potential deviation of 50% is chosen, the simulation runs scenarios ranging from 7.0 to 9.0. This is because the intervention change was 2.0, 50% of that is 1.0, and 1.0 above and below the new value of 8.0 gives the range of values the intervention may vary in.")
+    ),
     
-    
+    lapply(1:length(names), function(i) {
+      var_name <- names[i]
+      pct_change <- change[i]
+      diff_val <- diffs[i]
+      
+      # Add a '+' sign for positive changes
+      diff_str <- ifelse(diff_val > 0, paste0("+", diff_val), as.character(diff_val))
+      
+      # Simplified label without the max testing range sub-line
+      label_html <- HTML(paste0(
+        "<b>", var_name, "</b>: User Change of ", pct_change, "% (", diff_str, ")"
+      ))
+      
+      sliderInput(
+        paste0("pont.dev", i), 
+        label_html, 
+        min = 0, 
+        max = 100, 
+        value = 0, 
+        width = "400px"
+      )
+    }),
     
     if (failed)
       div(tags$b("Invalid name of data object", style = "color: red;")),
@@ -681,3 +772,246 @@ create_nice_ggplot <- function(superclusters_object, current_som_solution_object
   
   
 }  
+
+remove_xaxis_labels <- function(p) {
+  
+  x_axis_names <- names(p$x$layout)[grepl("^xaxis", names(p$x$layout))]
+  
+  code_to_append <- NULL
+  
+  for(xaxis in x_axis_names){
+    
+    code_to_append <- paste0(code_to_append,
+                             '%>% layout(', xaxis, '= list(showticklabels = FALSE, ticks=""),
+    margin = list(b = 20))'
+    )
+    
+  }
+  
+  eval(parse(text = paste0('p ', code_to_append)))
+  
+}
+
+##### DEFINING TEXT IN THE APP #####
+
+## CLUSTERING ##
+cluster_text <- "<div style='line-height: 30px'><u><b>1) Hypothesize Your Cluster Solution:</b></u>
+                 To begin, how many clusters do you think are in your database?
+                 What is your hypothesis based on -- the literature, a guess, expertise, experience, a hunch?
+                 How would you describe or name these different clusters?
+                 How do you think your case-based profile of variables account for these different clusters?
+
+                 <u><b>2) Run the K-Means Analysis:</b></u>
+                 Run your k-means several times to see if you can improve the Pseudo F
+                 How strong is the Pseudo F for your solution?
+                 Looking at the Silhouette, how well are the cases distributed for each cluster?
+                 Should you re-run k-means to look for more or less clsuters?
+
+                 <u><b>Do You Have a Good Statistical Fit?</b></u>
+                 The Pseudo F indicates the quality of the overall solution; the larger the number, the better the fit.
+                 The Silhouette displays how well each case fits within its respective cluster; where a score of 1 is a perfect fit.
+
+                 <u><b>Need Help?</b></u>
+                 For tutorials on using the SOM AI in COMPLEX-IT <a href='https://www.art-sciencefactory.com/tutorials.html'>click here</a>
+                 For a basic introduction to k-means <a href='https://en.wikipedia.org/wiki/K-means_clustering'>click here</a></div>"
+
+
+cluster_text <- gsub("\n", "<br>", cluster_text)
+
+## SOM AI ##
+train_SOM_text <- "<div style='line-height: 30px'><u><b>Advice For Using the SOM AI</b></u>
+                 For those new to the SOM, we recommend using all of the defaults. However, if you have over 25 clusters, you will need to make a bigger map, such as a 6x6 grid.
+                 For experienced users, the SOM algorithm we use comes from the <a href='https://cran.r-project.org/web/packages/SOMbrero/index.html'>SOMbrero R-Package</a>
+
+                 <u><b>Need Help?</b></u>
+                 For tutorials on using the SOM AI in COMPLEX-IT <a href='https://www.art-sciencefactory.com/tutorials.html'>click here</a>
+                 For a basic introduction to the Self-Organizing Map (SOM) <a href='https://en.wikipedia.org/wiki/Self-organizing_map'>click here</a></div>"
+
+
+
+train_SOM_text <- gsub("\n", "<br>", train_SOM_text) # Convert newline characters to HTML line breaks
+
+## COMPARE AND VISUALISE ##
+plot_map_text <- "<div style='line-height: 30px'><u><b>Reading the SOM Grid:</b></u>
+                 1) To begin, we label each case with its CASE ID and K-MEANS ID.
+                 2) To see these IDs, for 'PLOT WHAT?' select observations; and for 'TYPE OF PLOT' select names.
+                 3) The first ID on the grid is the k-means cluster number; the second ID is the case.
+                 4) The grid also places each case in a quadrant, based on the SOM AI solution.
+                 5) The more similar the profile, the closer the cases on the grid; the more profiles differ, the further away cases are.
+                 6) The PROTOTYPES option (i.e., variables) shows how your profile of variables influenced where cases are located.
+                 7) The BARPLOT option for both OBSERVATIONS and PROTOTYPES shows the profile of variables for each quadrant.
+                 8) The line in the BARPLOT is mean=0; above the line is more of a variable;below the line is less.
+                 9) NOTE: Several of the images created here are found in the GENERATE REPORT TAB.
+                 10) In addition, we recommend using SCREEN CAPTURE to save an image.
+
+                 <u><b>Interpreting Your Results:</b></u>
+                 1) Looking at the Names, are cases with similar k-means IDs located in similar quadrants?
+                 2) If yes, do you think the SOM and k-means are reasonably similar solutions? Or, should you re=run your k-means?
+                 3) How do the profiles account for the different cluster solutions and the quadrant locations of the cases?
+                 4) What factors (i.e., variables) seem to have the biggest impact on different clusters or the model as a whole?
+                 5) How does the data solution differ from your hypotheses back at the design phase of COMPLEX-IT?
+                 6) Are you satisfied with your solution?  If not, go back and run your k-means and SOM again.
+
+                 <u><b>Need Help?</b></u>
+                 For TUTORIALS on visualising your data in COMPLEX-IT <a href='https://www.art-sciencefactory.com/tutorials.html'>click here</a>
+                 The visualisations tools used for this tab come from the SOMbrero R-Package. To understand how they work <a href='https://cran.r-project.org/web/packages/SOMbrero/vignettes/c-doc-numericSOM.html'>click here</a></div>"
+
+plot_map_text <- gsub("\n", "<br>", plot_map_text) # Convert newline characters to HTML line breaks
+
+## CASE PREDICTION ##
+new_prediction_text <- "<div style='line-height: 30px'><u><b>Running the Predict Tab:</b></u>
+                 1) To begin, you need to convert your new dataset into a CSV file
+                 2) This CSV file can be comprised of a single new case or a large dataset of new cases
+                 3) Decide to use the SOM solution from your current session or a previously saved SOM solution
+                 4) Click classify profiles
+                 5) NOTE: you can find your results saved in the GENERATE REPORT TAB
+                 6) <b>The programme will crash if the headers/format of your new dataset are not the same as the TAB 1 dataset</b>
+
+                 <u><b>Interpreting Your Results:</b></u>
+                 1) After you run the data, you get a list of each case
+                 2) For each case, you will see its variable profile
+                 3) For validity purposes, COMPLEX-IT also provides the second best grid quadrant fit
+                 4) NOTE: For advanced users, goodness-of-fit for classification is based on a numeric tolerance defined as 10^(-10)
+
+                 <u><b>Need Help?</b></u>
+                 For TUTORIALS on using your SOM GRID for data forcasting in COMPLEX-IT <a href='https://www.art-sciencefactory.com/tutorials.html'>click here</a>
+                 To learn more about AI (machine learning) for data forecasting and prediction <a href='https://en.wikipedia.org/wiki/Machine_learning'>click here</a></div>  "
+
+new_prediction_text <- gsub("\n", "<br>", new_prediction_text) # Convert newline characters to HTML line breaks
+
+## SCENARIO SIMULATION ##
+scenarios_text <- "<div style='line-height: 30px'><u><b>To Run Model</b></u><br>
+                 1) Start by clicking on MODEL SETUP, which creates the SOM grid created with TAB4<br>
+                 2) The grid you see is based on the SOM solution you arrived at using TAB3<br>
+                 3) Next, click the RUN CLUSTERS tab, which places your k-means solution on the SOM grid<br>
+                 4) These are the k-means clusters you settled on using TAB2<br>
+                 5) Next, make changes to the various profile of variables for each of the cases.<br>
+                 6) Once done, click on RUN CLUSTERS again, to see if and where on the grid the cluster moved<br>
+                 7) Next, look at the BARPLOT grid to see what profile of factors account for the new grid placement<br>
+                 8) Is this where you wanted your cluster to arrive?  If not, try changing something else<br>
+                 9) If satisfied with your solution, run SENSITIVITY ANALYSIS; if not, click MODEL SETUP to reset<br>
+                 <br>
+
+                 <u><b>To Run Sensitivity Analysis</b></u><br>
+                 1) Pick the CLUSTER you are testing from the options<br>
+                 2) Decide how much to dither your solution by in order to account for variance and error that go with any real-world estimation of change<br>
+                 3) Run the sensitivity analysis<br>
+                 4) NOTE: very complex solutions can several minutes or hours to finish<br>
+                 <br>
+
+
+                 <u><b>Need Help?</b></u><br>
+                 For TUTORIALS on using your model to run scenario simulations in COMPLEX-IT <a href='https://www.art-sciencefactory.com/tutorials.html'>click here</a><br>
+                 To learn more about case-based scenario simulation <a href='https://www.art-sciencefactory.com/case-based%20microsimulation.pdf'>click here</a></div>  "
+
+## SYSTEMS MAPPING ##
+text <- "Purpose of Map:
+             1) The tab is intended to help you visually think about the relationships amongst your variables as a network of connections and pathways of influence. \n
+             2) It shows the correlation of pairs of factor, and encourages you to evaluate them, add new nodes and connections which represent your beliefs about possible <a href='https://www.khanacademy.org/test-prep/praxis-math/praxis-math-lessons/gtp--praxis-math--lessons--statistics-and-probability/a/gtp--praxis-math--article--correlation-and-causation--lesson'>causal connections</a>, or pull out subsection of the map. \n
+             3) THINK, DON’T ACCEPT: Be careful not to interpret the map as causal connections. It is only showing you the correlation between pairs of nodes. \n
+             4) Keep in mind the correlations are not conditioned on other factors (i.e. they do not control for other variables), so we must keep a critical mindset – these maps are intended to prompt thinking and discussion, not offer definitive or ‘correct’ analysis. \n
+
+             Using the Map:
+             1) Along the left you will see various toggles to change your network. Changing these makes 'deep' changes to the network, as it influences the final dataframe informing the construction of the network. This means changes here can be combined and carried over between changes to these toggles. \n
+             2) The network itself is rendered using the visNetwork package. Using this you can add and remove nodes and edges, and change the position of nodes. Be aware: these are 'shallow' or aesthetic changes: changing any parameter on the left will erase any changes made. \n
+             3) Along the bottom you can examine node and network statistic information. \n"
+text <- gsub("\n", "<br>", text) # Convert newline characters to HTML line breaks
+text <- gsub("Purpose of Map:", "<u><b>Purpose of Map:</b></u>", text) # Bold the "Purpose of Map:" heading
+text <- gsub("Using the Map:", "<u><b>Using the Map:</b></u>", text) # Bold the "Using the Map:" heading
+
+## MAKING THE DIFFERENT K MEANS CHARTS ##
+create_jitter_plot <- function(data_to_graph, min_silh_width, cluster){
+  
+  jitter_plot <- ggplot(data_to_graph, aes(x = 0, y = sil_width)) +
+    geom_jitter(height = 0, width = 0.01) + # Adjust 'height' for vertical spread
+    scale_x_continuous(breaks = NULL, labels = NULL) +
+    labs(x = NULL) +
+    expand_limits(y=c(min_silh_width, 1)) +
+    geom_hline(yintercept = 0, linetype="dotted") +
+    ylab("Silhouette width")+
+    theme_minimal()+
+    ggtitle(paste0("Cluster: ", cluster),
+            subtitle = paste0("Average silhouette width: ", round(mean(data_to_graph$sil_width), 2), "\n",
+                              "n = ", paste(nrow(data_to_graph))))+
+    theme_minimal()+
+    theme(plot.title = element_text(hjust = 0.5),
+          plot.subtitle = element_text(hjust = 0.5))
+  
+  return(jitter_plot)
+  
+}
+
+create_violin_plot <- function(data_to_graph, min_silh_width, cluster){
+  
+  violin_plot <- ggplot(data_to_graph, aes(x = "", y=sil_width)) +
+    geom_violin(color = "black", fill="steelblue") +
+    expand_limits(y=c(min_silh_width, 1)) +
+    geom_hline(yintercept = 0, linetype="dotted") +
+    ylab("Silhouette width")+
+    theme_minimal()+
+    ggtitle(paste0("Cluster: ", cluster),
+            subtitle = paste0("Average silhouette width: ", round(mean(data_to_graph$sil_width), 2), "\n",
+                              "n = ", paste(nrow(data_to_graph))))+
+    theme(plot.title = element_text(hjust = 0.5),
+          plot.subtitle = element_text(hjust = 0.5))+
+    labs(x = NULL)
+  
+  return(violin_plot)
+  
+}
+
+create_histogram_plot <- function(data_to_graph, min_silh_width, max_count_perc, cluster){
+  
+  histogram_plot <- ggplot(data_to_graph, aes(x=sil_width, y = after_stat(count)/nrow(data_to_graph))) + 
+    geom_histogram(fill = "steelblue", binwidth = 0.01) + 
+    expand_limits(x=c(min_silh_width, 1), y = c(0, max_count_perc)) +
+    geom_vline(xintercept = 0, linetype="dotted") +
+    ylab("Percentage of cases")+
+    xlab("Silhouette width")+
+    theme_minimal()+
+    ggtitle(paste0("Cluster: ", cluster),
+            subtitle = paste0("Average silhouette width: ", round(mean(data_to_graph$sil_width), 2), "\n",
+                              "n = ", paste(nrow(data_to_graph))))+
+    theme(plot.title = element_text(hjust = 0.5),
+          plot.subtitle = element_text(hjust = 0.5))+
+    scale_y_continuous(labels = scales::percent)
+  
+  return(histogram_plot)
+  
+}
+
+create_silhouette_plot <- function(data_to_graph, min_silh_width, cluster){
+  
+  silhouette_plot <- ggplot(data_to_graph, aes(x = nrow, y = sil_width)) +
+    geom_bar(stat = "identity", fill = "steelblue")  + # This makes it a horizontal bar chart
+    labs(x = "Individual Cases", y = "Silhouette width") +
+    scale_x_continuous(breaks = NULL, labels = NULL)+
+    expand_limits(y=c(min_silh_width, 1)) +
+    theme_minimal()+
+    coord_flip()+
+    ggtitle(paste0("Cluster: ", cluster),
+            subtitle = paste0("Average silhouette width: ", round(mean(data_to_graph$sil_width), 2), "\n",
+                              "n = ", paste(nrow(data_to_graph))))+
+    theme(plot.title = element_text(hjust = 0.5),
+          plot.subtitle = element_text(hjust = 0.5))
+  
+  return(silhouette_plot)
+  
+}
+
+# Source - https://stackoverflow.com/a/32930130
+# Posted by akhmed, modified by community. See post 'Timeline' for change history
+# Retrieved 2026-05-24, License - CC BY-SA 3.0
+
+round_df <- function(df, digits) {
+  nums <- vapply(df, is.numeric, FUN.VALUE = logical(1))
+  
+  df[,nums] <- round(df[,nums], digits = digits)
+  
+  (df)
+}
+
+
+
+
+
